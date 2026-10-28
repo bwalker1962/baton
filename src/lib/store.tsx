@@ -28,6 +28,9 @@ export interface Project {
   info: Record<string, string>;
   steps: ProjectStep[];
   created: string;
+  certainty?: import("./intake").Certainty; // how real it is; decides whether work starts
+  checkBack?: string; // for unofficial projects: when to ask if it became real
+  source?: string; // the prompt it was started from
 }
 
 interface Pending {
@@ -55,6 +58,7 @@ interface Store {
   undo: () => void;
   projects: Project[];
   addProject: (p: Project) => void;
+  updateProject: (id: string, patch: Partial<Project>) => void;
 }
 
 const Ctx = createContext<Store | null>(null);
@@ -117,10 +121,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addProject = useCallback((p: Project) => setProjects((prev) => [p, ...prev]), []);
+  const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p))), []);
 
   const value = useMemo(
-    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject }),
-    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject],
+    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject }),
+    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

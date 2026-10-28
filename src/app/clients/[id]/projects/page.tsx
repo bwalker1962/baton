@@ -4,6 +4,8 @@ import { use } from "react";
 import { templates } from "@/lib/templates";
 import { useStore } from "@/lib/store";
 import { Icon } from "@/components/Icon";
+import { ProjectStarter } from "@/components/ProjectStarter";
+import { CERTAINTY } from "@/lib/intake";
 
 export default function Projects({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -12,6 +14,7 @@ export default function Projects({ params }: { params: Promise<{ id: string }> }
 
   return (
     <>
+      <ProjectStarter clientId={id} />
       {mine.length > 0 && (
         <section className="card">
           <div className="card-head"><h2>Projects</h2></div>
@@ -21,7 +24,8 @@ export default function Projects({ params }: { params: Promise<{ id: string }> }
             return (
               <Link className="row" key={p.id} href={`/clients/${id}/projects/${p.id}`}>
                 <Icon name={templates.find((t) => t.id === p.templateId)?.icon ?? "file"} />
-                <span className="grow"><strong>{p.name}</strong><br /><span className="muted small">{done} done · {open} open</span></span>
+                <span className="grow"><strong>{p.name}</strong><br /><span className="muted small">{p.steps.length ? `${done} done · ${open} open` : "Watching, no tasks yet"}</span></span>
+                {p.certainty && <span className={`badge ${CERTAINTY[p.certainty].cls}`}>{CERTAINTY[p.certainty].label}</span>}
               </Link>
             );
           })}
@@ -29,7 +33,7 @@ export default function Projects({ params }: { params: Promise<{ id: string }> }
       )}
       <section className="card">
         <div className="card-head">
-          <h2>Start a project</h2>
+          <h2>Or start from a template</h2>
           <span className="muted small">Templates suggest what usually matters. Every field and step is optional.</span>
         </div>
         <div className="grid-auto" style={{ padding: "4px 18px 18px" }}>

@@ -280,7 +280,7 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
   .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .title { font-size: 22px; }
   .bottomnav {
-    display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
     background: var(--chrome); border-top: 1px solid var(--chrome-border); padding: 6px 0 18px;
   }
   .bottomnav a { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--chrome-muted); font-size: 11px; font-weight: 600; min-height: 48px; justify-content: center; }

@@ -57,6 +57,15 @@ This spec grows with the build. Every feature carries a status, and each build a
 
 | Feature | Status | Notes |
 | --- | --- | --- |
+| Start a project by typing or talking, on Home and each client's Projects tab | Prototyped | Voice uses the browser's speech recognition |
+| Baton asks only for what's missing: client, type, how real, date, role, check-back, name | Prototyped | One question at a time, with tap-to-answer options |
+| Guessed status is always confirmed before creating | Prototyped | "Not official yet" reads as Heard about it |
+| How real is it: Heard about it, Rough idea, Proposed, Confirmed | Prototyped | Change any time on the project |
+| Heard and Rough: no tasks, nothing on Today, a check-back reminder | Prototyped | Reminder Specified |
+| Proposed: checklist drafted with dates; Confirmed: checklist goes live | Prototyped | Moving up a stage builds the checklist |
+| Month-only dates kept as month-only | Prototyped | Never shown as a made-up day |
+| Understanding by Claude instead of rules | Specified | Same questions and slots; rules miss phrasing Claude would catch |
+| Start from a forwarded email, meeting notes or a link | Specified | Fills the same slots |
 | Templates: event, webinar, email campaign, podcast, award entry, launch | Prototyped | `src/lib/templates.ts` |
 | Info gathering with all fields optional | Prototyped | Key date times the checklist |
 | Steps: include, rename, add, remove before creating | Prototyped | Conditional hints such as "if exhibiting" |
@@ -158,6 +167,11 @@ Each result is OK, Check (you tick it to approve) or Blocks send. The four field
 Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
 
 ## Changelog
+
+### 2026-10-28: start a project by chat
+- "Start a project" box on Home and each client's Projects tab; type or talk, Baton asks clarifying questions.
+- Projects carry how real they are (Heard about it, Rough idea, Proposed, Confirmed); only Proposed and Confirmed create a checklist.
+- Phone menu fixed to fit five items.
 
 ### 2026-10-28: Today and slip checks
 - Today list: drag to reorder reviews, tasks, meetings and planning across clients; time and planning-share meters.

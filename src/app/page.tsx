@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { ProjectStarter } from "@/components/ProjectStarter";
+import { CERTAINTY } from "@/lib/intake";
 import { clients, tasks, TODAY } from "@/lib/data";
 import { healthOrder, minutesLabel, shortDate } from "@/lib/format";
 import { useStore } from "@/lib/store";
@@ -41,6 +43,7 @@ export default function Home() {
           </Link>
         )}
       </div>
+      <ProjectStarter />
 
       {needs.length === 0 && (
         <section className="card fade" style={{ padding: 20, display: "flex", gap: 14, alignItems: "center" }}>
@@ -114,7 +117,7 @@ export default function Home() {
           {projects.slice(0, 3).map((p) => (
             <Link className="row" key={p.id} href={`/clients/${p.clientId}/projects/${p.id}`}>
               <Icon name="plus" size={16} />
-              <span className="grow"><span style={{ fontWeight: 600 }}>{p.name}</span><br /><span className="muted small">New project · {p.steps.filter((s) => s.status === "open").length} open steps</span></span>
+              <span className="grow"><span style={{ fontWeight: 600 }}>{p.name}</span><br /><span className="muted small">{p.certainty ? CERTAINTY[p.certainty].label : "New project"} · {p.steps.filter((s) => s.status === "open").length} open steps</span></span>
             </Link>
           ))}
         </section>

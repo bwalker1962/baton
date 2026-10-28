@@ -6,10 +6,12 @@ import { getTemplate } from "@/lib/templates";
 import { shortDate } from "@/lib/format";
 import { Due } from "@/components/ui";
 import { Icon } from "@/components/Icon";
+import { buildSteps } from "@/components/ProjectStarter";
+import { CERTAINTY, dateLabel, type Certainty } from "@/lib/intake";
 
 export default function ProjectPage({ params }: { params: Promise<{ id: string; pid: string }> }) {
   const { id, pid } = use(params);
-  const { projects } = useStore();
+  const { projects, updateProject } = useStore();
   const project = projects.find((p) => p.id === pid);
   const [steps, setSteps] = useState<ProjectStep[]>(project?.steps ?? []);
   const [skipping, setSkipping] = useState<string | null>(null);
@@ -42,10 +44,30 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
         <span className="badge b-neutral">{done} of {steps.length} steps handled</span>
       </div>
 
+      {project.certainty && (
+        <section className="card" aria-label="How real is it" style={{ padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <strong className="small">How real is it?</strong>
+            <div className="seg" role="radiogroup" aria-label="Project status">
+              {(Object.keys(CERTAINTY) as Certainty[]).map((k) => (
+                <button key={k} role="radio" aria-checked={project.certainty === k} aria-pressed={project.certainty === k} onClick={() => {
+                  const live = k === "proposed" || k === "confirmed";
+                  const fill = live && steps.length === 0 ? buildSteps(project.templateId, project.info.date) : steps;
+                  setSteps(fill);
+                  updateProject(project.id, { certainty: k, steps: fill });
+                }}>{CERTAINTY[k].label}</button>
+              ))}
+            </div>
+          </div>
+          <div className="small muted">{CERTAINTY[project.certainty].next}{project.checkBack && (project.certainty === "heard" || project.certainty === "rough") ? ` Check back ${shortDate(project.checkBack).full}.` : ""}</div>
+          {project.source && <div className="xs muted">Started from: &ldquo;{project.source}&rdquo;</div>}
+        </section>
+      )}
+
       <section className="card">
         <div className="card-head"><h2>Details</h2></div>
         <div style={{ display: "flex", gap: 18, flexWrap: "wrap", padding: "0 18px 16px" }} className="small">
-          {filled.map((f) => <span key={f.id}><span className="muted">{f.label}</span><br /><strong>{f.type === "date" ? `${shortDate(project.info[f.id]).full}, ${project.info[f.id].slice(0, 4)}` : project.info[f.id]}</strong></span>)}
+          {filled.map((f) => <span key={f.id}><span className="muted">{f.label}</span><br /><strong>{f.type === "date" ? dateLabel(project.info[f.id], f.id === "date" && project.info.dateMonthOnly === "yes") : project.info[f.id]}</strong></span>)}
           {filled.length === 0 && <span className="muted">No details yet.</span>}
         </div>
         {missing.length > 0 && <div className="row muted small">Still open, if useful: {missing.map((f) => f.label).join(", ")}</div>}
@@ -53,6 +75,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
 
       <section className="card">
         <div className="card-head"><h2>Checklist</h2><span className="muted small">Tick, skip with a reason, or add steps as things change</span></div>
+        {steps.length === 0 && <div className="row muted small">No checklist yet. It starts when this becomes Proposed or Confirmed.</div>}
         {phases.map((ph) => (
           <div key={ph}>
             <div className="row muted xs" style={{ fontWeight: 700, letterSpacing: "0.04em", background: "var(--surface-2)" }}>{ph.toUpperCase()}</div>

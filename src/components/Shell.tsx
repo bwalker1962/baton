@@ -82,6 +82,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <div className="layout">
         <nav className="sidenav" aria-label="Main">
           <Link href="/" aria-current={is("/")}><Icon name="home" />Home</Link>
+          <Link href="/today" aria-current={is("/today")}><Icon name="tasks" />Today</Link>
           <Link href="/signoff" aria-current={is("/signoff")}><Icon name="eye" />Sign-off{eyes > 0 && <span className="navcount">{eyes}</span>}</Link>
           <Link href="/skills" aria-current={is("/skills")}><Icon name="layers" />Skills</Link>
           <div className="navlabel">CLIENTS</div>
@@ -102,6 +103,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       <nav className="bottomnav" aria-label="Mobile">
         <Link href="/signoff" aria-current={is("/signoff")}><Icon name="eye" size={22} />Sign-off</Link>
+        <Link href="/today" aria-current={is("/today")}><Icon name="tasks" size={22} />Today</Link>
         <Link href="/" aria-current={is("/")}><Icon name="check" size={22} />Glance</Link>
         <Link href="/clients" aria-current={is("/clients")}><Icon name="grid" size={22} />Clients</Link>
         <Link href="/skills" aria-current={is("/skills")}><Icon name="user" size={22} />More</Link>

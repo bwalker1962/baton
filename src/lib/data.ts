@@ -185,6 +185,14 @@ export const signoffItems: SignoffItem[] = [
       "[Ask: 20 minutes, one discovery question]",
       "[Signature block and unsubscribe footer]",
     ],
+    slips: [
+      { field: "From", result: "pass", detail: "Same sender as Pentara's last 12 sends" },
+      { field: "Brand", result: "pass", detail: "Logo, colors and footer are Pentara's, not another client's" },
+      { field: "Subject", result: "pass", detail: "Under 60 characters; no words left from the last version" },
+      { field: "Merge tags", result: "pass", detail: "First-name fallback set to \"there\"" },
+      { field: "Links", result: "pass", detail: "4 links open; tracking tags present" },
+      { field: "Send", result: "flag", detail: "10:00 am Mountain is noon for these recipients (Eastern). Intended?" },
+    ],
     settings: [
       { label: "From", value: "[Pentara sender] <[address]>" },
       { label: "Reply-to", value: "[address]" },
@@ -200,6 +208,11 @@ export const signoffItems: SignoffItem[] = [
     skill: "rf-content + Moda", version: "v1.2", owner: "rf-copy", due: "2026-10-28", sendAt: "Thu, 7:30 am via Buffer", dept: "Demand generation", state: "needs",
     regulatory: ["Use routine language, not treatment claims", "FDA disclaimer in first comment"],
     body: ["[Caption: routine-focused, modify-anytime wording]", "First comment: [link and disclaimer]"],
+    slips: [
+      { field: "Account", result: "pass", detail: "Posting to Morning Miracle, not another client's account" },
+      { field: "First comment", result: "flag", detail: "The link returns \"page not found\"" },
+      { field: "Alt text", result: "pass", detail: "Present and describes the image" },
+    ],
     settings: [
       { label: "Account", value: "[Morning Miracle Instagram]" },
       { label: "First comment", value: "[Link and FDA disclaimer]" },
@@ -213,6 +226,12 @@ export const signoffItems: SignoffItem[] = [
     skill: "rf-copy", version: "v1.4", owner: "rf-copy", due: "2026-10-26", sendAt: "Blocked: no send tool", dept: "Demand generation", state: "needs",
     subject: "[You're 45 days in]",
     body: ["[Day-45 check-in: what's working]", "[Reorder prompt with modify-anytime option]", "[Compliance footer]"],
+    slips: [
+      { field: "From", result: "flag", detail: "Differs from Morning Miracle's last 6 sends. Intended?" },
+      { field: "Subject", result: "flag", detail: "Same subject as Email 4, sent Oct 12" },
+      { field: "Unsubscribe", result: "pass", detail: "Footer and unsubscribe link present" },
+      { field: "Platform", result: "block", detail: "No send tool connected" },
+    ],
     settings: [
       { label: "From", value: "[Morning Miracle sender] <[address]>" },
       { label: "Subject", value: "[You're 45 days in]" },
@@ -227,6 +246,10 @@ export const signoffItems: SignoffItem[] = [
     skill: "rf-positioning", version: "v1.1", owner: "rf-positioning", due: "2026-11-03", sendAt: "Share with CEO after sign-off", dept: "Brand", state: "needs",
     regulatory: ["Investigational device: no safety or effectiveness claims"],
     body: ["[Who we are and the problem we address]", "[What makes the approach different]", "[Where we are in the regulatory path]"],
+    slips: [
+      { field: "Name", result: "flag", detail: "\"Photopharmics\" appears twice; their style is PhotoPharmics" },
+      { field: "Recipients", result: "pass", detail: "Only the CEO; no outside addresses" },
+    ],
     settings: [
       { label: "Destination", value: "Shared with CEO as a doc" },
       { label: "Recipients", value: "[CEO name]" },
@@ -236,6 +259,10 @@ export const signoffItems: SignoffItem[] = [
     id: "s5", clientId: "pentara", title: "LinkedIn carousel: ABM war room", kind: "social", channel: "LinkedIn", tier: 2,
     skill: "rf-amplify", version: "v1.0", owner: "rf-amplify", due: "2026-10-29", sendAt: "Wed, 8:15 am via Metricool", dept: "Demand generation", state: "needs",
     body: ["[Cover slide: the hook]", "[Slides 2-7: one idea each]", "[Last slide: call to action]"],
+    slips: [
+      { field: "Account", result: "pass", detail: "Pentara company page, not your personal profile" },
+      { field: "Dates", result: "flag", detail: "Slide 6 says \"Tuesday, Nov 4\". Nov 4, 2026 is a Wednesday" },
+    ],
     settings: [
       { label: "Account", value: "[Pentara company page]" },
       { label: "Slides", value: "8" },
@@ -247,6 +274,10 @@ export const signoffItems: SignoffItem[] = [
     id: "s6", clientId: "pentara", title: "Award entry draft", kind: "doc", channel: "Submission", tier: 1,
     skill: "PR contractor", version: "draft 2", owner: "PR contractor", due: "2026-11-03", sendAt: "Submit by Nov 3", dept: "Earned media", state: "needs",
     body: ["[Entry summary]", "[Results and evidence]", "[Supporting quotes, approved]"],
+    slips: [
+      { field: "Length", result: "flag", detail: "Summary is 612 words; the form allows 500" },
+      { field: "Deadline", result: "pass", detail: "Nov 3 matches the program's site" },
+    ],
     settings: [
       { label: "Program", value: "[Award program, category]" },
       { label: "Submit to", value: "[Submission site]" },

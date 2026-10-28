@@ -64,10 +64,32 @@ This spec grows with the build. Every feature carries a status, and each build a
 | Steps that produce outbound work create sign-off items | Specified | Marked with a sign-off badge today |
 | Save a customized checklist as your own template | Future | |
 
+### Today and long-lead planning
+
+| Feature | Status | Notes |
+| --- | --- | --- |
+| Today list across all clients: reviews, tasks, meetings and planning in one order | Prototyped | `/today` |
+| Drag to reorder; arrow buttons for keyboard and phone; move to tomorrow | Prototyped | Order saved on this device in the prototype |
+| Time planned against a 6-hour day, warns when over | Prototyped | Day length adjustable Specified |
+| Planning share meter with a 20% floor | Prototyped | Keeps urgent work from crowding out next month |
+| Long-lead radar: start-by date = due date minus lead time | Prototyped | Sorted by when work must start, not when it is due |
+| Recurring planning cadences per client (newsletter kickoff, editorial calendar, quarterly plan) | Specified | Each generates radar items automatically |
+| Lead times learned from history ("newsletters took 5 weeks, not 4") | Specified | |
+| Built from your calendar, sign-off queue and task due dates each morning | Specified | You reorder; Baton never reorders on its own |
+| Block planning time on your calendar | Specified | Asks first |
+| Unfinished items carry over with a count of days carried | Specified | Three days carried prompts: do, delegate or drop |
+
 ### Sign-off
 
 | Feature | Status | Notes |
 | --- | --- | --- |
+| Slip check: automated look for common mistakes on every item | Prototyped | Sample results; real checks Specified |
+| Each flagged slip is its own tick; a blocking slip disables Approve | Prototyped | |
+| Flagged settings highlighted where they appear | Prototyped | |
+| Read-back of From, Recipients, Subject and Send right above Approve | Prototyped | Large type; flagged fields in amber |
+| Expected values per client (sender, reply-to, lists, accounts, time zone) | Specified | A setting that differs from the client's usual is flagged |
+| Test send to your own inbox, opened from the review screen | Specified | |
+| Slip log: caught before send vs got through | Specified | Every slip that got through becomes a new check |
 | Queue: needs your eyes, held, decided; filter by tier | Prototyped | `/signoff` |
 | Embedded asset preview: email, social post, document | Prototyped | Placeholders for real content |
 | Settings shown with the asset (subject, preview text, from, reply-to, recipients, schedule, platform) | Prototyped | Part of what you approve |
@@ -118,11 +140,29 @@ This spec grows with the build. Every feature carries a status, and each build a
 
 Every item arrives complete: the asset, screen grabs of how it will look where it lands, and every setting that decides how it goes out. Review never requires another login, an app install or a download. Baton fetches previews and settings through each client's connected apps, and approval sends the item on exactly as reviewed. Workflows that flow.
 
+## Slip checks: making human review hold
+
+Most damaging mistakes are not bad writing; they are small, normal-looking errors a tired reviewer skims past. Baton checks for them before you see the item, so a slip has to get past both the machine and you.
+
+- **Sender and identity:** From and reply-to differ from the client's usual; another client's logo, footer or account.
+- **Subject and preview:** placeholder or leftover text, repeats a recent send, too long for phones, preview text duplicates the subject.
+- **Audience:** wrong list or segment, a test list on a live send, recipient count far from normal.
+- **Timing:** time zone of the recipients, weekday matching the date, sends on a holiday or overlapping another send to the same people.
+- **Content:** merge tags without fallbacks, broken or untagged links, "TK", "lorem" or bracketed notes, names misspelled or styled wrongly, word or character limits.
+- **Compliance:** unsubscribe and address footer, required disclaimers, rf-regulatory redlines.
+
+Each result is OK, Check (you tick it to approve) or Blocks send. The four fields people most often get wrong are read back in large type just above Approve. When a slip gets through anyway, you log it in one tap and it becomes a new check for every client.
+
 ## How brand detection works
 
 Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
 
 ## Changelog
+
+### 2026-10-28: Today and slip checks
+- Today list: drag to reorder reviews, tasks, meetings and planning across clients; time and planning-share meters.
+- Long-lead radar shows work by its start-by date, with Add to today.
+- Sign-off review adds slip checks, a tick for each flagged slip, highlighted settings and a read-back above Approve.
 
 ### 2026-10-28: client brand and sign-in
 - Brand tab pulls logo, icon, colors and fonts from the client's website (sample results), lets you adjust them and applies them to the client's tile, top bar and accents.

@@ -4,11 +4,38 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getClient } from "@/lib/data";
 import { useStore } from "@/lib/store";
-import type { SignoffItem } from "@/lib/types";
+import type { SignoffItem, Slip } from "@/lib/types";
 import { Icon } from "@/components/Icon";
 import { ClientTile, Due } from "@/components/ui";
 
-const CHECKS = ["Read in full", "Claims and proof points accurate", "Recipients, channel and send time right"];
+const BASE_CHECKS = ["Read in full", "Claims and proof points accurate"];
+// Every flagged slip becomes its own tick, so nothing flagged can be waved through with one click.
+const checksFor = (item?: SignoffItem) => [
+  ...BASE_CHECKS,
+  ...(item?.slips ?? []).filter((x) => x.result === "flag").map((x) => `${x.field}: looked, it's right`),
+];
+// The fields people most often get wrong, read back right above Approve.
+const READBACK = ["From", "Account", "Recipients", "Subject", "Send", "Schedule", "Submit to", "Destination"];
+
+function SlipPanel({ slips }: { slips: Slip[] }) {
+  const flags = slips.filter((x) => x.result !== "pass").length;
+  const tone = { pass: "var(--good-fg)", flag: "var(--warn-fg)", block: "var(--bad-fg)" };
+  const icon = { pass: "check", flag: "alert", block: "stop" };
+  return (
+    <section className="card" style={{ padding: 14 }} aria-label="Slip check">
+      <h2 style={{ margin: "0 0 2px", fontSize: 14 }}>Slip check</h2>
+      <div className="muted xs" style={{ marginBottom: 8 }}>{slips.length} common mistakes checked · {flags ? `${flags} need${flags === 1 ? "s" : ""} your eyes` : "all clear"}</div>
+      <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 8 }} className="small">
+        {[...slips].sort((a, b) => ["block", "flag", "pass"].indexOf(a.result) - ["block", "flag", "pass"].indexOf(b.result)).map((x) => (
+          <li key={x.field + x.detail} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+            <span style={{ color: tone[x.result], flexShrink: 0, marginTop: 1 }}><Icon name={icon[x.result]} size={16} /></span>
+            <span><strong>{x.field}</strong> <span className="xs" style={{ color: tone[x.result], fontWeight: 600 }}>{x.result === "pass" ? "OK" : x.result === "flag" ? "Check" : "Blocks send"}</span><br /><span className="muted">{x.detail}</span></span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 type ChangePath = "fix" | "owner" | "call" | "meet" | "chat";
 const PATHS: { id: ChangePath; title: string; sub: string; icon: string; holds?: boolean }[] = [
@@ -56,20 +83,24 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
   const { items, decide } = useStore();
   const router = useRouter();
   const item = items.find((i) => i.id === id);
-  const [checks, setChecks] = useState<boolean[]>(CHECKS.map(() => false));
+  const [checks, setChecks] = useState<boolean[]>(() => checksFor(item).map(() => false));
   const [note, setNote] = useState("");
   const [lessonTo, setLessonTo] = useState("skill");
   const [sheet, setSheet] = useState<null | "changes" | "resubmit" | "decline">(null);
   const [path, setPath] = useState<ChangePath>("call");
   const [width, setWidth] = useState<"phone" | "desktop">("desktop");
 
-  useEffect(() => { setChecks(CHECKS.map(() => false)); setNote(""); setSheet(null); }, [id]);
+  useEffect(() => { setChecks(checksFor(item).map(() => false)); setNote(""); setSheet(null); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!item) return <section className="card empty"><h3>Item not found</h3><Link href="/signoff" className="btn">Back to sign-off</Link></section>;
   const client = getClient(item.clientId)!;
   const queue = items.filter((i) => i.state === "needs");
   const next = queue.find((i) => i.id !== id);
-  const ready = checks.every(Boolean);
+  const CHECKS = checksFor(item);
+  const blocked = (item.slips ?? []).some((x) => x.result === "block");
+  const flagged = new Set((item.slips ?? []).filter((x) => x.result !== "pass").map((x) => x.field));
+  const readback = (item.settings ?? []).filter((x) => READBACK.includes(x.label));
+  const ready = checks.length === CHECKS.length && checks.every(Boolean) && !blocked;
   const decided = item.state !== "needs";
 
   const finish = (state: Parameters<typeof decide>[1], outcome?: string) => {
@@ -114,6 +145,7 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
           <div className="muted xs">Rendered from the client&apos;s connected app. No sign-in needed to review.</div>
         </div>
         <aside className="narrow" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {item.slips && <SlipPanel slips={item.slips} />}
           {item.settings && (
             <section className="card" style={{ padding: 14 }} aria-label="Settings">
               <h2 style={{ margin: "0 0 2px", fontSize: 14 }}>Settings</h2>
@@ -122,7 +154,9 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
                 {item.settings.map((s) => (
                   <div key={s.label} style={{ display: "contents" }}>
                     <dt className="muted">{s.label}</dt>
-                    <dd style={{ margin: 0, fontWeight: 500, color: s.value.startsWith("Not connected") ? "var(--bad-fg)" : undefined }}>{s.value}</dd>
+                    <dd style={{ margin: 0, fontWeight: 500, color: s.value.startsWith("Not connected") ? "var(--bad-fg)" : undefined, ...(flagged.has(s.label) ? { background: "var(--warn-bg)", color: "var(--warn-fg)", borderRadius: 6, padding: "1px 6px", marginLeft: -6 } : {}) }}>
+                      {flagged.has(s.label) && <Icon name="alert" size={13} />} {s.value}
+                    </dd>
                   </div>
                 ))}
               </dl>
@@ -152,6 +186,16 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
         </section>
       ) : (
         <section id="decision" className="card" aria-label="Decision" style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12, borderWidth: 2, borderColor: "var(--text)" }}>
+          {readback.length > 0 && (
+            <div aria-label="You're approving" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 8 }}>
+              {readback.map((r) => (
+                <div key={r.label} style={{ borderRadius: 10, padding: "8px 10px", background: flagged.has(r.label) ? "var(--warn-bg)" : "var(--surface-2)" }}>
+                  <div className="xs muted" style={{ fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" }}>{r.label}</div>
+                  <div style={{ fontWeight: 600, fontSize: 15 }}>{r.value}</div>
+                </div>
+              ))}
+            </div>
+          )}
           <fieldset style={{ border: 0, padding: 0, margin: 0, display: "flex", gap: 16, flexWrap: "wrap" }}>
             <legend style={{ fontWeight: 700, marginBottom: 6 }}>Sign-off checklist</legend>
             {CHECKS.map((c, n) => (
@@ -176,11 +220,11 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
             <button className="btn btn-danger" onClick={() => setSheet("decline")}>Decline</button>
             <button className="btn" onClick={() => setSheet("resubmit")}>Changes and resubmit</button>
             <button className="btn btn-outline" onClick={() => setSheet("changes")}>Approve with changes</button>
-            <button className="btn btn-primary btn-lg" disabled={!ready} onClick={() => finish("approved")} title={ready ? undefined : "Tick the checklist first"} style={!ready ? { opacity: 0.45, cursor: "not-allowed" } : undefined}>
+            <button className="btn btn-primary btn-lg" disabled={!ready} onClick={() => finish("approved")} title={ready ? undefined : blocked ? "A slip check blocks the send" : "Tick the checklist first"} style={!ready ? { opacity: 0.45, cursor: "not-allowed" } : undefined}>
               <Icon name="eyecheck" />Approve{item.tier === 1 ? " · confirm" : ""}
             </button>
           </div>
-          {!ready && <div className="muted xs" style={{ textAlign: "right" }}>Approve unlocks once the checklist is ticked.</div>}
+          {!ready && <div className="muted xs" style={{ textAlign: "right" }}>{blocked ? "Can't approve yet: a slip check blocks the send." : "Approve unlocks once every box is ticked, including each flagged slip."}</div>}
         </section>
       )}
 

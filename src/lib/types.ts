@@ -112,6 +112,15 @@ export interface SignoffItem {
   outcome?: string;
   // Settings are part of what is signed off: changing one after approval reopens the gate.
   settings?: { label: string; value: string }[];
+  // Slip checks: automated look for the common mistakes before a human ever sees the item.
+  slips?: Slip[];
+}
+
+/** pass = checked and fine; flag = a human must look; block = cannot send until fixed. */
+export interface Slip {
+  field: string; // matches a settings label when it is about a setting
+  result: "pass" | "flag" | "block";
+  detail: string;
 }
 
 export interface Topic {

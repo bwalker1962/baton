@@ -40,6 +40,11 @@ This spec grows with the build. Every feature carries a status, and each build a
 | Feature | Status | Notes |
 | --- | --- | --- |
 | Client identity: logo tile, color, phase steps | Prototyped | Logo upload Specified |
+| Brand pulled from the client's website: logo, icon, colors, fonts | Prototyped | Sample results; real fetch Specified |
+| Adjust brand: pick logo or monogram, pick or set color | Prototyped | `/clients/[id]/brand`; applies everywhere |
+| Readability guard: light brand colors darkened for Baton's own accents | Built | 4.5:1 contrast; client's real brand untouched |
+| Re-check brand monthly; flag when the site's logo or colors change | Specified | You confirm before anything changes |
+| Push brand to connected tools (Moda brand kit, Brevo brand, Klaviyo) | Specified | Only after you approve |
 | Key files strip, logins as vault references | Prototyped | No passwords stored, by design |
 | Score by department, crew chips, empty chairs | Prototyped | Full Score for Pentara |
 | Score by status with display switches | Prototyped | Icons, progress, due dates, roadblocks |
@@ -96,6 +101,13 @@ This spec grows with the build. Every feature carries a status, and each build a
 | Feature | Status | Notes |
 | --- | --- | --- |
 | Data and auth (Supabase, row-level security per client) | Specified | |
+| Sign up: name, email, firm, password or Google | Prototyped | `/signup`; creates the firm (multi-firm ready) |
+| Sign in: password, emailed one-time link, Google | Prototyped | `/login`; real auth via Supabase Auth Specified |
+| Face ID, Touch ID, Windows Hello through passkeys | Prototyped | WebAuthn; offered right after sign-up |
+| Remember me: 30-day session on trusted devices | Prototyped | Off means session ends when the browser closes |
+| Forgot password: single-use reset link | Prototyped | `/forgot`; 30-minute expiry |
+| Two-step verification and new-device alerts | Specified | Required before client data is shown on a new device |
+| Session list with sign out of other devices | Specified | |
 | App connections through MCP connectors | Specified | Moda, Buffer, Metricool, Brevo, Klaviyo, Press Ranger, Drive |
 | Scheduling and retries (durable job queue) | Specified | |
 | Failure alerts when a skill or connection breaks | Specified | |
@@ -106,7 +118,16 @@ This spec grows with the build. Every feature carries a status, and each build a
 
 Every item arrives complete: the asset, screen grabs of how it will look where it lands, and every setting that decides how it goes out. Review never requires another login, an app install or a download. Baton fetches previews and settings through each client's connected apps, and approval sends the item on exactly as reviewed. Workflows that flow.
 
+## How brand detection works
+
+Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
+
 ## Changelog
+
+### 2026-10-28: client brand and sign-in
+- Brand tab pulls logo, icon, colors and fonts from the client's website (sample results), lets you adjust them and applies them to the client's tile, top bar and accents.
+- Light brand colors are automatically deepened for readability.
+- Sign-up, sign-in (Face ID or passkey, password, emailed link, Google), remember me and password reset screens. Avatar now signs out.
 
 ### 2026-10-28: review completeness
 - Sign-off review shows each item's settings beside the asset (subject, preview text, from, reply-to, recipients, schedule, platform).

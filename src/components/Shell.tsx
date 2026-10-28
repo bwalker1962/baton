@@ -46,14 +46,18 @@ function Toast() {
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  const { items } = useStore();
+  const { items, brand } = useStore();
   const eyes = items.filter((i) => i.state === "needs").length;
   const clientId = path.startsWith("/clients/") ? path.split("/")[2] : null;
   const active = clientId ? clients.find((c) => c.id === clientId) : null;
   const is = (p: string) => (p === "/" ? path === "/" : path.startsWith(p)) ? "page" : undefined;
 
+  // Sign-up and login screens render without the app frame.
+  if (["/login", "/signup", "/forgot"].some((p) => path.startsWith(p))) return <>{children}</>;
+
+  const accent = active ? brand[active.id]?.accent ?? active.color : undefined;
   return (
-    <div style={active ? ({ ["--accent" as string]: active.color } as React.CSSProperties) : undefined}>
+    <div style={accent ? ({ ["--accent" as string]: accent } as React.CSSProperties) : undefined}>
       <header className={`topbar ${active ? "client" : ""}`}>
         <Link href="/" className="brand" aria-label="Baton home">
           <span className="brand-mark">B</span>
@@ -72,7 +76,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </span>
         )}
         <ModeSwitch />
-        <span className="avatar hide-mobile" role="img" aria-label="Brett Walker">BW</span>
+        <Link href="/login" className="avatar hide-mobile" aria-label="Brett Walker. Sign out" title="Sign out" style={{ textDecoration: "none" }}>BW</Link>
       </header>
 
       <div className="layout">

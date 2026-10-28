@@ -1,4 +1,4 @@
-import type { Client, Crew, Health } from "@/lib/types";
+import type { Crew, Health } from "@/lib/types";
 import { dueLabel, healthClass, healthLabel } from "@/lib/format";
 import { Icon } from "./Icon";
 
@@ -30,13 +30,7 @@ export function Due({ iso }: { iso: string | null }) {
   return <span className={`badge ${cls}`}>{d.text}</span>;
 }
 
-export function ClientTile({ client, small }: { client: Pick<Client, "color" | "initial" | "name">; small?: boolean }) {
-  return (
-    <span className={`tile ${small ? "tile-sm" : ""}`} style={{ background: client.color }} aria-hidden="true">
-      {client.initial}
-    </span>
-  );
-}
+export { ClientTile } from "./ClientTile";
 
 export function CrewChip({ crew }: { crew: Crew }) {
   const cls = { skill: "chip-skill", app: "chip-app", person: "chip-person", gap: "chip-gap" }[crew.kind];

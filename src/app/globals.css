@@ -291,3 +291,15 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
   .main:has(.sticky-actions) { padding-bottom: 190px; }
 }
 @media (min-width: 861px) { .show-mobile { display: none !important; } }
+
+/* Sign-in screens (no app frame) */
+.auth { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; background: var(--bg); }
+.auth-card { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 14px; }
+.auth-card h1 { margin: 0; font-size: 24px; letter-spacing: -0.02em; }
+.auth-card form { display: flex; flex-direction: column; gap: 12px; }
+.auth-card label.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; }
+.auth-card .btn { width: 100%; justify-content: center; }
+.auth-or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
+.auth-or::before, .auth-or::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+.check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+.check input { margin-top: 2px; width: 16px; height: 16px; }

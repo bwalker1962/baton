@@ -9,6 +9,7 @@ const TABS = [
   { seg: "chats", label: "Chats" },
   { seg: "apps", label: "Apps & files" },
   { seg: "report", label: "CEO report" },
+  { seg: "brand", label: "Brand" },
 ];
 
 export function ClientTabs({ id }: { id: string }) {

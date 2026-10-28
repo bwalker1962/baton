@@ -23,10 +23,18 @@ export interface KeyFile {
   isLogin?: boolean;
 }
 
+export interface BrandDetection {
+  logos: { id: string; source: string; kind: "logo" | "icon" | "social" }[];
+  palette: { hex: string; source: string }[];
+  fonts: string[];
+}
+
 export interface Client {
   id: string;
   firmId: string;
   name: string;
+  website: string;
+  detected: BrandDetection; // sample of what a website scan returns
   initial: string;
   color: string;
   tint: string;

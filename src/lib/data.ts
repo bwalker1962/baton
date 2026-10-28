@@ -10,6 +10,8 @@ export const clients: Client[] = [
   {
     id: "morning-miracle",
     firmId: "ridgefront",
+    website: "https://[morningmiracle site]",
+    detected: { logos: [{ id: "header", source: "Site header logo", kind: "logo" }, { id: "favicon", source: "Favicon", kind: "icon" }, { id: "social", source: "Social share image", kind: "social" }], palette: [{ hex: "#c96a1c", source: "Button color" }, { hex: "#f2b66d", source: "Theme color" }, { hex: "#2b2622", source: "Text color" }, { hex: "#f7efe6", source: "Page background" }], fonts: ["Cabinet Grotesk", "Fraunces"] },
     name: "Morning Miracle",
     initial: "M",
     color: "#c96a1c",
@@ -39,6 +41,8 @@ export const clients: Client[] = [
   {
     id: "pentara",
     firmId: "ridgefront",
+    website: "https://[pentara site]",
+    detected: { logos: [{ id: "header", source: "Site header logo", kind: "logo" }, { id: "icon", source: "App icon", kind: "icon" }], palette: [{ hex: "#1f5c6b", source: "Header background" }, { hex: "#5fb3c4", source: "Link color" }, { hex: "#203038", source: "Text color" }], fonts: ["Source Sans"] },
     name: "Pentara",
     initial: "P",
     color: "#1f5c6b",
@@ -70,6 +74,8 @@ export const clients: Client[] = [
   {
     id: "photopharmics",
     firmId: "ridgefront",
+    website: "https://[photopharmics site]",
+    detected: { logos: [{ id: "header", source: "Site header logo", kind: "logo" }, { id: "favicon", source: "Favicon", kind: "icon" }], palette: [{ hex: "#3e5c8a", source: "Button color" }, { hex: "#9fc1e8", source: "Theme color" }], fonts: ["Inter"] },
     name: "PhotoPharmics",
     initial: "P",
     color: "#3e5c8a",
@@ -95,6 +101,8 @@ export const clients: Client[] = [
   {
     id: "mountain-peaks",
     firmId: "ridgefront",
+    website: "https://[mountainpeaks site]",
+    detected: { logos: [{ id: "favicon", source: "Favicon", kind: "icon" }], palette: [{ hex: "#4e7d4f", source: "Header background" }, { hex: "#c7e0a8", source: "Accent" }], fonts: [] },
     name: "Mountain Peaks",
     initial: "M",
     color: "#4e7d4f",

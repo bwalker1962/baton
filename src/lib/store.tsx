@@ -37,7 +37,16 @@ interface Pending {
   expires: number;
 }
 
+export interface BrandChoice {
+  color: string; // as chosen
+  accent: string; // readable version used in Baton
+  logo: string; // detected logo id, or "monogram"
+  initial: string;
+}
+
 interface Store {
+  brand: Record<string, BrandChoice>;
+  setBrand: (clientId: string, b: BrandChoice) => void;
   mode: Mode;
   setMode: (m: Mode) => void;
   items: SignoffItem[];
@@ -65,6 +74,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<SignoffItem[]>(seedItems);
   const [pending, setPending] = useState<Pending | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [brand, setBrandState] = useState<Record<string, BrandChoice>>({});
+  const setBrand = useCallback((clientId: string, b: BrandChoice) => setBrandState((all) => ({ ...all, [clientId]: b })), []);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -108,10 +119,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const addProject = useCallback((p: Project) => setProjects((prev) => [p, ...prev]), []);
 
   const value = useMemo(
-    () => ({ mode, setMode, items, decide, pending, undo, projects, addProject }),
-    [mode, setMode, items, decide, pending, undo, projects, addProject],
+    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject }),
+    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+/** A client's look inside Baton: the saved brand choice, or its defaults. */
+export function useClientLook(client: { id: string; color: string; initial: string }) {
+  const { brand } = useStore();
+  const b = brand[client.id];
+  return { color: b?.accent ?? client.color, initial: b?.initial ?? client.initial, logo: b?.logo ?? "monogram" };
 }
 
 export function useStore() {

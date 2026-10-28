@@ -3,7 +3,7 @@
 // researches each area live through the RF skills and cites its sources.
 // © 2026 RidgeFront. All rights reserved.
 
-export type Segment = "b2b" | "dtc" | "medtech";
+export type Segment = "b2b" | "dtc" | "medtech" | "dpc";
 export type Impact = "Highest" | "High" | "Medium";
 export type Effort = "Low" | "Medium" | "High";
 
@@ -14,7 +14,7 @@ export const PEERS: Record<string, Peer> = {
   pentara: { segment: "b2b", peers: "Specialist scientific services firms selling to biotech and pharma clinical teams", buyers: "Clinical, regulatory and executive leads making a long, considered decision together" },
   "morning-miracle": { segment: "dtc", peers: "Direct-to-consumer wellness brands sold by subscription", buyers: "Individuals deciding quickly, then deciding again at every reorder" },
   photopharmics: { segment: "medtech", peers: "Medical device companies with an investigational therapy", buyers: "Clinicians, patients and families, and investors, each needing different proof" },
-  "mountain-peaks": { peers: "Not set yet", buyers: "Not set yet" },
+  "mountain-peaks": { segment: "dpc", peers: "Direct primary care (DPC) family practices", buyers: "Families, individuals and small employers choosing a doctor and a monthly membership, mostly close to home" },
 };
 
 export interface Consideration {
@@ -57,24 +57,25 @@ export const TOPICS: Topic[] = [
     id: "website", name: "Website", match: /web ?site|home ?page|landing|site\b|seo|aeo/i, templateIds: ["launch"],
     items: [
       { id: "w1", title: "Home page answers \"is this for me?\" above the fold", impact: "Highest", effort: "Medium", customer: "Visitors arrive with a problem. Name it, name who you help, and show the next step before they scroll.",
-        peer: { b2b: "Lead with the outcome for the buyer's program, not a list of services.", dtc: "Lead with the result in the customer's routine and the offer, with reviews close by.", medtech: "Separate paths for clinicians, patients and investors from the first screen." }, skills: ["rf-positioning", "rf-copy"] },
+        peer: { b2b: "Lead with the outcome for the buyer's program, not a list of services.", dtc: "Lead with the result in the customer's routine and the offer, with reviews close by.", medtech: "Separate paths for clinicians, patients and investors from the first screen.", dpc: "Lead with what membership includes, the monthly price and how quickly members see their doctor. Plain pricing is central to DPC." }, skills: ["rf-positioning", "rf-copy"] },
       { id: "w2", title: "Pages organized by the customer's problem, not your org chart", impact: "High", effort: "High", customer: "People look for their situation, not your departments.",
-        peer: { b2b: "Pages by situation (\"rescuing a delayed trial\") alongside service pages.", medtech: "Condition and patient-journey pages, written within approved claims." }, skills: ["rf-positioning", "rf-insight"] },
+        peer: { b2b: "Pages by situation (\"rescuing a delayed trial\") alongside service pages.", medtech: "Condition and patient-journey pages, written within approved claims.", dpc: "Pages for families, individuals and small employers, plus a plain \"how DPC works with insurance\" page." }, skills: ["rf-positioning", "rf-insight"] },
       { id: "w3", title: "Proof on every page: results, named peers, specifics", impact: "High", effort: "Medium", customer: "Evidence from someone like them, where the doubt arises.",
-        peer: { b2b: "Short case notes with the client's situation, approach and result.", dtc: "Reviews and before-and-after routines near the buy button.", medtech: "Published data and trial status, with careful claims language." }, skills: ["rf-insight", "rf-regulatory"] },
-      { id: "w4", title: "Found in search and AI answers for the questions they ask", impact: "High", effort: "Medium", customer: "They ask Google and AI assistants first. Plain answers to their real questions get you cited.", skills: ["rf-found"] },
+        peer: { b2b: "Short case notes with the client's situation, approach and result.", dtc: "Reviews and before-and-after routines near the buy button.", medtech: "Published data and trial status, with careful claims language.", dpc: "Member stories, shared only with written consent, and doctor bios about access and time with patients." }, skills: ["rf-insight", "rf-regulatory"] },
+      { id: "w4", title: "Found in search and AI answers for the questions they ask", impact: "High", effort: "Medium", customer: "They ask Google and AI assistants first. Plain answers to their real questions get you cited.",
+        peer: { dpc: "Local search matters most: a complete Google Business Profile, steady reviews, and answers to \"direct primary care near me\"." }, skills: ["rf-found"] },
       { id: "w5", title: "One clear next step that matches their readiness", impact: "Medium", effort: "Low", customer: "Early visitors want something useful; ready buyers want a short call. Offer both, plainly.",
-        peer: { b2b: "A useful tool or guide for early researchers, and a 20-minute call for ready buyers.", dtc: "Trial or starter offer, with easy cancel stated up front." }, skills: ["rf-leads"] },
+        peer: { b2b: "A useful tool or guide for early researchers, and a 20-minute call for ready buyers.", dtc: "Trial or starter offer, with easy cancel stated up front.", dpc: "Book a meet-the-doctor visit, or enroll online in a few minutes." }, skills: ["rf-leads"] },
     ],
   },
   {
     id: "booth", name: "Trade show booth", match: /booth|trade ?show|exhibit|conference|expo|event/i, templateIds: ["event"],
     items: [
       { id: "b1", title: "Book meetings before the show", impact: "Highest", effort: "Medium", customer: "Busy attendees plan their days in advance. A booked 15 minutes respects their time.",
-        peer: { b2b: "Targeted outreach to named accounts weeks ahead, with a reason specific to them.", medtech: "Pre-arranged meetings with investigators and key opinion leaders." }, skills: ["rf-leads", "rf-copy"] },
+        peer: { b2b: "Targeted outreach to named accounts weeks ahead, with a reason specific to them.", medtech: "Pre-arranged meetings with investigators and key opinion leaders.", dpc: "Local employer benefits fairs and chamber events; book time with HR and benefits leads ahead." }, skills: ["rf-leads", "rf-copy"] },
       { id: "b2", title: "Booth headline states their problem, readable from the aisle", impact: "High", effort: "Low", customer: "People decide to stop in a few steps. Your logo doesn't tell them why they should.", skills: ["rf-copy", "rf-positioning"] },
       { id: "b3", title: "Something useful to take or do, not a brochure", impact: "High", effort: "Medium", customer: "A quick assessment, a checklist or a short demo answers their question on the spot.",
-        peer: { b2b: "A one-page readiness checklist or a short consult slot.", medtech: "Device demonstrations and data posters, within approved claims." }, skills: ["rf-leads", "rf-regulatory"] },
+        peer: { b2b: "A one-page readiness checklist or a short consult slot.", medtech: "Device demonstrations and data posters, within approved claims.", dpc: "A cost worksheet visitors fill in for their own family or company, comparing membership with what they pay now." }, skills: ["rf-leads", "rf-regulatory"] },
       { id: "b4", title: "Follow up within two business days, about what they said", impact: "Highest", effort: "Low", customer: "A note that recalls their situation shows you listened. A generic \"great to meet you\" doesn't.", skills: ["rf-copy"] },
       { id: "b5", title: "Measure conversations and next meetings, not badge scans", impact: "Medium", effort: "Low", customer: "Counting real conversations keeps staff talking with people instead of scanning them.", skills: ["rf-analyze"] },
     ],
@@ -83,12 +84,12 @@ export const TOPICS: Topic[] = [
     id: "newsletter", name: "Newsletter", match: /newsletter|email|campaign|drip|nurture/i, templateIds: ["email-campaign"],
     items: [
       { id: "n1", title: "A frequency you can keep, set by what readers find useful", impact: "Highest", effort: "Low", customer: "Readers trust a steady rhythm. Silence followed by a burst reads as being sold to.",
-        peer: { b2b: "Usually monthly, sometimes twice a month; consistency matters more than volume.", dtc: "Often weekly, plus timed emails around each customer's reorder point.", medtech: "Typically monthly or quarterly, by audience: clinicians, patients, investors." }, skills: ["rf-content", "rf-analyze"] },
+        peer: { b2b: "Usually monthly, sometimes twice a month; consistency matters more than volume.", dtc: "Often weekly, plus timed emails around each customer's reorder point.", medtech: "Typically monthly or quarterly, by audience: clinicians, patients, investors.", dpc: "Usually monthly, with seasonal reminders (flu shots, school physicals) members can act on." }, skills: ["rf-content", "rf-analyze"] },
       { id: "n2", title: "Mostly their world; a small share about you", impact: "Highest", effort: "Low", customer: "They open for useful insight on their problems. Your news belongs only where it helps them.",
-        peer: { b2b: "One sharp insight on the reader's problem, one practical takeaway, then a light mention of you.", dtc: "Routines, tips and customer stories first; the offer second." }, skills: ["rf-content", "rf-copy"] },
+        peer: { b2b: "One sharp insight on the reader's problem, one practical takeaway, then a light mention of you.", dtc: "Routines, tips and customer stories first; the offer second.", dpc: "Practical health tips and practice news members can use; general guidance, never advice to an individual." }, skills: ["rf-content", "rf-copy"] },
       { id: "n3", title: "Subject line promises one specific benefit to the reader", impact: "High", effort: "Low", customer: "The subject is the whole decision to open. Specific and about them beats clever.", skills: ["rf-copy"] },
       { id: "n4", title: "Segment by where readers are, not one list for all", impact: "High", effort: "Medium", customer: "A new subscriber and a three-year customer need different things.",
-        peer: { b2b: "Separate tracks for prospects, current clients and alumni contacts.", dtc: "New, active, lapsed and at-risk subscribers each get their own flow." }, skills: ["rf-analyze", "rf-revenue"] },
+        peer: { b2b: "Separate tracks for prospects, current clients and alumni contacts.", dtc: "New, active, lapsed and at-risk subscribers each get their own flow.", dpc: "Members, prospects and employer contacts each get their own track." }, skills: ["rf-analyze", "rf-revenue"] },
       { id: "n5", title: "Judge by replies, clicks and pipeline, not opens", impact: "Medium", effort: "Low", customer: "What readers do afterwards shows what was worth their time.", skills: ["rf-analyze"] },
     ],
   },
@@ -106,7 +107,7 @@ export const TOPICS: Topic[] = [
     items: [
       { id: "s1", title: "Teach or show something in the post itself", impact: "Highest", effort: "Low", customer: "Value inside the feed, without a click, earns attention and trust.", skills: ["rf-amplify", "rf-copy"] },
       { id: "s2", title: "People over logos", impact: "High", effort: "Medium", customer: "Audiences follow people. Founders' and experts' posts usually travel further than brand pages.",
-        peer: { b2b: "Leaders and practitioners post; the company page amplifies.", dtc: "Customers and creators show the product in real routines." }, skills: ["rf-amplify"] },
+        peer: { b2b: "Leaders and practitioners post; the company page amplifies.", dtc: "Customers and creators show the product in real routines.", dpc: "The doctors themselves explaining DPC in plain words, answering common questions." }, skills: ["rf-amplify"] },
       { id: "s3", title: "Reply to every real comment", impact: "Medium", effort: "Low", customer: "A conversation shows there are people behind the account.", skills: ["rf-media"] },
     ],
   },

@@ -125,7 +125,7 @@ This spec grows with the build. Every feature carries a status, and each build a
 | --- | --- | --- |
 | Advisor page: pick a client, name any area, get ranked best practices | Prototyped | `/advisor`; sample guidance for 8 areas |
 | Ranked by impact, then least effort | Prototyped | Highest, High, Medium; Low, Medium, High effort |
-| Every item says what the customer gets, and what companies like this client do | Prototyped | Peer notes differ for B2B services, DTC subscription and medtech |
+| Every item says what the customer gets, and what companies like this client do | Prototyped | Peer notes differ for B2B services, DTC subscription, medtech and DPC practices |
 | Peer set per client (who it's compared with, who its customers are) | Prototyped | From Direction; missing peer set prompts you to name competitors |
 | "Applies to everything" fundamentals and a five-question customer-first test | Prototyped | |
 | Top three moves on every project, by project type | Prototyped | Links to the full advice |
@@ -186,6 +186,7 @@ Baton reads the client's public website: the header logo, favicon and app icon (
 ### 2026-10-28: advisor
 - Advisor page ranks best practices for an area by impact, written from the customer's side, with notes on what companies like the client do.
 - Projects show their top three moves; sign-off shows a customer-first check.
+- Mountain Peaks peer set: direct primary care (DPC) family practices.
 
 ### 2026-10-28: start a project by chat
 - "Start a project" box on Home and each client's Projects tab; type or talk, Baton asks clarifying questions.

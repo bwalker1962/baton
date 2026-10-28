@@ -5,6 +5,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { signoffItems as seedItems } from "./data";
 import type { SignoffItem, SignoffState } from "./types";
+import { noteSeed, type Note } from "./notes";
 
 export type Mode = "light" | "half" | "dark";
 
@@ -75,6 +76,9 @@ interface Store {
   /** Snoozed task ids and the date each wakes. */
   snoozed: Record<string, string>;
   snooze: (id: string, until: string | null) => void;
+  notes: Note[];
+  saveNote: (n: Note) => void; // add or update
+  removeNote: (id: string) => void;
 }
 
 const Ctx = createContext<Store | null>(null);
@@ -96,6 +100,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [docs, setDocs] = useState<FiledDoc[]>([]);
   const [snoozed, setSnoozed] = useState<Record<string, string>>({});
+  const [notes, setNotes] = useState<Note[]>(noteSeed);
+  // Notes are kept on this device in the prototype; the build stores them per client.
+  useEffect(() => {
+    try { const raw = localStorage.getItem("baton-notes-v1"); if (raw) setNotes(JSON.parse(raw)); } catch {}
+  }, []);
+  const persist = (next: Note[]) => { try { localStorage.setItem("baton-notes-v1", JSON.stringify(next)); } catch {} return next; };
+  const saveNote = useCallback((n: Note) => setNotes((all) => persist(all.some((x) => x.id === n.id) ? all.map((x) => (x.id === n.id ? n : x)) : [n, ...all])), []);
+  const removeNote = useCallback((id: string) => setNotes((all) => persist(all.filter((x) => x.id !== id))), []);
   const addDoc = useCallback((d: FiledDoc) => setDocs((all) => [d, ...all]), []);
   const moveDoc = useCallback((id: string, clientId: string) => setDocs((all) => all.map((d) => (d.id === id ? { ...d, clientId } : d))), []);
   const snooze = useCallback((id: string, until: string | null) => setSnoozed((all) => {
@@ -149,8 +161,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p))), []);
 
   const value = useMemo(
-    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze }),
-    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze],
+    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote }),
+    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

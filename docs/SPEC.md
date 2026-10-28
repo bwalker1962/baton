@@ -39,6 +39,14 @@ This spec grows with the build. Every feature carries a status, and each build a
 
 | Feature | Status | Notes |
 | --- | --- | --- |
+| Notes tab: notepad for conversations with the CEO or staff, by client | Prototyped | Who, date, free text; edit, delete, search, filter by person |
+| Lines starting with → or [ ] become action items you can tick | Prototyped | Open actions counted per client |
+| Home: cascading post-it stacks, one per client, in the client's color | Prototyped | Most recent conversation on top; opens the client's notes |
+| Notes saved on this device | Prototyped | Stored per client, private to you, in the build |
+| Dictate a note by voice | Specified | Same speech input as Start a project |
+| Action item to task or Today in one tap | Specified | |
+| Before a meeting, show the last notes with that person | Specified | From the calendar |
+| Notes never appear in client-facing views or reports | Specified | Phase 2 roles respect this |
 | First tab is Sign-off filtered to this client, with a count on the tab | Prototyped | Score moved to its own tab |
 | Review mode started from a client stays inside that client | Prototyped | Returns to the client when done |
 | Drag documents from your computer onto any screen to file them | Prototyped | Overlay names where it will land |
@@ -195,6 +203,10 @@ Each result is OK, Check (you tick it to approve) or Blocks send. The four field
 Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
 
 ## Changelog
+
+### 2026-10-28: conversation notes
+- Notes tab per client for conversations with the CEO and staff; arrow lines become action items.
+- Home shows a cascading post-it stack per client, color-coded with the client's brand.
 
 ### 2026-10-28: client sign-off tab, drop to file, snooze
 - Each client opens on its own sign-off queue; review mode stays within that client.

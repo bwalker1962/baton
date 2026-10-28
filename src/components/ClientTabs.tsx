@@ -8,6 +8,7 @@ const TABS = [
   { seg: "score", label: "Score" },
   { seg: "tasks", label: "Tasks" },
   { seg: "projects", label: "Projects" },
+  { seg: "notes", label: "Notes" },
   { seg: "chats", label: "Chats" },
   { seg: "apps", label: "Apps & files" },
   { seg: "report", label: "CEO report" },

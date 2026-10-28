@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { ProjectStarter } from "@/components/ProjectStarter";
+import { NotesBoard } from "@/components/Notes";
 import { CERTAINTY } from "@/lib/intake";
 import { clients, tasks, TODAY } from "@/lib/data";
 import { healthOrder, minutesLabel, shortDate } from "@/lib/format";
@@ -68,6 +69,7 @@ export default function Home() {
         ))}
       </section>
 
+      <NotesBoard />
       <div className="split">
         <section className="card wide scroll-x" aria-label="Clients">
           <div className="card-head">

@@ -212,6 +212,11 @@ Baton reads the client's public website: the header logo, favicon and app icon (
 
 ## Changelog
 
+### 2026-10-28: contrast fixes
+- Post-it notes follow the page in Half-dark (light page, dark frame); their buttons take the note's text color.
+- Fixed low contrast: avatar, completed phase badges, client-colored labels in dark mode, brand swatch labels.
+- Added `npm run audit:contrast`: checks every label on every page in all three modes against WCAG AA.
+
 ### 2026-10-28: floating 1:1 agenda
 - 1:1 agenda per client floats over every screen; drag work onto it, jump to items without losing your place.
 - In-meeting notes and outcomes; Wrap up sends decisions to Notes and follow-ups to tasks and project checklists.

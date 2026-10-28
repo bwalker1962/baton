@@ -119,7 +119,7 @@ html, body {
 
 a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; }
-button { font: inherit; cursor: pointer; }
+button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--link); outline-offset: 2px; border-radius: 6px; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -151,7 +151,7 @@ button { font: inherit; cursor: pointer; }
 .modes { display: flex; gap: 2px; padding: 3px; border-radius: 10px; border: 1px solid var(--chrome-border); background: var(--chrome-input); }
 .modes button { width: 32px; height: 28px; border: 0; border-radius: 7px; background: transparent; color: var(--chrome-muted); display: flex; align-items: center; justify-content: center; }
 .modes button[aria-checked="true"] { background: var(--chrome-text); color: var(--chrome); }
-.avatar { width: 34px; height: 34px; border-radius: 50%; background: #5b6cf0; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex: none; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: #4f5bd5; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex: none; }
 .switcher { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px 0 6px; border-radius: 10px; border: 1px solid var(--chrome-border); background: var(--chrome-input); color: var(--chrome-text); font-weight: 600; }
 
 .layout { display: flex; min-height: calc(100vh - 60px); }
@@ -313,21 +313,20 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
   box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 8px 18px -10px rgba(0,0,0,.35);
   font-size: 14px; line-height: 1.5;
 }
-[data-mode="dark"] .postit, [data-mode="half"] .postit { background: color-mix(in srgb, var(--note) 30%, #24262b); color: #f1efe9; }
+[data-mode="dark"] .postit { background: color-mix(in srgb, var(--note) 30%, #24262b); color: #f1efe9; }
 .postit .who { font-size: 12px; font-weight: 700; letter-spacing: .02em; opacity: .75; display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
 .postit .who > span:last-child { white-space: nowrap; }
 .postit p { margin: 0 0 4px; white-space: pre-wrap; }
 .postit .act { display: flex; gap: 8px; align-items: flex-start; margin: 2px 0; font-weight: 600; }
 .postit .act input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--note); }
 .postit textarea, .postit input, .postit select { background: rgba(255,255,255,.55); color: inherit; border-color: rgba(0,0,0,.15); }
-[data-mode="dark"] .postit textarea, [data-mode="dark"] .postit input, [data-mode="dark"] .postit select,
-[data-mode="half"] .postit textarea, [data-mode="half"] .postit input, [data-mode="half"] .postit select { background: rgba(0,0,0,.25); border-color: rgba(255,255,255,.18); }
+[data-mode="dark"] .postit textarea, [data-mode="dark"] .postit input, [data-mode="dark"] .postit select { background: rgba(0,0,0,.25); border-color: rgba(255,255,255,.18); }
 
 .stack { display: block; color: inherit; text-decoration: none; }
 .stack .pile { position: relative; margin: 0 14px 14px 0; }
 .stack:hover { text-decoration: none; }
 .stack .layer { position: absolute; inset: 0; border-radius: 4px 4px 10px 4px; background: color-mix(in srgb, var(--note) 34%, #f1e6c4); border-top: 5px solid var(--note); box-shadow: 0 6px 14px -10px rgba(0,0,0,.4); transition: transform .2s ease; }
-[data-mode="dark"] .stack .layer, [data-mode="half"] .stack .layer { background: color-mix(in srgb, var(--note) 38%, #1c1e22); }
+[data-mode="dark"] .stack .layer { background: color-mix(in srgb, var(--note) 38%, #1c1e22); }
 .stack .layer.l1 { transform: translate(6px, 6px) rotate(1.4deg); }
 .stack .layer.l2 { transform: translate(12px, 12px) rotate(-1.2deg); }
 .stack .postit { position: relative; transition: transform .2s ease; min-height: 150px; }
@@ -367,3 +366,10 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
   .oneonone { left: 12px; width: auto; max-height: calc(100dvh - 170px); }
 }
 @media (min-width: 1200px) { [data-oneonone="open"] .main { padding-right: 420px; } }
+
+/* Buttons on a post-it take the note's own text color, whatever the mode. */
+.postit .btn:not(.btn-primary) { color: inherit; border-color: color-mix(in srgb, currentColor 30%, transparent); background: transparent; }
+
+/* Client-colored labels: tinted background, text lightened in dark mode so it stays readable. */
+.badge-accent { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+[data-mode="dark"] .badge-accent { background: color-mix(in srgb, var(--accent) 28%, transparent); color: color-mix(in srgb, var(--accent) 40%, #ffffff); }

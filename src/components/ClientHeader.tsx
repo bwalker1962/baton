@@ -22,7 +22,7 @@ export function ClientHeader({ client }: { client: Client }) {
       </div>
       <ol aria-label="Engagement phase" style={{ display: "flex", gap: 6, listStyle: "none", margin: 0, padding: 0, flexWrap: "wrap" }}>
         {PHASES.map((p, i) => (
-          <li key={p} className={`badge ${i === at ? "" : "b-neutral"}`} style={i === at ? { background: look.color, color: "#fff" } : i < at ? { opacity: 0.75 } : undefined} aria-current={i === at ? "step" : undefined}>
+          <li key={p} className={`badge ${i === at ? "" : "b-neutral"}`} style={i === at ? { background: look.color, color: "#fff" } : undefined} aria-current={i === at ? "step" : undefined}>
             {i < at ? "✓ " : ""}{p}
           </li>
         ))}

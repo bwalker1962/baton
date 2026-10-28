@@ -132,7 +132,7 @@ export default function Brand({ params }: { params: Promise<{ id: string }> }) {
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <span className="badge" style={{ background: accent.color, color: "#fff" }}>Grow</span>
-                  <span className="badge" style={{ background: `color-mix(in srgb, ${accent.color} 14%, transparent)`, color: accent.color }}>Strategy</span>
+                  <span className="badge badge-accent" style={{ ["--accent" as string]: accent.color }}>Strategy</span>
                   <button className="btn" style={{ background: accent.color, borderColor: accent.color, color: "#fff", minHeight: 34 }}>Send</button>
                 </div>
               </div>

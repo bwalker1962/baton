@@ -36,7 +36,7 @@ export default function Chats({ params }: { params: Promise<{ id: string }> }) {
                 <span className="grow" style={{ flexBasis: 280, display: "flex", flexDirection: "column", gap: 6 }}>
                   <span style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                     <strong>{t.title}</strong>
-                    <span className="badge" style={{ background: "color-mix(in srgb, var(--accent) 14%, transparent)", color: "var(--accent)" }}>{t.category}</span>
+                    <span className="badge badge-accent">{t.category}</span>
                   </span>
                   <span className="muted">{t.summary}</span>
                   <span style={{ background: "var(--surface-2)", borderRadius: 8, padding: "6px 10px" }}><strong>Decision</strong> · {t.decision}</span>

@@ -1,7 +1,6 @@
-import { SignoffList } from "@/components/SignoffList";
+import { ClientDashboard } from "./ClientDashboard";
 
-// A client's first tab: only this client's sign-off, so you review in one context at a time.
-export default async function ClientSignoff({ params }: { params: Promise<{ id: string }> }) {
+export default async function ClientHome({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  return <div style={{ display: "flex", flexDirection: "column", gap: 16 }}><SignoffList clientId={id} /></div>;
+  return <ClientDashboard clientId={id} />;
 }

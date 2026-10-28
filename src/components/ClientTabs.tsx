@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation";
 import { useStore } from "@/lib/store";
 
 const TABS = [
-  { seg: "", label: "Sign-off" },
+  { seg: "", label: "Dashboard" },
+  { seg: "signoff", label: "Sign-off" },
   { seg: "score", label: "Score" },
   { seg: "tasks", label: "Tasks" },
   { seg: "projects", label: "Projects" },
@@ -27,7 +28,7 @@ export function ClientTabs({ id }: { id: string }) {
         const active = t.seg ? path.startsWith(href) : path === base;
         return (
           <Link key={t.label} href={href} aria-current={active ? "page" : undefined}>
-            {t.label}{t.seg === "" && eyes > 0 && <span className="navcount" style={{ marginLeft: 6 }}>{eyes}</span>}
+            {t.label}{t.seg === "signoff" && eyes > 0 && <span className="navcount" style={{ marginLeft: 6 }}>{eyes}</span>}
           </Link>
         );
       })}

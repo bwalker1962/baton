@@ -1,7 +1,7 @@
 "use client";
 import { use, useState } from "react";
 import { useStore } from "@/lib/store";
-import { actions } from "@/lib/notes";
+import { noteText, openActions } from "@/lib/notes";
 import { Composer, PostIt } from "@/components/Notes";
 
 export default function ClientNotes({ params }: { params: Promise<{ id: string }> }) {
@@ -11,10 +11,10 @@ export default function ClientNotes({ params }: { params: Promise<{ id: string }
   const topics = agenda?.items.filter((i) => !i.covered) ?? [];
   const [who, setWho] = useState("All");
   const [q, setQ] = useState("");
-  const mine = notes.filter((n) => n.clientId === id).sort((a, b) => b.date.localeCompare(a.date));
+  const mine = notes.filter((n) => n.clientId === id).sort((a, b) => b.updated.localeCompare(a.updated));
   const people = ["All", ...new Set(mine.map((n) => n.with))];
-  const shown = mine.filter((n) => (who === "All" || n.with === who) && (!q || n.text.toLowerCase().includes(q.toLowerCase())));
-  const open = mine.flatMap((n) => actions(n.text).filter((a) => !(n.done ?? []).includes(a.i)));
+  const shown = mine.filter((n) => (who === "All" || n.with === who) && (!q || noteText(n).toLowerCase().includes(q.toLowerCase())));
+  const open = mine.flatMap(openActions);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

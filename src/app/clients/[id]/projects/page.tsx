@@ -4,7 +4,7 @@ import { use } from "react";
 import { templates } from "@/lib/templates";
 import { useStore } from "@/lib/store";
 import { Icon } from "@/components/Icon";
-import { ProjectStarter } from "@/components/ProjectStarter";
+import { StartProjectPill } from "@/components/ProjectStarter";
 import { dragInto1on1 } from "@/lib/agenda";
 import { CERTAINTY } from "@/lib/intake";
 
@@ -15,7 +15,7 @@ export default function Projects({ params }: { params: Promise<{ id: string }> }
 
   return (
     <>
-      <ProjectStarter clientId={id} />
+      <StartProjectPill clientId={id} />
       {mine.length > 0 && (
         <section className="card">
           <div className="card-head"><h2>Projects</h2></div>

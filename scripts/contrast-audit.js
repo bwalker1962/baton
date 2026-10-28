@@ -2,10 +2,12 @@
 // Usage: npm run build && npx next start -p 3324, then: node scripts/contrast-audit.js 3324 [phone]
 // Prints nothing when every label meets WCAG AA (4.5:1, or 3:1 for large text).
 const { chromium } = require('playwright');
-const pages = ['/', '/today', '/signoff', '/signoff/s3', '/advisor', '/skills', '/clients', '/clients/pentara', '/clients/pentara/score',
+const pages = ['/', '/today', '/signoff', '/signoff/s3', '/advisor', '/skills', '/clients', '/clients/pentara', '/clients/pentara/signoff', '/clients/pentara/score',
   '/clients/pentara/tasks', '/clients/pentara/projects', '/clients/pentara/notes', '/clients/pentara/chats', '/clients/pentara/apps',
   '/clients/pentara/report', '/clients/pentara/brand', '/login', '/signup', '/projects-new'];
 const extras = {
+  '/': async (p) => { await p.getByRole('button', { name: 'Customize' }).click(); },
+  '/clients/pentara': async (p) => { await p.getByRole('button', { name: 'Start a project' }).click(); },
   '/clients/pentara/tasks': async (p) => { await p.locator('tbody tr').first().getByRole('button', { name: /Snooze/ }).click(); },
   '/clients/pentara/notes': async (p) => { await p.locator('.oneonone-pill').click(); },
   '/signoff/s3': async (p) => { await p.getByRole('button', { name: 'Approve with changes' }).click(); },

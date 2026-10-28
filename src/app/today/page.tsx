@@ -9,6 +9,7 @@ import { Icon } from "@/components/Icon";
 import { ClientTile } from "@/components/ui";
 import { SnoozeButton, wakeLabel } from "@/components/Snooze";
 import { DRAG_TYPE } from "@/lib/agenda";
+import { DayItemPopover, anchorOf, type Anchor } from "@/components/TaskPopover";
 
 const KIND: Record<DayKind, { label: string; icon: string; cls: string }> = {
   review: { label: "Review", icon: "eye", cls: "b-eyes" },
@@ -27,6 +28,7 @@ export default function Today() {
   const [done, setDone] = useState<string[]>([]);
   const [added, setAdded] = useState<string[]>([]); // lead items pulled into today
   const [asleep, setAsleep] = useState<Record<string, string>>({}); // snoozed item id → wake date
+  const [pop, setPop] = useState<{ id: string; anchor: Anchor } | null>(null);
   const [drag, setDrag] = useState<string | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
@@ -119,7 +121,7 @@ export default function Today() {
                 <input type="checkbox" aria-label={`Done: ${it.title}`} checked={isDone} onChange={() => setDone((d) => (isDone ? d.filter((x) => x !== it.id) : [...d, it.id]))} style={{ width: 18, height: 18 }} />
                 {c ? <ClientTile client={c} small /> : <span className="tile tile-sm" style={{ background: "var(--text)" }} aria-hidden="true">B</span>}
                 <span style={{ flex: 1, minWidth: 180 }}>
-                  <span style={{ fontWeight: 600, textDecoration: isDone ? "line-through" : undefined }}>{it.href ? <Link href={it.href}>{it.title}</Link> : it.title}</span>
+                  <span style={{ fontWeight: 600, textDecoration: isDone ? "line-through" : undefined }}><button className="title-btn" onClick={(e) => setPop({ id: it.id, anchor: anchorOf(e.currentTarget) })} aria-haspopup="dialog">{it.title}</button></span>
                   <span className="muted small" style={{ display: "block" }}>{c?.name ?? "All clients"}{it.why ? ` · ${it.why}` : ""}</span>
                 </span>
                 <span className={`badge ${k.cls}`}><Icon name={k.icon} size={13} />{k.label}</span>
@@ -185,6 +187,15 @@ export default function Today() {
           );
         })}
       </section>
+      {pop && (() => {
+        const it = list.find((x) => x.id === pop.id);
+        return it ? (
+          <DayItemPopover item={it} anchor={pop.anchor} onClose={() => setPop(null)}
+            onChange={(p) => setList((all) => all.map((x) => (x.id === it.id ? { ...x, ...p } : x)))}
+            onSnooze={(until) => setAsleep((a) => ({ ...a, [it.id]: until }))}
+            onRemove={() => remove(it.id)} />
+        ) : null;
+      })()}
     </div>
   );
 }

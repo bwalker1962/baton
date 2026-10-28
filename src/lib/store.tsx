@@ -3,9 +3,9 @@
 // In-memory only; a real build moves this to the database.
 // © 2026 RidgeFront. All rights reserved.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { signoffItems as seedItems } from "./data";
+import { signoffItems as seedItems, tasks as seedTasks } from "./data";
 import type { SignoffItem, SignoffState } from "./types";
-import { noteSeed, type Note } from "./notes";
+import { migrate, noteSeed, type Note } from "./notes";
 import { agendaSeed, type Agenda } from "./agenda";
 import type { Task } from "./types";
 
@@ -86,6 +86,11 @@ interface Store {
   /** Tasks created in Baton (from 1:1 follow-ups), merged with each client's task list. */
   newTasks: Task[];
   addTask: (t: Task) => void;
+  agendaOpenFor: string | null;
+  openAgenda: (clientId: string | null) => void;
+  /** Every task: the sample list plus tasks created in Baton, with your edits applied. */
+  tasks: Task[];
+  editTask: (id: string, patch: Partial<Task>) => void;
 }
 
 const Ctx = createContext<Store | null>(null);
@@ -110,13 +115,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [notes, setNotes] = useState<Note[]>(noteSeed);
   // Notes are kept on this device in the prototype; the build stores them per client.
   useEffect(() => {
-    try { const raw = localStorage.getItem("baton-notes-v1"); if (raw) setNotes(JSON.parse(raw)); } catch {}
+    try { const raw = localStorage.getItem("baton-notes-v1"); if (raw) setNotes((JSON.parse(raw) as unknown[]).map(migrate)); } catch {}
   }, []);
   const persist = (next: Note[]) => { try { localStorage.setItem("baton-notes-v1", JSON.stringify(next)); } catch {} return next; };
   const saveNote = useCallback((n: Note) => setNotes((all) => persist(all.some((x) => x.id === n.id) ? all.map((x) => (x.id === n.id ? n : x)) : [n, ...all])), []);
   const removeNote = useCallback((id: string) => setNotes((all) => persist(all.filter((x) => x.id !== id))), []);
   const [agendas, setAgendas] = useState<Agenda[]>(agendaSeed);
   const [newTasks, setNewTasks] = useState<Task[]>([]);
+  const [agendaOpenFor, openAgenda] = useState<string | null>(null);
+  const [taskEdits, setTaskEdits] = useState<Record<string, Partial<Task>>>({});
+  useEffect(() => { try { const raw = localStorage.getItem("baton-taskedits-v1"); if (raw) setTaskEdits(JSON.parse(raw)); } catch {} }, []);
+  const editTask = useCallback((id: string, patch: Partial<Task>) => setTaskEdits((all) => {
+    const next = { ...all, [id]: { ...all[id], ...patch } };
+    try { localStorage.setItem("baton-taskedits-v1", JSON.stringify(next)); } catch {}
+    return next;
+  }), []);
+  const tasks = useMemo(() => [...seedTasks, ...newTasks].map((t) => (taskEdits[t.id] ? { ...t, ...taskEdits[t.id] } : t)), [newTasks, taskEdits]);
   useEffect(() => {
     try { const raw = localStorage.getItem("baton-agendas-v1"); if (raw) setAgendas(JSON.parse(raw)); } catch {}
     try { const raw = localStorage.getItem("baton-newtasks-v1"); if (raw) setNewTasks(JSON.parse(raw)); } catch {}
@@ -184,8 +198,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p))), []);
 
   const value = useMemo(
-    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask }),
-    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask],
+    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, openAgenda, tasks, editTask }),
+    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, tasks, editTask],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

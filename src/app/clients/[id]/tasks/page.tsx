@@ -1,6 +1,7 @@
 "use client";
 import { use, useState } from "react";
-import { tasks as seed, TODAY } from "@/lib/data";
+import { TODAY } from "@/lib/data";
+import { TaskPopover, anchorOf, type Anchor } from "@/components/TaskPopover";
 import { useStore } from "@/lib/store";
 import { SnoozeButton, wakeLabel } from "@/components/Snooze";
 import { dragInto1on1 } from "@/lib/agenda";
@@ -11,15 +12,15 @@ import { Icon } from "@/components/Icon";
 
 export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const [rows, setRows] = useState(seed.filter((t) => t.clientId === id));
   const [owners, setOwners] = useState<string[]>(["BCW", "Client", "PR contractor", "rf-copy", "rf-positioning", "rf-content"]);
   const [adding, setAdding] = useState<string | null>(null);
   const [newOwner, setNewOwner] = useState("");
-  const { snoozed, snooze, newTasks } = useStore();
+  const { snoozed, snooze, tasks, editTask } = useStore();
+  const [pop, setPop] = useState<{ id: string; anchor: Anchor } | null>(null);
   const addToAgenda = useAddToAgenda();
   const [added, setAdded] = useState<string[]>([]);
-  // Tasks sent back from a 1:1 join the client's list.
-  const all = [...rows, ...newTasks.filter((t) => t.clientId === id && !rows.some((r) => r.id === t.id))];
+  // Includes tasks sent back from a 1:1; edits made anywhere show here.
+  const all = tasks.filter((t) => t.clientId === id);
   const [showSnoozed, setShowSnoozed] = useState(false);
   const isAsleep = (tid: string) => !!snoozed[tid] && snoozed[tid] > TODAY;
   const asleep = all.filter((t) => isAsleep(t.id));
@@ -28,12 +29,12 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
   const setOwner = (taskId: string, owner: string) => {
     if (owner === "__new") return setAdding(taskId);
     const kind: CrewKind = owner.startsWith("rf-") ? "skill" : "person";
-    setRows((r) => r.map((t) => (t.id === taskId ? { ...t, owner, ownerKind: kind } : t)));
+    editTask(taskId, { owner, ownerKind: kind });
   };
   const saveOwner = () => {
     if (!adding || !newOwner.trim()) return setAdding(null);
     setOwners((o) => [...o, newOwner.trim()]);
-    setRows((r) => r.map((t) => (t.id === adding ? { ...t, owner: newOwner.trim(), ownerKind: "person" } : t)));
+    editTask(adding, { owner: newOwner.trim(), ownerKind: "person" });
     setAdding(null);
     setNewOwner("");
   };
@@ -43,7 +44,7 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
       <div className="card-head">
         <h2>Tasks</h2>
         <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <span className="muted small hide-mobile">Change an owner inline, or snooze until it matters</span>
+          <span className="muted small hide-mobile">Click a task to adjust it</span>
           {asleep.length > 0 && <button className="btn" style={{ minHeight: 32 }} aria-pressed={showSnoozed} onClick={() => setShowSnoozed((v) => !v)}><Icon name="clock" size={15} />Snoozed · {asleep.length}</button>}
         </span>
       </div>
@@ -66,7 +67,11 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
           <tbody>
             {visible.map((t) => (
               <tr key={t.id} {...dragInto1on1({ kind: "task", title: t.title, href: `/clients/${id}/tasks`, refId: t.id, clientId: id })}>
-                <td><strong>{t.title}</strong><br /><span className="muted small">{t.dept}</span></td>
+                <td>
+                  <button className="title-btn" aria-haspopup="dialog" onClick={(e) => setPop({ id: t.id, anchor: anchorOf(e.currentTarget) })}>{t.title}</button>
+                  {t.promised && <span className="badge b-info" style={{ marginLeft: 6 }}>Promised to {t.promised.to}</span>}
+                  <br /><span className="muted small">{t.dept}</span>
+                </td>
                 <td><StatusBadge health={t.health} /></td>
                 <td>
                   {adding === t.id ? (
@@ -97,6 +102,7 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
           </tbody>
         </table>
       )}
+      {pop && <TaskPopover taskId={pop.id} anchor={pop.anchor} onClose={() => setPop(null)} />}
     </section>
   );
 }

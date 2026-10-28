@@ -32,7 +32,7 @@ type Rec = { lang: string; interimResults: boolean; onresult: (e: { results: Arr
 const getRecognizer = (): (new () => Rec) | undefined =>
   typeof window === "undefined" ? undefined : ((window as unknown as Record<string, unknown>).SpeechRecognition ?? (window as unknown as Record<string, unknown>).webkitSpeechRecognition) as (new () => Rec) | undefined;
 
-export function ProjectStarter({ clientId }: { clientId?: string }) {
+export function ProjectStarter({ clientId, onClose }: { clientId?: string; onClose?: () => void }) {
   const router = useRouter();
   const { addProject } = useStore();
   const [msgs, setMsgs] = useState<Msg[]>([]);
@@ -112,7 +112,10 @@ export function ProjectStarter({ clientId }: { clientId?: string }) {
     <section className="card" aria-label="Start a project" style={{ overflow: "hidden" }}>
       <div className="card-head">
         <h2 style={{ display: "flex", gap: 8, alignItems: "center" }}><Icon name="plus" size={18} />Start a project</h2>
-        {!fresh && <button className="btn" style={{ minHeight: 32 }} onClick={reset}>Start over</button>}
+        <span style={{ display: "flex", gap: 6 }}>
+          {!fresh && <button className="btn" style={{ minHeight: 32 }} onClick={reset}>Start over</button>}
+          {onClose && <button className="btn" style={{ minHeight: 32 }} onClick={onClose} aria-label="Close Start a project">Close</button>}
+        </span>
       </div>
 
       {fresh ? (
@@ -175,5 +178,21 @@ export function ProjectStarter({ clientId }: { clientId?: string }) {
         </form>
       )}
     </section>
+  );
+}
+
+/** "Start a project" as a pill that opens only when you need it. */
+export function StartProjectPill({ clientId, children }: { clientId?: string; children?: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button className={`btn pill ${open ? "btn-outline" : ""}`} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+          <Icon name="plus" size={15} />Start a project
+        </button>
+        {children}
+      </div>
+      {open && <div className="fade"><ProjectStarter clientId={clientId} onClose={() => setOpen(false)} /></div>}
+    </>
   );
 }

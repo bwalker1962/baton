@@ -128,14 +128,14 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
   const finish = (state: Parameters<typeof decide>[1], outcome?: string) => {
     decide(item.id, state, outcome);
     setSheet(null);
-    router.push(next ? `/signoff/${next.id}${scope ? `?client=${scope}` : ""}` : scope ? `/clients/${scope}` : "/signoff");
+    router.push(next ? `/signoff/${next.id}${scope ? `?client=${scope}` : ""}` : scope ? `/clients/${scope}/signoff` : "/signoff");
   };
 
   return (
     <div style={{ ["--accent" as string]: client.color, display: "flex", flexDirection: "column", gap: 16 }}>
       <div className="pagehead">
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <Link href={scope ? `/clients/${scope}` : "/signoff"} className="btn" aria-label="Back to sign-off" style={{ minHeight: 40, padding: "0 10px" }}><Icon name="back" /></Link>
+          <Link href={scope ? `/clients/${scope}/signoff` : "/signoff"} className="btn" aria-label="Back to sign-off" style={{ minHeight: 40, padding: "0 10px" }}><Icon name="back" /></Link>
           <ClientTile client={client} />
           <div>
             <div className="eyebrow">{client.name} · {item.dept} · {queue.findIndex((i) => i.id === id) + 1 || "–"} of {queue.length}</div>

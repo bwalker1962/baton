@@ -373,3 +373,72 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 /* Client-colored labels: tinted background, text lightened in dark mode so it stays readable. */
 .badge-accent { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
 [data-mode="dark"] .badge-accent { background: color-mix(in srgb, var(--accent) 28%, transparent); color: color-mix(in srgb, var(--accent) 40%, #ffffff); }
+
+/* Widget dashboard */
+.dash { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; grid-auto-flow: dense; align-items: start; }
+.widget { min-width: 0; overflow: hidden; transition: box-shadow .15s ease, opacity .15s ease; }
+.widget.size-s { grid-column: span 1; }
+.widget.size-m { grid-column: span 2; }
+.widget.size-l { grid-column: span 4; }
+.widget.dragging { opacity: .4; }
+.widget.drop-before { box-shadow: -4px 0 0 0 var(--text), var(--shadow); }
+.widget-head { padding-top: 12px; padding-bottom: 8px; }
+.widget-body { padding-bottom: 6px; }
+.widget-body > .row:first-child { border-top: 0; }
+.grip { cursor: grab; color: var(--muted); letter-spacing: -2px; font-weight: 700; padding: 2px 4px; border-radius: 4px; user-select: none; touch-action: none; }
+.grip:hover, .grip:focus-visible { background: var(--surface-2); color: var(--text); outline: none; }
+.dash-end { display: none; grid-column: 1 / -1; border: 2px dashed var(--border); border-radius: 12px; padding: 18px; text-align: center; color: var(--muted); font-size: 13px; }
+.dash-end.show { display: block; }
+.dash-end.hot { border-color: var(--text); color: var(--text); }
+.tray-item { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); cursor: grab; max-width: 360px; }
+@media (max-width: 1100px) {
+  .dash { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .widget.size-l { grid-column: span 2; }
+}
+@media (max-width: 700px) {
+  .dash { grid-template-columns: 1fr; }
+  .widget.size-s, .widget.size-m, .widget.size-l { grid-column: span 1; }
+}
+.btn.pill { border-radius: 999px; padding: 0 14px; min-height: 36px; }
+
+/* Task pop-over */
+.task-pop { padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 18px 50px -12px rgba(0,0,0,.45), 0 0 0 1px var(--border); max-height: calc(100dvh - 24px); overflow-y: auto; }
+.task-pop .input { padding: 6px 8px; }
+.task-promise { border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.row.as-button { width: 100%; background: none; border: 0; border-top: 1px solid var(--divider); text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.row.as-button:hover { background: var(--surface-2); }
+.title-btn { all: unset; cursor: pointer; font-weight: 600; }
+.title-btn:hover { text-decoration: underline; }
+.title-btn:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 3px; }
+
+/* Notes edited in place */
+.postit .entry { position: relative; display: flex; gap: 8px; align-items: flex-start; margin: 1px 0; padding-right: 4px; }
+.postit .entry.is-action { font-weight: 600; }
+.postit .entry input[type=checkbox] { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--note); flex: none; }
+.postit .entry.is-done { opacity: .6; }
+.postit .entry-text { white-space: pre-wrap; display: block; }
+.inline-text { all: unset; display: block; width: 100%; box-sizing: border-box; white-space: pre-wrap; overflow-wrap: anywhere; resize: none; line-height: 1.5; border-radius: 4px; padding: 1px 3px; margin-left: -3px; cursor: text; }
+.inline-text:hover { background: color-mix(in srgb, currentColor 6%, transparent); }
+.inline-text:focus { background: rgba(255,255,255,.55); outline: 1px solid color-mix(in srgb, var(--note) 70%, transparent); }
+[data-mode="dark"] .inline-text:focus { background: rgba(0,0,0,.25); }
+.inline-who { all: unset; font: inherit; font-weight: 700; border-bottom: 1px dashed color-mix(in srgb, currentColor 40%, transparent); min-width: 3ch; }
+.inline-who:focus { border-bottom-style: solid; }
+.inline-add { all: unset; display: block; width: 100%; box-sizing: border-box; margin-top: 6px; padding: 4px 3px; font-size: 13px; border-top: 1px dashed color-mix(in srgb, currentColor 22%, transparent); }
+.inline-add::placeholder { color: inherit; opacity: .55; }
+/* The clock sits on the note's right edge, one per entry. */
+.stamp-btn { position: absolute; right: -24px; top: 3px; width: 18px; height: 18px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center;
+  background: var(--note); color: #fff; opacity: .35; cursor: pointer; transition: opacity .12s ease; }
+.entry:hover .stamp-btn, .stamp-btn:focus-visible, .stamp-btn[aria-pressed="true"] { opacity: 1; }
+.entry-stamp { display: block; font-size: 11px; font-weight: 500; opacity: .75; margin-top: 1px; }
+.completed { margin-top: 8px; }
+.completed-toggle { all: unset; cursor: pointer; font-size: 12px; font-weight: 700; opacity: .55; }
+.completed-toggle:hover, .completed-toggle:focus-visible { opacity: .9; }
+.note-delete { all: unset; cursor: pointer; font-size: 12px; opacity: .55; text-decoration: underline; }
+.note-delete:hover, .note-delete:focus-visible { opacity: .9; }
+/* Inline fields read as plain writing until focused (beats the older .postit field rule). */
+.postit .inline-text, .postit .inline-add, .postit .inline-who { background: transparent; border-color: transparent; }
+.postit .inline-who { border-bottom: 1px dashed color-mix(in srgb, currentColor 40%, transparent); }
+.postit .inline-text:hover { background: color-mix(in srgb, currentColor 6%, transparent); }
+.postit .inline-text:focus, .postit .inline-add:focus { background: rgba(255,255,255,.55); }
+[data-mode="dark"] .postit .inline-text:focus, [data-mode="dark"] .postit .inline-add:focus { background: rgba(0,0,0,.25); }
+.completed-toggle, .note-delete { opacity: .78; }

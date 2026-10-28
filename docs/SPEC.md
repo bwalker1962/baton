@@ -39,6 +39,11 @@ This spec grows with the build. Every feature carries a status, and each build a
 
 | Feature | Status | Notes |
 | --- | --- | --- |
+| Notes edited in place: Who, every line, add a line; no edit mode | Prototyped | Enter starts a new line; backspace on an empty line removes it |
+| Each line carries its time, revealed by a small clock on the note's right edge | Prototyped | Added, edited and done times |
+| Ticked items move to a grayed "Completed items" list at the bottom | Prototyped | Untick to restore |
+| Last updated time on every note; newest first | Prototyped | |
+| Promises to the CEO tracked on tasks: who, when promised, due | Prototyped | 1:1 follow-ups become promises due by the next 1:1 |
 | Floating 1:1 agenda per client, on every screen, minimizes to a pill | Prototyped | Follows the client you're viewing, except during a meeting |
 | Drag tasks, sign-off items, projects and Today items onto it; or "1:1" buttons and "Add the page I'm on" | Prototyped | Another client's item goes to that client's agenda, and says so |
 | Reorder topics by dragging; jump to any linked item while the agenda stays open | Prototyped | Page makes room for the panel on wide screens |
@@ -98,10 +103,33 @@ This spec grows with the build. Every feature carries a status, and each build a
 | Steps that produce outbound work create sign-off items | Specified | Marked with a sign-off badge today |
 | Save a customized checklist as your own template | Future | |
 
+### Dashboards
+
+| Feature | Status | Notes |
+| --- | --- | --- |
+| Home and each client open on a dashboard of widgets you arrange | Prototyped | Client tabs: Dashboard, then Sign-off |
+| Drag a widget by its grip to move it; arrow keys on the grip move it too | Prototyped | Drags inside a widget (rows into the 1:1) never move the widget |
+| Customize: widget library grouped by priority; drag in or tap Add; S, M, Wide sizes; remove; reset to recommended | Prototyped | Saved per dashboard |
+| Widgets: Owed to the CEO, Next 1:1, CEO report, Conversation notes, Ear to the ground, Peace of mind, Needs your eyes, Long-lead radar, Today, Tasks, Projects, Clients, Status mix | Prototyped | |
+| Start a project is a pill that opens when needed | Prototyped | Home, client dashboard, Projects tab |
+| Layouts sync across devices | Specified | Saved on this device in the prototype |
+
+### Ear to the ground
+
+| Feature | Status | Notes |
+| --- | --- | --- |
+| Upcoming holidays, observances, seasons and awareness months, each with the clients it matters to and the angle | Prototyped | Real 2026 dates; angles are suggestions |
+| Trend signals marked as samples | Prototyped | Refreshed weekly in the build through rf-compete, web research and Press Ranger, with sources |
+| Add any angle to that client's next 1:1 as a talking point | Prototyped | |
+| Industry events and deadlines per client (conferences, abstracts, award cycles) | Specified | Feeds the long-lead radar |
+| Weekly "what's coming" digest | Specified | |
+
 ### Today and long-lead planning
 
 | Feature | Status | Notes |
 | --- | --- | --- |
+| Click any task or Today item to adjust it in a pop-over | Prototyped | Title, status, owner, due, progress, roadblock, promised to the CEO, snooze, add to 1:1 |
+| Edits apply everywhere the task appears | Prototyped | Tasks tab, dashboards, Owed to the CEO |
 | Snooze any task or Today item: tomorrow, 3 days, 1 week, 2 weeks, 1 month, or any number of days, weeks or months | Prototyped | Shows the wake date before you choose |
 | Snoozed list with wake dates; wake early with one tap | Prototyped | On Tasks and Today |
 | Snoozing past a due date asks whether to move the due date | Specified | |
@@ -175,6 +203,8 @@ This spec grows with the build. Every feature carries a status, and each build a
 
 | Feature | Status | Notes |
 | --- | --- | --- |
+| Claude connector: Baton as a remote MCP server | Specified | Read status, add notes, topics, tasks; never approve or send |
+| OAuth sign-in so Claude acts as you, scoped to your firm | Specified | Same permissions as the app |
 | Data and auth (Supabase, row-level security per client) | Specified | |
 | Sign up: name, email, firm, password or Google | Prototyped | `/signup`; creates the firm (multi-firm ready) |
 | Sign in: password, emailed one-time link, Google | Prototyped | `/login`; real auth via Supabase Auth Specified |
@@ -188,6 +218,18 @@ This spec grows with the build. Every feature carries a status, and each build a
 | Failure alerts when a skill or connection breaks | Specified | |
 | Phase 2: roles for collaborators and client teams | Future | Owner, Collaborator, Client admin, Client viewer |
 | Away mode | Future | |
+
+## Principle: the order of priorities
+
+Every screen is ordered the same way: accountability to each CEO first, your own peace of mind second, project and task views third.
+
+What the review changed:
+
+- **CEO first.** Promises to a CEO are now tracked (who, when promised, due), late ones first. 1:1 follow-ups become promises due by the next 1:1. The CEO report is a standing promise with a cadence. Home's greeting leads with whether any promise is late. Both dashboards open with Owed to the CEO, Next 1:1 and the CEO report. Ear to the ground turns into talking points for the 1:1.
+- **Peace of mind second.** A Peace of mind widget checks five guarantees: no late promise, nothing sending today without your eyes, no slip flags waiting, long-lead work started on time, and a recent conversation with every CEO. All clear means you can stop thinking about work.
+- **Projects and tasks third.** Still one click away, below the fold by default.
+
+Still open (Specified): an action line in a note can be marked as a promise; a pre-1:1 brief assembled automatically from what's owed, decisions needed and Ear to the ground; the CEO report shows promises kept and at risk; an end-of-day "you can stop" check.
 
 ## Principle: everything for review lives in Baton
 
@@ -211,6 +253,13 @@ Each result is OK, Check (you tick it to approve) or Blocks send. The four field
 Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
 
 ## Changelog
+
+### 2026-10-28: dashboards, CEO-first workflow, task pop-over, notes in place
+- Home and client dashboards of widgets you drag in, move, resize and remove; Start a project is a pill.
+- Promises to the CEO tracked; Owed to the CEO, Peace of mind and Ear to the ground widgets.
+- Click any task to adjust it in a pop-over; edits show everywhere.
+- Notes edited in place with Who and last updated; each line timestamped behind a small clock; ticked items fold into Completed items.
+- Fixed: dragging a row inside a widget no longer moves the widget.
 
 ### 2026-10-28: contrast fixes
 - Post-it notes follow the page in Half-dark (light page, dark frame); their buttons take the note's text color.

@@ -79,6 +79,8 @@ export interface Task {
   health: Health;
   pct: number;
   blocker?: { kind: BlockerKind; label: string };
+  // A commitment you made to the client's CEO (or founder): who, and when you promised it.
+  promised?: { to: string; on: string };
 }
 
 export type SignoffState =

@@ -160,15 +160,15 @@ export const departments: Department[] = [
 ];
 
 export const tasks: Task[] = [
-  { id: "t1", clientId: "pentara", title: "Pipeline reporting", dept: "Revenue growth", owner: "Client", ownerKind: "person", due: "2026-10-21", health: "bad", pct: 0, blocker: { kind: "access", label: "CRM access" } },
-  { id: "t2", clientId: "pentara", title: "Narrative layer decision", dept: "Brand", owner: "BCW", ownerKind: "person", due: "2026-11-01", health: "warn", pct: 50, blocker: { kind: "client", label: "client input" } },
+  { id: "t1", clientId: "pentara", title: "Pipeline reporting", dept: "Revenue growth", owner: "Client", ownerKind: "person", due: "2026-10-21", health: "bad", pct: 0, blocker: { kind: "access", label: "CRM access" } , promised: { to: "CEO", on: "2026-10-13" } },
+  { id: "t2", clientId: "pentara", title: "Narrative layer decision", dept: "Brand", owner: "BCW", ownerKind: "person", due: "2026-11-01", health: "warn", pct: 50, blocker: { kind: "client", label: "client input" } , promised: { to: "CEO", on: "2026-10-27" } },
   { id: "t3", clientId: "pentara", title: "Cost alignment review prep", dept: "Strategy", owner: "BCW", ownerKind: "person", due: "2026-11-04", health: "warn", pct: 10, blocker: { kind: "task", label: "prep task" } },
   { id: "t4", clientId: "pentara", title: "Research 30 Forensic Engineering", dept: "Brand", owner: "rf-positioning", ownerKind: "skill", due: "2026-10-30", health: "good", pct: 60 },
   { id: "t5", clientId: "pentara", title: "Q1 plan draft", dept: "Strategy", owner: "BCW", ownerKind: "person", due: "2026-12-01", health: "good", pct: 35 },
   { id: "t6", clientId: "pentara", title: "Customer research plan", dept: "Customer insight", owner: "Unassigned", ownerKind: "gap", due: null, health: "none", pct: 0 },
-  { id: "t7", clientId: "morning-miracle", title: "Connect Klaviyo", dept: "Marketing ops", owner: "BCW", ownerKind: "person", due: "2026-10-26", health: "bad", pct: 20, blocker: { kind: "access", label: "Klaviyo account" } },
+  { id: "t7", clientId: "morning-miracle", title: "Connect Klaviyo", dept: "Marketing ops", owner: "BCW", ownerKind: "person", due: "2026-10-26", health: "bad", pct: 20, blocker: { kind: "access", label: "Klaviyo account" } , promised: { to: "Founder", on: "2026-10-19" } },
   { id: "t8", clientId: "morning-miracle", title: "Day-45 reorder email", dept: "Demand generation", owner: "rf-copy", ownerKind: "skill", due: "2026-10-28", health: "warn", pct: 90 },
-  { id: "t9", clientId: "photopharmics", title: "Narrative one-pager", dept: "Brand", owner: "rf-positioning", ownerKind: "skill", due: "2026-11-03", health: "good", pct: 80 },
+  { id: "t9", clientId: "photopharmics", title: "Narrative one-pager", dept: "Brand", owner: "rf-positioning", ownerKind: "skill", due: "2026-11-03", health: "good", pct: 80 , promised: { to: "CEO", on: "2026-10-22" } },
   { id: "t10", clientId: "mountain-peaks", title: "Monday input", dept: "Strategy", owner: "Client", ownerKind: "person", due: "2026-10-26", health: "warn", pct: 0, blocker: { kind: "client", label: "client input" } },
 ];
 

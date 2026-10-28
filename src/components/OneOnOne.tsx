@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { clients, TODAY } from "@/lib/data";
+import { entriesFromText, nowIso } from "@/lib/notes";
 import { DRAG_TYPE, KIND_ICON, OUTCOMES, type Agenda, type AgendaItem, type Draggable, type Outcome } from "@/lib/agenda";
 import { useClientLook, useStore } from "@/lib/store";
 import { shortDate } from "@/lib/format";
@@ -29,7 +30,7 @@ export function useAddToAgenda() {
 
 export function OneOnOne({ here }: { here?: string }) {
   const router = useRouter();
-  const { agendas, saveAgenda, saveNote, addTask, projects, updateProject } = useStore();
+  const { agendas, saveAgenda, saveNote, addTask, projects, updateProject, agendaOpenFor, openAgenda } = useStore();
   const [open, setOpen] = useState(false);
   const [cid, setCid] = useState(here ?? agendas[0]?.clientId ?? clients[0].id);
   const [meeting, setMeeting] = useState(false);
@@ -39,6 +40,8 @@ export function OneOnOne({ here }: { here?: string }) {
   const [flash, setFlash] = useState("");
   const [stepTarget, setStepTarget] = useState<Record<string, string>>({});
 
+  // Any screen can ask for a client's agenda to open.
+  useEffect(() => { if (agendaOpenFor) { setCid(agendaOpenFor); setOpen(true); openAgenda(null); } }, [agendaOpenFor, openAgenda]);
   // Follow the client you're looking at, except during a meeting: then the agenda holds still.
   useEffect(() => { if (here && !meeting) setCid(here); }, [here, meeting]);
   // On wide screens the page makes room for the open panel instead of hiding under it.
@@ -101,7 +104,7 @@ export function OneOnOne({ here }: { here?: string }) {
         if (p) { updateProject(p.id, { steps: [...p.steps, { id: uid(), title: text, phase: "From 1:1", due: null, owner: "BCW", status: "open" }] }); steps++; continue; }
       }
       if (i.outcome === "task" || i.outcome === "step") {
-        addTask({ id: uid(), clientId: cid, title: text, dept: `From 1:1 on ${shortDate(TODAY).full}`, owner: "BCW", ownerKind: "person", due: null, health: "none", pct: 0 });
+        addTask({ id: uid(), clientId: cid, title: text, dept: `From 1:1 on ${shortDate(TODAY).full}`, owner: "BCW", ownerKind: "person", due: agenda.next, health: "none", pct: 0, promised: { to: agenda.with, on: TODAY } });
         tasks++;
       }
     }
@@ -110,7 +113,7 @@ export function OneOnOne({ here }: { here?: string }) {
       const follow = i.outcome === "task" || i.outcome === "step" ? `\n→ ${(i.answer?.split("\n")[0] || i.title)}` : "";
       return follow ? `${i.title}${follow}` : `${i.title}${tag}${i.answer ? `: ${i.answer}` : ""}`;
     });
-    if (lines.length) saveNote({ id: `n${Date.now().toString(36)}`, clientId: cid, with: agenda.with, date: TODAY, text: `1:1\n${lines.join("\n")}` });
+    if (lines.length) { const at = nowIso(); saveNote({ id: `n${Date.now().toString(36)}`, clientId: cid, with: agenda.with, date: TODAY, entries: entriesFromText(`1:1\n${lines.join("\n")}`, at), updated: at }); }
     // Uncovered topics carry over to the next 1:1.
     put({ items: agenda.items.filter((i) => !(i.covered || i.answer)), current: undefined, next: addDays(agenda.next, 7) });
     setWrap(false); setMeeting(false);
@@ -207,7 +210,7 @@ export function OneOnOne({ here }: { here?: string }) {
         <div className="backdrop" role="presentation" onClick={() => setWrap(false)}>
           <div className="sheet fade" role="dialog" aria-modal="true" aria-label="Wrap up 1:1" onClick={(e) => e.stopPropagation()}>
             <h2 style={{ margin: 0, fontSize: 20 }}>Send the 1:1 back into your work</h2>
-            <p className="small muted" style={{ margin: 0 }}>Everything discussed is saved as a note with {agenda.with}. Follow-ups become tasks or project steps. Topics you didn&apos;t reach carry over to the next 1:1.</p>
+            <p className="small muted" style={{ margin: 0 }}>Everything discussed is saved as a note with {agenda.with}. Follow-ups become promises to {agenda.with}, due by the next 1:1 ({shortDate(agenda.next).full}), as tasks or project steps. Topics you didn&apos;t reach carry over to the next 1:1.</p>
             {agenda.items.filter((i) => i.covered || i.answer).map((i) => (
               <div key={i.id} className="card" style={{ padding: 12, display: "flex", flexDirection: "column", gap: 6 }}>
                 <strong className="small">{i.title}</strong>

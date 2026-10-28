@@ -3,6 +3,7 @@ import { useClientLook } from "@/lib/store";
 import type { Client } from "@/lib/types";
 import { ClientTile } from "./ClientTile";
 import { StatusBadge } from "./ui";
+import { CoachButton } from "./Coach";
 
 const PHASES = ["Align", "Shape", "Grow", "Optimize"] as const;
 
@@ -16,7 +17,7 @@ export function ClientHeader({ client }: { client: Client }) {
         <div>
           <div className="eyebrow">{client.retainer}{client.regulated ? " · regulated: compliance review on" : ""}</div>
           <h1 className="title" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            {client.name} <StatusBadge health={client.health} />
+            {client.name} <StatusBadge health={client.health} /> <CoachButton context="client" clientId={client.id} />
           </h1>
         </div>
       </div>

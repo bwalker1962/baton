@@ -57,4 +57,17 @@ export const agendaSeed: Agenda[] = [
       { id: "a3", title: "Award entry: OK to name the trial sponsor?", kind: "signoff", refId: "s6", href: "/signoff/s6?client=pentara" },
     ],
   },
+  {
+    clientId: "morning-miracle", next: "2026-11-04", with: "Founder",
+    items: [
+      { id: "a4", title: "Klaviyo access: day-45 email is blocked", kind: "task", refId: "t7", href: "/clients/morning-miracle/tasks" },
+      { id: "a5", title: "Black Friday offer: what are we willing to discount?", kind: "topic" },
+    ],
+  },
+  {
+    clientId: "photopharmics", next: "2026-10-26", with: "CEO",
+    items: [
+      { id: "a6", title: "One-pager: does it work for the December investor update?", kind: "signoff", refId: "s4", href: "/signoff/s4?client=photopharmics" },
+    ],
+  },
 ];

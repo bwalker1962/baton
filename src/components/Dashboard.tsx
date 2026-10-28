@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "./Icon";
+import { CoachButton } from "./Coach";
 import { TIER_LABEL, WIDGETS, type Size, type Slot, type Tier } from "./Widgets";
 
 const MOVE = "application/x-baton-widget-move";
@@ -116,7 +117,12 @@ export function Dashboard({ storageKey, scope, clientId, defaults }: { storageKe
                       )}
                       <button className="btn" style={{ minHeight: 30, padding: "0 8px" }} aria-label={`Remove ${w.title}`} onClick={() => setLayout((l) => l.filter((_, i) => i !== n))}>×</button>
                     </>
-                  ) : href ? <Link href={href} className="xs">Open</Link> : null}
+                  ) : (
+                    <>
+                      {w.coach && <CoachButton context={w.coach} clientId={clientId} />}
+                      {href && <Link href={href} className="xs">Open</Link>}
+                    </>
+                  )}
                 </span>
               </div>
               <div className="widget-body"><w.Body clientId={clientId} size={slot.size} /></div>

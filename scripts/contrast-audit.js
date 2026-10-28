@@ -6,7 +6,8 @@ const pages = ['/', '/today', '/signoff', '/signoff/s3', '/advisor', '/skills', 
   '/clients/pentara/tasks', '/clients/pentara/projects', '/clients/pentara/notes', '/clients/pentara/chats', '/clients/pentara/apps',
   '/clients/pentara/report', '/clients/pentara/brand', '/login', '/signup', '/projects-new'];
 const extras = {
-  '/': async (p) => { await p.getByRole('button', { name: 'Customize' }).click(); },
+  '/': async (p) => { await p.locator('section[aria-label="Owed to the CEO"] .coach-btn').click(); },
+  '/today': async (p) => { await p.locator('.coach-btn').first().click(); },
   '/clients/pentara': async (p) => { await p.getByRole('button', { name: 'Start a project' }).click(); },
   '/clients/pentara/tasks': async (p) => { await p.locator('tbody tr').first().getByRole('button', { name: /Snooze/ }).click(); },
   '/clients/pentara/notes': async (p) => { await p.locator('.oneonone-pill').click(); },

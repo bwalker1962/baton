@@ -36,6 +36,7 @@ export interface WidgetDef {
   sizes: Size[];
   blurb: string;
   href?: (clientId?: string) => string;
+  coach?: import("@/lib/coach").CoachContext;
   Body: (p: { clientId?: string; size: Size }) => React.ReactNode;
 }
 export const TIER_LABEL: Record<Tier, string> = { ceo: "CEO accountability", peace: "Peace of mind", work: "Projects and tasks" };
@@ -313,14 +314,14 @@ function StatusMixBody({ clientId }: { clientId?: string }) {
 }
 
 export const WIDGETS: WidgetDef[] = [
-  { id: "owed", title: "Owed to the CEO", icon: "user", tier: "ceo", scopes: ["home", "client"], sizes: ["s", "m", "l"], blurb: "Every promise and report, late first", Body: OwedBody },
-  { id: "oneonone", title: "Next 1:1", icon: "chat", tier: "ceo", scopes: ["home", "client"], sizes: ["s", "m"], blurb: "Dates and topics ready", Body: NextOneOnOneBody },
+  { id: "owed", title: "Owed to the CEO", icon: "user", tier: "ceo", scopes: ["home", "client"], sizes: ["s", "m", "l"], blurb: "Every promise and report, late first", coach: "owed", Body: OwedBody },
+  { id: "oneonone", title: "Next 1:1", icon: "chat", tier: "ceo", scopes: ["home", "client"], sizes: ["s", "m"], blurb: "Dates and topics ready", coach: "oneonone", Body: NextOneOnOneBody },
   { id: "report", title: "CEO report", icon: "report", tier: "ceo", scopes: ["home", "client"], sizes: ["s", "m", "l"], blurb: "When it's due and how things are going", href: (c) => (c ? `/clients/${c}/report` : "/clients"), Body: ReportBody },
   { id: "ear", title: "Ear to the ground", icon: "bulb", tier: "ceo", scopes: ["home", "client"], sizes: ["m", "l"], blurb: "Dates, observances and trends, with each client's angle", Body: EarBody },
-  { id: "peace", title: "Peace of mind", icon: "check", tier: "peace", scopes: ["home", "client"], sizes: ["s", "m"], blurb: "The guarantees that let you switch off", Body: PeaceBody },
-  { id: "signoff", title: "Needs your eyes", icon: "eye", tier: "peace", scopes: ["home", "client"], sizes: ["s", "m", "l"], blurb: "Sign-off queue with slip flags", href: (c) => (c ? `/clients/${c}/signoff` : "/signoff"), Body: SignoffBody },
+  { id: "peace", title: "Peace of mind", icon: "check", tier: "peace", scopes: ["home", "client"], sizes: ["s", "m"], blurb: "The guarantees that let you switch off", coach: "peace", Body: PeaceBody },
+  { id: "signoff", title: "Needs your eyes", icon: "eye", tier: "peace", scopes: ["home", "client"], sizes: ["s", "m", "l"], blurb: "Sign-off queue with slip flags", href: (c) => (c ? `/clients/${c}/signoff` : "/signoff"), coach: "signoff", Body: SignoffBody },
   { id: "radar", title: "Long-lead radar", icon: "clock", tier: "peace", scopes: ["home", "client"], sizes: ["s", "m"], blurb: "Work that has to start now", href: () => "/today", Body: RadarBody },
-  { id: "notes", title: "Conversation notes", icon: "chat", tier: "ceo", scopes: ["home", "client"], sizes: ["m", "l"], blurb: "Post-it stacks by client", href: (c) => (c ? `/clients/${c}/notes` : "/"), Body: ClientNotesBody },
+  { id: "notes", title: "Conversation notes", icon: "chat", tier: "ceo", scopes: ["home", "client"], sizes: ["m", "l"], blurb: "Post-it stacks by client", href: (c) => (c ? `/clients/${c}/notes` : "/"), coach: "notes", Body: ClientNotesBody },
   { id: "today", title: "Today", icon: "tasks", tier: "work", scopes: ["home"], sizes: ["s", "m"], blurb: "Your order for the day", href: () => "/today", Body: TodayBody },
   { id: "tasks", title: "Tasks", icon: "tasks", tier: "work", scopes: ["home", "client"], sizes: ["s", "m", "l"], blurb: "Worst first", href: (c) => (c ? `/clients/${c}/tasks` : "/today"), Body: TasksBody },
   { id: "projects", title: "Projects", icon: "layers", tier: "work", scopes: ["home", "client"], sizes: ["s", "m"], blurb: "Recent projects and how real they are", href: (c) => (c ? `/clients/${c}/projects` : "/"), Body: ProjectsBody },

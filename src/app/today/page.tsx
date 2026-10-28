@@ -9,6 +9,7 @@ import { Icon } from "@/components/Icon";
 import { ClientTile } from "@/components/ui";
 import { SnoozeButton, wakeLabel } from "@/components/Snooze";
 import { DRAG_TYPE } from "@/lib/agenda";
+import { CoachButton } from "@/components/Coach";
 import { DayItemPopover, anchorOf, type Anchor } from "@/components/TaskPopover";
 
 const KIND: Record<DayKind, { label: string; icon: string; cls: string }> = {
@@ -77,7 +78,10 @@ export default function Today() {
           <div className="eyebrow">{new Date(TODAY + "T12:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</div>
           <h1 className="title">Today</h1>
         </div>
-        <button className="btn" onClick={reset}>Reset sample day</button>
+        <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <CoachButton context="peace" />
+          <button className="btn" onClick={reset}>Reset sample day</button>
+        </span>
       </div>
 
       <div className="grid-auto" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>

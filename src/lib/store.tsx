@@ -7,6 +7,7 @@ import { signoffItems as seedItems, tasks as seedTasks } from "./data";
 import type { SignoffItem, SignoffState } from "./types";
 import { migrate, noteSeed, type Note } from "./notes";
 import { agendaSeed, type Agenda } from "./agenda";
+import { styleSeed, type Style } from "./coach";
 import type { Task } from "./types";
 
 export type Mode = "light" | "half" | "dark";
@@ -91,6 +92,12 @@ interface Store {
   /** Every task: the sample list plus tasks created in Baton, with your edits applied. */
   tasks: Task[];
   editTask: (id: string, patch: Partial<Task>) => void;
+  /** Working style per client person, in your words. Private to you. */
+  styles: Style[];
+  saveStyles: (s: Style[]) => void;
+  /** Coach tips you've dismissed, with the date (they can return when things change). */
+  dismissed: Record<string, string>;
+  dismissTip: (id: string) => void;
 }
 
 const Ctx = createContext<Store | null>(null);
@@ -128,6 +135,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const editTask = useCallback((id: string, patch: Partial<Task>) => setTaskEdits((all) => {
     const next = { ...all, [id]: { ...all[id], ...patch } };
     try { localStorage.setItem("baton-taskedits-v1", JSON.stringify(next)); } catch {}
+    return next;
+  }), []);
+  const [styles, setStyles] = useState<Style[]>(styleSeed);
+  const [dismissed, setDismissed] = useState<Record<string, string>>({});
+  useEffect(() => {
+    try { const raw = localStorage.getItem("baton-styles-v1"); if (raw) setStyles(JSON.parse(raw)); } catch {}
+    try { const raw = localStorage.getItem("baton-dismissed-v1"); if (raw) setDismissed(JSON.parse(raw)); } catch {}
+  }, []);
+  const saveStyles = useCallback((s: Style[]) => { setStyles(s); try { localStorage.setItem("baton-styles-v1", JSON.stringify(s)); } catch {} }, []);
+  const dismissTip = useCallback((id: string) => setDismissed((all) => {
+    const next = { ...all, [id]: new Date().toISOString() };
+    try { localStorage.setItem("baton-dismissed-v1", JSON.stringify(next)); } catch {}
     return next;
   }), []);
   const tasks = useMemo(() => [...seedTasks, ...newTasks].map((t) => (taskEdits[t.id] ? { ...t, ...taskEdits[t.id] } : t)), [newTasks, taskEdits]);
@@ -198,8 +217,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p))), []);
 
   const value = useMemo(
-    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, openAgenda, tasks, editTask }),
-    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, tasks, editTask],
+    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, openAgenda, tasks, editTask, styles, saveStyles, dismissed, dismissTip }),
+    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, tasks, editTask, styles, saveStyles, dismissed, dismissTip],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

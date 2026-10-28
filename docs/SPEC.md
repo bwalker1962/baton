@@ -114,6 +114,21 @@ This spec grows with the build. Every feature carries a status, and each build a
 | Start a project is a pill that opens when needed | Prototyped | Home, client dashboard, Projects tab |
 | Layouts sync across devices | Specified | Saved on this device in the prototype |
 
+### Coach
+
+| Feature | Status | Notes |
+| --- | --- | --- |
+| Coach icon on cards (Owed to the CEO, Next 1:1, Peace of mind, Needs your eyes, Notes), client headers and Today | Prototyped | Hover to peek, click to pin; count shows how many suggestions; amber when urgent |
+| Late and near-due promises: what to tell the CEO before they ask, shaped by their working style | Prototyped | |
+| Backlog: sign-off items piling up or past due, with how to clear them | Prototyped | |
+| Meetings: a 1:1 date that passed with no notes; too long since the last CEO conversation for that client's rhythm | Prototyped | Rhythm per client (weekly, every other week) |
+| Tone: pressure words building in your own recent notes ("worried," "pushback," "blocked") | Prototyped | Shows the line it noticed; nudges only |
+| Working style per person, in your words, as behaviors not labels | Prototyped | Notes tab; private to you |
+| Every tip shows its evidence ("Noticed" or "You said"), can be raised at the 1:1, or dismissed with Got it | Prototyped | Dismissed tips return when the facts change |
+| Claude reads notes, emails and meeting transcripts to suggest working-style observations for you to confirm | Specified | Nothing inferred is saved without your yes |
+| Patterns over time: promises usually late with one client, meetings that keep slipping, a CEO whose replies are getting shorter | Specified | |
+| Working style never appears in client-facing views, reports, exports, or the Claude connector's write tools | Specified | |
+
 ### Ear to the ground
 
 | Feature | Status | Notes |
@@ -253,6 +268,10 @@ Each result is OK, Check (you tick it to approve) or Blocks send. The four field
 Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
 
 ## Changelog
+
+### 2026-10-28: coach
+- Coach icon on key cards and client headers: hover for reminders and coaching about late promises, backlog, missed or overdue 1:1s, the tone of your notes, and each CEO's working style.
+- Working-style notes per client person on the Notes tab.
 
 ### 2026-10-28: dashboards, CEO-first workflow, task pop-over, notes in place
 - Home and client dashboards of widgets you drag in, move, resize and remove; Start a project is a pill.

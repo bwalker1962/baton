@@ -3,6 +3,8 @@ import { use, useState } from "react";
 import { tasks as seed, TODAY } from "@/lib/data";
 import { useStore } from "@/lib/store";
 import { SnoozeButton, wakeLabel } from "@/components/Snooze";
+import { dragInto1on1 } from "@/lib/agenda";
+import { useAddToAgenda } from "@/components/OneOnOne";
 import type { CrewKind } from "@/lib/types";
 import { Due, Progress, StatusBadge } from "@/components/ui";
 import { Icon } from "@/components/Icon";
@@ -13,11 +15,15 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
   const [owners, setOwners] = useState<string[]>(["BCW", "Client", "PR contractor", "rf-copy", "rf-positioning", "rf-content"]);
   const [adding, setAdding] = useState<string | null>(null);
   const [newOwner, setNewOwner] = useState("");
-  const { snoozed, snooze } = useStore();
+  const { snoozed, snooze, newTasks } = useStore();
+  const addToAgenda = useAddToAgenda();
+  const [added, setAdded] = useState<string[]>([]);
+  // Tasks sent back from a 1:1 join the client's list.
+  const all = [...rows, ...newTasks.filter((t) => t.clientId === id && !rows.some((r) => r.id === t.id))];
   const [showSnoozed, setShowSnoozed] = useState(false);
   const isAsleep = (tid: string) => !!snoozed[tid] && snoozed[tid] > TODAY;
-  const asleep = rows.filter((t) => isAsleep(t.id));
-  const visible = rows.filter((t) => !isAsleep(t.id));
+  const asleep = all.filter((t) => isAsleep(t.id));
+  const visible = all.filter((t) => !isAsleep(t.id));
 
   const setOwner = (taskId: string, owner: string) => {
     if (owner === "__new") return setAdding(taskId);
@@ -52,14 +58,14 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
           ))}
         </div>
       )}
-      {rows.length === 0 ? (
+      {all.length === 0 ? (
         <div className="empty"><h3>No tasks yet</h3><p>Start a project from a template to create them.</p></div>
       ) : (
         <table className="tbl" style={{ minWidth: 760 }}>
           <thead><tr><th>Task</th><th>Status</th><th>Owner</th><th>Due</th><th>Progress</th><th>Roadblock</th><th><span style={{ position: "absolute", left: -9999 }}>Snooze</span></th></tr></thead>
           <tbody>
             {visible.map((t) => (
-              <tr key={t.id}>
+              <tr key={t.id} {...dragInto1on1({ kind: "task", title: t.title, href: `/clients/${id}/tasks`, refId: t.id, clientId: id })}>
                 <td><strong>{t.title}</strong><br /><span className="muted small">{t.dept}</span></td>
                 <td><StatusBadge health={t.health} /></td>
                 <td>
@@ -79,7 +85,13 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
                 <td><Due iso={t.due} /></td>
                 <td><Progress pct={t.pct} health={t.health} /></td>
                 <td className="small">{t.blocker ? <span className="chip" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}><Icon name={t.blocker.kind === "access" ? "lock" : t.blocker.kind === "task" ? "link" : "user"} size={13} />{t.blocker.label}</span> : <span className="muted">None</span>}</td>
-                <td><SnoozeButton label={t.title} compact onSnooze={(until) => snooze(t.id, until)} /></td>
+                <td style={{ whiteSpace: "nowrap" }}>
+                  <button className="btn" style={{ minHeight: 32, padding: "0 8px", marginRight: 4 }} aria-label={`Add ${t.title} to the next 1:1`} title="Add to next 1:1"
+                    disabled={added.includes(t.id)} onClick={() => { addToAgenda(id, { title: t.title, kind: "task", href: `/clients/${id}/tasks`, refId: t.id }); setAdded((a) => [...a, t.id]); }}>
+                    {added.includes(t.id) ? "On 1:1" : "1:1"}
+                  </button>
+                  <SnoozeButton label={t.title} compact onSnooze={(until) => snooze(t.id, until)} />
+                </td>
               </tr>
             ))}
           </tbody>

@@ -8,6 +8,7 @@ import { daysFromToday, minutesLabel, shortDate } from "@/lib/format";
 import { Icon } from "@/components/Icon";
 import { ClientTile } from "@/components/ui";
 import { SnoozeButton, wakeLabel } from "@/components/Snooze";
+import { DRAG_TYPE } from "@/lib/agenda";
 
 const KIND: Record<DayKind, { label: string; icon: string; cls: string }> = {
   review: { label: "Review", icon: "eye", cls: "b-eyes" },
@@ -102,7 +103,11 @@ export default function Today() {
             return (
               <li key={it.id}
                 draggable={!isDone}
-                onDragStart={(e) => { setDrag(it.id); e.dataTransfer.effectAllowed = "move"; }}
+                onDragStart={(e) => {
+                  setDrag(it.id); e.dataTransfer.effectAllowed = "copyMove";
+                  // Also droppable into the floating 1:1 agenda.
+                  if (it.clientId) e.dataTransfer.setData(DRAG_TYPE, JSON.stringify({ kind: "task", title: it.title, href: it.href ?? `/clients/${it.clientId}`, refId: it.id, clientId: it.clientId }));
+                }}
                 onDragOver={(e) => { e.preventDefault(); setOver(it.id); }}
                 onDragLeave={() => setOver((o) => (o === it.id ? null : o))}
                 onDrop={(e) => { e.preventDefault(); dropOn(it.id); }}

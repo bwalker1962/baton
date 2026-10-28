@@ -5,6 +5,7 @@ import { getClient } from "@/lib/data";
 import { useStore } from "@/lib/store";
 import type { SignoffItem } from "@/lib/types";
 import { Icon } from "./Icon";
+import { dragInto1on1 } from "@/lib/agenda";
 import { ClientTile, Due } from "./ui";
 
 const DONE_LABEL: Record<string, { cls: string; text: string }> = {
@@ -20,7 +21,8 @@ function ItemRow({ i, scope }: { i: SignoffItem; scope?: string }) {
   const done = DONE_LABEL[i.state];
   const flags = (i.slips ?? []).filter((x) => x.result !== "pass").length;
   return (
-    <Link href={`/signoff/${i.id}${scope ? `?client=${scope}` : ""}`} className="row" style={{ flexWrap: "wrap" }}>
+    <Link href={`/signoff/${i.id}${scope ? `?client=${scope}` : ""}`} className="row" style={{ flexWrap: "wrap" }}
+      {...dragInto1on1({ kind: "signoff", title: i.title, href: `/signoff/${i.id}?client=${i.clientId}`, refId: i.id, clientId: i.clientId })}>
       <ClientTile client={c} />
       <span className="grow" style={{ flexBasis: 220 }}>
         <strong>{i.title}</strong><br />

@@ -6,7 +6,9 @@ import { Composer, PostIt } from "@/components/Notes";
 
 export default function ClientNotes({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { notes } = useStore();
+  const { notes, agendas } = useStore();
+  const agenda = agendas.find((a) => a.clientId === id);
+  const topics = agenda?.items.filter((i) => !i.covered) ?? [];
   const [who, setWho] = useState("All");
   const [q, setQ] = useState("");
   const mine = notes.filter((n) => n.clientId === id).sort((a, b) => b.date.localeCompare(a.date));
@@ -16,7 +18,14 @@ export default function ClientNotes({ params }: { params: Promise<{ id: string }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ maxWidth: 620 }}><Composer clientId={id} /></div>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
+        <div style={{ flex: "1 1 420px", maxWidth: 620 }}><Composer clientId={id} /></div>
+        <section className="card" style={{ flex: "1 1 260px", padding: 14 }} aria-label="Next 1:1">
+          <h2 style={{ margin: "0 0 2px", fontSize: 14 }}>Next 1:1{agenda ? ` with ${agenda.with}` : ""}</h2>
+          <div className="xs muted" style={{ marginBottom: 8 }}>Floats at the bottom right on every screen. Drag tasks, sign-off items or projects onto it.</div>
+          {topics.length ? <ol style={{ margin: 0, paddingLeft: 18, lineHeight: 1.6 }} className="small">{topics.map((t) => <li key={t.id}>{t.title}</li>)}</ol> : <p className="small muted" style={{ margin: 0 }}>No topics yet.</p>}
+        </section>
+      </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
         <div className="seg" role="group" aria-label="Conversation with">
           {people.map((p) => <button key={p} aria-pressed={who === p} onClick={() => setWho(p)}>{p}</button>)}

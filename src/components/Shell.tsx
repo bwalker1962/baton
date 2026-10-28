@@ -5,6 +5,7 @@ import { clients, firm } from "@/lib/data";
 import { useStore, UNDO_SECONDS, type Mode } from "@/lib/store";
 import { Icon } from "./Icon";
 import { DropDocs } from "./DropDocs";
+import { OneOnOne } from "./OneOnOne";
 import { ClientTile } from "./ui";
 import { useEffect, useState } from "react";
 
@@ -112,6 +113,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </nav>
       <Toast />
       <DropDocs here={active?.id} />
+      <OneOnOne here={active?.id} />
     </div>
   );
 }

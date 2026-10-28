@@ -5,6 +5,7 @@ import { templates } from "@/lib/templates";
 import { useStore } from "@/lib/store";
 import { Icon } from "@/components/Icon";
 import { ProjectStarter } from "@/components/ProjectStarter";
+import { dragInto1on1 } from "@/lib/agenda";
 import { CERTAINTY } from "@/lib/intake";
 
 export default function Projects({ params }: { params: Promise<{ id: string }> }) {
@@ -22,7 +23,8 @@ export default function Projects({ params }: { params: Promise<{ id: string }> }
             const open = p.steps.filter((s) => s.status === "open").length;
             const done = p.steps.filter((s) => s.status === "done").length;
             return (
-              <Link className="row" key={p.id} href={`/clients/${id}/projects/${p.id}`}>
+              <Link className="row" key={p.id} href={`/clients/${id}/projects/${p.id}`}
+                {...dragInto1on1({ kind: "project", title: p.name, href: `/clients/${id}/projects/${p.id}`, refId: p.id, clientId: id })}>
                 <Icon name={templates.find((t) => t.id === p.templateId)?.icon ?? "file"} />
                 <span className="grow"><strong>{p.name}</strong><br /><span className="muted small">{p.steps.length ? `${done} done · ${open} open` : "Watching, no tasks yet"}</span></span>
                 {p.certainty && <span className={`badge ${CERTAINTY[p.certainty].cls}`}>{CERTAINTY[p.certainty].label}</span>}

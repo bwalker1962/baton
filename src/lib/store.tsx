@@ -6,6 +6,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { signoffItems as seedItems } from "./data";
 import type { SignoffItem, SignoffState } from "./types";
 import { noteSeed, type Note } from "./notes";
+import { agendaSeed, type Agenda } from "./agenda";
+import type { Task } from "./types";
 
 export type Mode = "light" | "half" | "dark";
 
@@ -79,6 +81,11 @@ interface Store {
   notes: Note[];
   saveNote: (n: Note) => void; // add or update
   removeNote: (id: string) => void;
+  agendas: Agenda[];
+  saveAgenda: (a: Agenda) => void;
+  /** Tasks created in Baton (from 1:1 follow-ups), merged with each client's task list. */
+  newTasks: Task[];
+  addTask: (t: Task) => void;
 }
 
 const Ctx = createContext<Store | null>(null);
@@ -108,6 +115,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const persist = (next: Note[]) => { try { localStorage.setItem("baton-notes-v1", JSON.stringify(next)); } catch {} return next; };
   const saveNote = useCallback((n: Note) => setNotes((all) => persist(all.some((x) => x.id === n.id) ? all.map((x) => (x.id === n.id ? n : x)) : [n, ...all])), []);
   const removeNote = useCallback((id: string) => setNotes((all) => persist(all.filter((x) => x.id !== id))), []);
+  const [agendas, setAgendas] = useState<Agenda[]>(agendaSeed);
+  const [newTasks, setNewTasks] = useState<Task[]>([]);
+  useEffect(() => {
+    try { const raw = localStorage.getItem("baton-agendas-v1"); if (raw) setAgendas(JSON.parse(raw)); } catch {}
+    try { const raw = localStorage.getItem("baton-newtasks-v1"); if (raw) setNewTasks(JSON.parse(raw)); } catch {}
+  }, []);
+  const saveAgenda = useCallback((a: Agenda) => setAgendas((all) => {
+    const next = all.some((x) => x.clientId === a.clientId) ? all.map((x) => (x.clientId === a.clientId ? a : x)) : [...all, a];
+    try { localStorage.setItem("baton-agendas-v1", JSON.stringify(next)); } catch {}
+    return next;
+  }), []);
+  const addTask = useCallback((t: Task) => setNewTasks((all) => {
+    const next = [...all, t];
+    try { localStorage.setItem("baton-newtasks-v1", JSON.stringify(next)); } catch {}
+    return next;
+  }), []);
   const addDoc = useCallback((d: FiledDoc) => setDocs((all) => [d, ...all]), []);
   const moveDoc = useCallback((id: string, clientId: string) => setDocs((all) => all.map((d) => (d.id === id ? { ...d, clientId } : d))), []);
   const snooze = useCallback((id: string, until: string | null) => setSnoozed((all) => {
@@ -161,8 +184,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p))), []);
 
   const value = useMemo(
-    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote }),
-    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote],
+    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask }),
+    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

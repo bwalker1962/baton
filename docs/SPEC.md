@@ -39,6 +39,14 @@ This spec grows with the build. Every feature carries a status, and each build a
 
 | Feature | Status | Notes |
 | --- | --- | --- |
+| Floating 1:1 agenda per client, on every screen, minimizes to a pill | Prototyped | Follows the client you're viewing, except during a meeting |
+| Drag tasks, sign-off items, projects and Today items onto it; or "1:1" buttons and "Add the page I'm on" | Prototyped | Another client's item goes to that client's agenda, and says so |
+| Reorder topics by dragging; jump to any linked item while the agenda stays open | Prototyped | Page makes room for the panel on wide screens |
+| In-the-meeting mode: current topic highlighted, notes field for the CEO's answers, Next topic | Prototyped | Your place survives navigation |
+| Each topic's outcome: note, decision, follow-up task, or step on a project | Prototyped | |
+| Wrap up: saves the 1:1 as a note, creates tasks and project steps, carries uncovered topics to next time | Prototyped | Next 1:1 date moves a week |
+| Next 1:1 date from the calendar; agenda sent to the CEO ahead if you choose | Specified | |
+| Dictate answers during the meeting | Specified | |
 | Notes tab: notepad for conversations with the CEO or staff, by client | Prototyped | Who, date, free text; edit, delete, search, filter by person |
 | Lines starting with → or [ ] become action items you can tick | Prototyped | Open actions counted per client |
 | Home: cascading post-it stacks, one per client, in the client's color | Prototyped | Most recent conversation on top; opens the client's notes |
@@ -203,6 +211,10 @@ Each result is OK, Check (you tick it to approve) or Blocks send. The four field
 Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
 
 ## Changelog
+
+### 2026-10-28: floating 1:1 agenda
+- 1:1 agenda per client floats over every screen; drag work onto it, jump to items without losing your place.
+- In-meeting notes and outcomes; Wrap up sends decisions to Notes and follow-ups to tasks and project checklists.
 
 ### 2026-10-28: conversation notes
 - Notes tab per client for conversations with the CEO and staff; arrow lines become action items.

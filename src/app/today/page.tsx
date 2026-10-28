@@ -7,6 +7,7 @@ import { addDays } from "@/lib/templates";
 import { daysFromToday, minutesLabel, shortDate } from "@/lib/format";
 import { Icon } from "@/components/Icon";
 import { ClientTile } from "@/components/ui";
+import { SnoozeButton, wakeLabel } from "@/components/Snooze";
 
 const KIND: Record<DayKind, { label: string; icon: string; cls: string }> = {
   review: { label: "Review", icon: "eye", cls: "b-eyes" },
@@ -14,9 +15,9 @@ const KIND: Record<DayKind, { label: string; icon: string; cls: string }> = {
   planning: { label: "Planning", icon: "calendar", cls: "b-info" },
   meeting: { label: "Meeting", icon: "clock", cls: "b-neutral" },
 };
-const KEY = "baton-today-v1";
+const KEY = "baton-today-v2";
 
-interface Saved { list: DayItem[]; done: string[]; added: string[] }
+interface Saved { list: DayItem[]; done: string[]; added: string[]; asleep: Record<string, string> }
 
 const startBy = (l: LeadItem) => addDays(l.due, -l.leadDays);
 
@@ -24,6 +25,7 @@ export default function Today() {
   const [list, setList] = useState<DayItem[]>(todaySeed);
   const [done, setDone] = useState<string[]>([]);
   const [added, setAdded] = useState<string[]>([]); // lead items pulled into today
+  const [asleep, setAsleep] = useState<Record<string, string>>({}); // snoozed item id → wake date
   const [drag, setDrag] = useState<string | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
@@ -32,12 +34,12 @@ export default function Today() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) { const s: Saved = JSON.parse(raw); setList(s.list); setDone(s.done); setAdded(s.added); }
+      if (raw) { const s: Saved = JSON.parse(raw); setList(s.list); setDone(s.done); setAdded(s.added); setAsleep(s.asleep ?? {}); }
     } catch { /* storage unavailable: start from the sample day */ }
   }, []);
   useEffect(() => {
-    try { localStorage.setItem(KEY, JSON.stringify({ list, done, added } satisfies Saved)); } catch { /* ignore */ }
-  }, [list, done, added]);
+    try { localStorage.setItem(KEY, JSON.stringify({ list, done, added, asleep } satisfies Saved)); } catch { /* ignore */ }
+  }, [list, done, added, asleep]);
 
   const move = (id: string, to: number) => setList((all) => {
     const from = all.findIndex((i) => i.id === id);
@@ -53,11 +55,14 @@ export default function Today() {
     setAdded((a) => [...a, l.id]);
   };
   const remove = (id: string) => { setList((all) => all.filter((i) => i.id !== id)); setAdded((a) => a.filter((x) => x !== id)); };
-  const reset = () => { setList(todaySeed); setDone([]); setAdded([]); };
+  const reset = () => { setList(todaySeed); setDone([]); setAdded([]); setAsleep({}); };
+  const awake = (i: DayItem) => !asleep[i.id] || asleep[i.id] <= TODAY;
 
-  const ordered = [...list.filter((i) => !done.includes(i.id)), ...list.filter((i) => done.includes(i.id))];
-  const total = list.reduce((n, i) => n + i.minutes, 0);
-  const planning = list.filter((i) => i.kind === "planning").reduce((n, i) => n + i.minutes, 0);
+  const today = list.filter(awake);
+  const sleeping = list.filter((i) => !awake(i)).sort((a, b) => asleep[a.id].localeCompare(asleep[b.id]));
+  const ordered = [...today.filter((i) => !done.includes(i.id)), ...today.filter((i) => done.includes(i.id))];
+  const total = today.reduce((n, i) => n + i.minutes, 0);
+  const planning = today.filter((i) => i.kind === "planning").reduce((n, i) => n + i.minutes, 0);
   const share = total ? planning / total : 0;
   const over_ = total > DAY_HOURS * 60;
   const radar = leadSeed.filter((l) => !added.includes(l.id)).sort((a, b) => startBy(a).localeCompare(startBy(b)));
@@ -77,7 +82,7 @@ export default function Today() {
           <div className="muted xs" style={{ fontWeight: 700, letterSpacing: "0.04em" }}>TIME PLANNED</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: over_ ? "var(--bad-fg)" : undefined }}>{minutesLabel(total)} <span className="muted small" style={{ fontWeight: 500 }}>of {DAY_HOURS}h</span></div>
           <Meter value={total / (DAY_HOURS * 60)} tone={over_ ? "var(--bad-dot)" : "var(--text)"} />
-          {over_ && <div className="xs" style={{ color: "var(--bad-fg)", marginTop: 6 }}>Over your day. Move something to tomorrow.</div>}
+          {over_ && <div className="xs" style={{ color: "var(--bad-fg)", marginTop: 6 }}>Over your day. Snooze something.</div>}
         </section>
         <section className="card" style={{ padding: 14 }} aria-label="Planning share">
           <div className="muted xs" style={{ fontWeight: 700, letterSpacing: "0.04em" }}>LONG-LEAD AND PLANNING</div>
@@ -117,12 +122,25 @@ export default function Today() {
                 <span style={{ display: "flex", gap: 2 }}>
                   <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-label={`Move ${it.title} up`} disabled={isDone || n === 0} onClick={() => move(it.id, list.findIndex((i) => i.id === it.id) - 1)}>↑</button>
                   <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-label={`Move ${it.title} down`} disabled={isDone} onClick={() => move(it.id, list.findIndex((i) => i.id === it.id) + 1)}>↓</button>
-                  <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-label={`Move ${it.title} to tomorrow`} title="Tomorrow" onClick={() => remove(it.id)}>→</button>
+                  <SnoozeButton label={it.title} compact onSnooze={(until) => setAsleep((a) => ({ ...a, [it.id]: until }))} />
                 </span>
               </li>
             );
           })}
         </ol>
+        {sleeping.length > 0 && (
+          <details className="row" style={{ display: "block", background: "var(--surface-2)" }}>
+            <summary className="small" style={{ cursor: "pointer", fontWeight: 600 }}>Snoozed · {sleeping.length}</summary>
+            {sleeping.map((it) => (
+              <div key={it.id} className="small" style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 0" }}>
+                <Icon name="clock" size={15} />
+                <span style={{ flex: 1 }}>{it.title} <span className="muted">· back {wakeLabel(asleep[it.id])}</span></span>
+                <button className="btn" style={{ minHeight: 30 }} onClick={() => setAsleep((a) => { const n = { ...a }; delete n[it.id]; return n; })}>Back to today</button>
+                <button className="btn" style={{ minHeight: 30 }} onClick={() => remove(it.id)}>Remove</button>
+              </div>
+            ))}
+          </details>
+        )}
         <form className="row" onSubmit={(e) => { e.preventDefault(); if (!draft.trim()) return; setList((all) => [...all, { id: `n${Date.now()}`, title: draft.trim(), kind: draftKind, minutes: 30 }]); setDraft(""); }} style={{ gap: 8, flexWrap: "wrap" }}>
           <Icon name="plus" size={16} />
           <input className="input" style={{ flex: 1, minWidth: 200 }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Add to today, e.g. Plan January webinar topics" aria-label="New item" />

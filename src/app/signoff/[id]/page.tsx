@@ -108,12 +108,15 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
   const [sheet, setSheet] = useState<null | "changes" | "resubmit" | "decline">(null);
   const [path, setPath] = useState<ChangePath>("call");
   const [width, setWidth] = useState<"phone" | "desktop">("desktop");
+  // Review mode started from a client's tab stays inside that client.
+  const [scope, setScope] = useState<string | null>(null);
+  useEffect(() => { setScope(new URLSearchParams(window.location.search).get("client")); }, [id]);
 
   useEffect(() => { setChecks(checksFor(item).map(() => false)); setNote(""); setSheet(null); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!item) return <section className="card empty"><h3>Item not found</h3><Link href="/signoff" className="btn">Back to sign-off</Link></section>;
   const client = getClient(item.clientId)!;
-  const queue = items.filter((i) => i.state === "needs");
+  const queue = items.filter((i) => i.state === "needs" && (!scope || i.clientId === scope));
   const next = queue.find((i) => i.id !== id);
   const CHECKS = checksFor(item);
   const blocked = (item.slips ?? []).some((x) => x.result === "block");
@@ -125,14 +128,14 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
   const finish = (state: Parameters<typeof decide>[1], outcome?: string) => {
     decide(item.id, state, outcome);
     setSheet(null);
-    router.push(next ? `/signoff/${next.id}` : "/signoff");
+    router.push(next ? `/signoff/${next.id}${scope ? `?client=${scope}` : ""}` : scope ? `/clients/${scope}` : "/signoff");
   };
 
   return (
     <div style={{ ["--accent" as string]: client.color, display: "flex", flexDirection: "column", gap: 16 }}>
       <div className="pagehead">
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <Link href="/signoff" className="btn" aria-label="Back to sign-off" style={{ minHeight: 40, padding: "0 10px" }}><Icon name="back" /></Link>
+          <Link href={scope ? `/clients/${scope}` : "/signoff"} className="btn" aria-label="Back to sign-off" style={{ minHeight: 40, padding: "0 10px" }}><Icon name="back" /></Link>
           <ClientTile client={client} />
           <div>
             <div className="eyebrow">{client.name} · {item.dept} · {queue.findIndex((i) => i.id === id) + 1 || "–"} of {queue.length}</div>

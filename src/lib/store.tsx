@@ -40,6 +40,16 @@ interface Pending {
   expires: number;
 }
 
+/** A document dropped into Baton and filed to a client. */
+export interface FiledDoc {
+  id: string;
+  clientId: string;
+  name: string;
+  kind: string; // Brand guide, Logo, Brief, Report, Contract, Meeting notes, Document
+  size: number;
+  added: string;
+}
+
 export interface BrandChoice {
   color: string; // as chosen
   accent: string; // readable version used in Baton
@@ -59,6 +69,12 @@ interface Store {
   projects: Project[];
   addProject: (p: Project) => void;
   updateProject: (id: string, patch: Partial<Project>) => void;
+  docs: FiledDoc[];
+  addDoc: (d: FiledDoc) => void;
+  moveDoc: (id: string, clientId: string) => void;
+  /** Snoozed task ids and the date each wakes. */
+  snoozed: Record<string, string>;
+  snooze: (id: string, until: string | null) => void;
 }
 
 const Ctx = createContext<Store | null>(null);
@@ -78,6 +94,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<SignoffItem[]>(seedItems);
   const [pending, setPending] = useState<Pending | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [docs, setDocs] = useState<FiledDoc[]>([]);
+  const [snoozed, setSnoozed] = useState<Record<string, string>>({});
+  const addDoc = useCallback((d: FiledDoc) => setDocs((all) => [d, ...all]), []);
+  const moveDoc = useCallback((id: string, clientId: string) => setDocs((all) => all.map((d) => (d.id === id ? { ...d, clientId } : d))), []);
+  const snooze = useCallback((id: string, until: string | null) => setSnoozed((all) => {
+    const next = { ...all };
+    if (until) next[id] = until; else delete next[id];
+    return next;
+  }), []);
   const [brand, setBrandState] = useState<Record<string, BrandChoice>>({});
   const setBrand = useCallback((clientId: string, b: BrandChoice) => setBrandState((all) => ({ ...all, [clientId]: b })), []);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -124,8 +149,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p))), []);
 
   const value = useMemo(
-    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject }),
-    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject],
+    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze }),
+    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

@@ -39,6 +39,15 @@ This spec grows with the build. Every feature carries a status, and each build a
 
 | Feature | Status | Notes |
 | --- | --- | --- |
+| First tab is Sign-off filtered to this client, with a count on the tab | Prototyped | Score moved to its own tab |
+| Review mode started from a client stays inside that client | Prototyped | Returns to the client when done |
+| Drag documents from your computer onto any screen to file them | Prototyped | Overlay names where it will land |
+| Obvious documents file themselves, with Change in the confirmation | Prototyped | Client named clearly, and no conflict with where you dropped it |
+| Unclear documents ask which client: no name, several names, or a different client than where you dropped it | Prototyped | Mixed mentions preselect nothing |
+| File kind guessed from the name (brand guide, logo, brief, report, contract, notes) | Prototyped | Changeable before filing |
+| Files that look like passwords or keys are refused | Prototyped | Logins belong in the vault |
+| Reading PDFs, Word and slide files; Claude judges the client from content | Specified | Prototype reads names and plain text |
+| Dropped files stored in the client's Drive folder, linked in Baton | Specified | |
 | Client identity: logo tile, color, phase steps | Prototyped | Logo upload Specified |
 | Brand pulled from the client's website: logo, icon, colors, fonts | Prototyped | Sample results; real fetch Specified |
 | Adjust brand: pick logo or monogram, pick or set color | Prototyped | `/clients/[id]/brand`; applies everywhere |
@@ -77,6 +86,10 @@ This spec grows with the build. Every feature carries a status, and each build a
 
 | Feature | Status | Notes |
 | --- | --- | --- |
+| Snooze any task or Today item: tomorrow, 3 days, 1 week, 2 weeks, 1 month, or any number of days, weeks or months | Prototyped | Shows the wake date before you choose |
+| Snoozed list with wake dates; wake early with one tap | Prototyped | On Tasks and Today |
+| Snoozing past a due date asks whether to move the due date | Specified | |
+| Option to skip weekends when a snooze would wake on one | Specified | |
 | Today list across all clients: reviews, tasks, meetings and planning in one order | Prototyped | `/today` |
 | Drag to reorder; arrow buttons for keyboard and phone; move to tomorrow | Prototyped | Order saved on this device in the prototype |
 | Time planned against a 6-hour day, warns when over | Prototyped | Day length adjustable Specified |
@@ -182,6 +195,11 @@ Each result is OK, Check (you tick it to approve) or Blocks send. The four field
 Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
 
 ## Changelog
+
+### 2026-10-28: client sign-off tab, drop to file, snooze
+- Each client opens on its own sign-off queue; review mode stays within that client.
+- Drag documents onto Baton to file them; unclear ones ask which client; password files are refused.
+- Snooze tasks and Today items for any number of days, weeks or months.
 
 ### 2026-10-28: advisor
 - Advisor page ranks best practices for an area by impact, written from the customer's side, with notes on what companies like the client do.

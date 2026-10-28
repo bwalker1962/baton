@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { clients, firm } from "@/lib/data";
 import { useStore, UNDO_SECONDS, type Mode } from "@/lib/store";
 import { Icon } from "./Icon";
+import { DropDocs } from "./DropDocs";
 import { ClientTile } from "./ui";
 import { useEffect, useState } from "react";
 
@@ -110,6 +111,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <Link href="/skills" aria-current={is("/skills")}><Icon name="user" size={22} />More</Link>
       </nav>
       <Toast />
+      <DropDocs here={active?.id} />
     </div>
   );
 }

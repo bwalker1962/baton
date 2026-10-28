@@ -177,34 +177,73 @@ export const signoffItems: SignoffItem[] = [
       "[Ask: 20 minutes, one discovery question]",
       "[Signature block and unsubscribe footer]",
     ],
+    settings: [
+      { label: "From", value: "[Pentara sender] <[address]>" },
+      { label: "Reply-to", value: "[address]" },
+      { label: "Subject", value: "[Subject line from draft]" },
+      { label: "Preview text", value: "[Preview text]" },
+      { label: "Recipients", value: "GEODesign · 3 contacts (founder, ops lead, BD)" },
+      { label: "Send", value: "Today, 10:00 am MT" },
+      { label: "Platform", value: "Brevo" },
+    ],
   },
   {
     id: "s2", clientId: "morning-miracle", title: "Week 45 social stack, post 3 of 6", kind: "social", channel: "Instagram", tier: 2,
     skill: "rf-content + Moda", version: "v1.2", owner: "rf-copy", due: "2026-10-28", sendAt: "Thu, 7:30 am via Buffer", dept: "Demand generation", state: "needs",
     regulatory: ["Use routine language, not treatment claims", "FDA disclaimer in first comment"],
     body: ["[Caption: routine-focused, modify-anytime wording]", "First comment: [link and disclaimer]"],
+    settings: [
+      { label: "Account", value: "[Morning Miracle Instagram]" },
+      { label: "First comment", value: "[Link and FDA disclaimer]" },
+      { label: "Alt text", value: "[Image description]" },
+      { label: "Schedule", value: "Thu, 7:30 am MT" },
+      { label: "Posting tool", value: "Buffer" },
+    ],
   },
   {
     id: "s3", clientId: "morning-miracle", title: "Email 5: day-45 reorder nudge", kind: "email", channel: "Email", tier: 1,
     skill: "rf-copy", version: "v1.4", owner: "rf-copy", due: "2026-10-26", sendAt: "Blocked: no send tool", dept: "Demand generation", state: "needs",
     subject: "[You're 45 days in]",
     body: ["[Day-45 check-in: what's working]", "[Reorder prompt with modify-anytime option]", "[Compliance footer]"],
+    settings: [
+      { label: "From", value: "[Morning Miracle sender] <[address]>" },
+      { label: "Subject", value: "[You're 45 days in]" },
+      { label: "Preview text", value: "[Preview text]" },
+      { label: "Recipients", value: "Subscribers at day 45 · [count]" },
+      { label: "Send", value: "Triggered at day 45" },
+      { label: "Platform", value: "Not connected (Klaviyo pending)" },
+    ],
   },
   {
     id: "s4", clientId: "photopharmics", title: "Narrative one-pager", kind: "doc", channel: "Document", tier: 1,
     skill: "rf-positioning", version: "v1.1", owner: "rf-positioning", due: "2026-11-03", sendAt: "Share with CEO after sign-off", dept: "Brand", state: "needs",
     regulatory: ["Investigational device: no safety or effectiveness claims"],
     body: ["[Who we are and the problem we address]", "[What makes the approach different]", "[Where we are in the regulatory path]"],
+    settings: [
+      { label: "Destination", value: "Shared with CEO as a doc" },
+      { label: "Recipients", value: "[CEO name]" },
+    ],
   },
   {
     id: "s5", clientId: "pentara", title: "LinkedIn carousel: ABM war room", kind: "social", channel: "LinkedIn", tier: 2,
     skill: "rf-amplify", version: "v1.0", owner: "rf-amplify", due: "2026-10-29", sendAt: "Wed, 8:15 am via Metricool", dept: "Demand generation", state: "needs",
     body: ["[Cover slide: the hook]", "[Slides 2-7: one idea each]", "[Last slide: call to action]"],
+    settings: [
+      { label: "Account", value: "[Pentara company page]" },
+      { label: "Slides", value: "8" },
+      { label: "Schedule", value: "Wed, 8:15 am MT" },
+      { label: "Posting tool", value: "Metricool" },
+    ],
   },
   {
     id: "s6", clientId: "pentara", title: "Award entry draft", kind: "doc", channel: "Submission", tier: 1,
     skill: "PR contractor", version: "draft 2", owner: "PR contractor", due: "2026-11-03", sendAt: "Submit by Nov 3", dept: "Earned media", state: "needs",
     body: ["[Entry summary]", "[Results and evidence]", "[Supporting quotes, approved]"],
+    settings: [
+      { label: "Program", value: "[Award program, category]" },
+      { label: "Submit to", value: "[Submission site]" },
+      { label: "Deadline", value: "Nov 3 (late deadline: [date])" },
+    ],
   },
 ];
 

@@ -65,6 +65,13 @@ This spec grows with the build. Every feature carries a status, and each build a
 | --- | --- | --- |
 | Queue: needs your eyes, held, decided; filter by tier | Prototyped | `/signoff` |
 | Embedded asset preview: email, social post, document | Prototyped | Placeholders for real content |
+| Settings shown with the asset (subject, preview text, from, reply-to, recipients, schedule, platform) | Prototyped | Part of what you approve |
+| Email preview at phone and desktop width | Prototyped | |
+| Screen grabs rendered from the client's connected apps | Specified | Baton fetches; no sign-in to other tools |
+| Changing a setting after approval reopens sign-off | Specified | Settings are versioned with the asset |
+| Approval hands the item to the connected app to schedule or publish | Specified | |
+| Post-send screen grab compared with what was approved | Specified | |
+| Client approvers review through a secure single-use link | Future | Phase 2; no account or install |
 | Checklist must be ticked before Approve unlocks | Prototyped | |
 | Four outcomes: approve, approve with changes, resubmit, decline | Prototyped | |
 | Approve with changes: fix now, owner applies, call, meet, chat | Prototyped | Talk-it-through paths hold the send |
@@ -95,7 +102,16 @@ This spec grows with the build. Every feature carries a status, and each build a
 | Phase 2: roles for collaborators and client teams | Future | Owner, Collaborator, Client admin, Client viewer |
 | Away mode | Future | |
 
+## Principle: everything for review lives in Baton
+
+Every item arrives complete: the asset, screen grabs of how it will look where it lands, and every setting that decides how it goes out. Review never requires another login, an app install or a download. Baton fetches previews and settings through each client's connected apps, and approval sends the item on exactly as reviewed. Workflows that flow.
+
 ## Changelog
+
+### 2026-10-28: review completeness
+- Sign-off review shows each item's settings beside the asset (subject, preview text, from, reply-to, recipients, schedule, platform).
+- Email previews switch between phone and desktop width.
+- Spec adds screen grabs from connected apps, settings-versioned sign-off, hand-off on approval, post-send check and no-login client approvals.
 
 ### 2026-10-28: first prototype
 - App shell with Light, Half-dark and Dark modes, desktop and mobile layouts.

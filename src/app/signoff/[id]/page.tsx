@@ -61,6 +61,7 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
   const [lessonTo, setLessonTo] = useState("skill");
   const [sheet, setSheet] = useState<null | "changes" | "resubmit" | "decline">(null);
   const [path, setPath] = useState<ChangePath>("call");
+  const [width, setWidth] = useState<"phone" | "desktop">("desktop");
 
   useEffect(() => { setChecks(CHECKS.map(() => false)); setNote(""); setSheet(null); }, [id]);
 
@@ -98,10 +99,35 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
 
       <div className="split">
         <div className="wide" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <div className="muted small">Exact version that will go out · {item.sendAt}</div>
-          <Asset item={item} accent={client.color} />
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span className="muted small">Exact version that will go out · {item.sendAt}</span>
+            {item.kind === "email" && (
+              <div className="seg" role="group" aria-label="Preview width">
+                <button aria-pressed={width === "phone"} onClick={() => setWidth("phone")}>Phone</button>
+                <button aria-pressed={width === "desktop"} onClick={() => setWidth("desktop")}>Desktop</button>
+              </div>
+            )}
+          </div>
+          <div style={{ maxWidth: item.kind === "email" && width === "phone" ? 390 : undefined, width: "100%", margin: item.kind === "email" && width === "phone" ? "0 auto" : undefined }}>
+            <Asset item={item} accent={client.color} />
+          </div>
+          <div className="muted xs">Rendered from the client&apos;s connected app. No sign-in needed to review.</div>
         </div>
         <aside className="narrow" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {item.settings && (
+            <section className="card" style={{ padding: 14 }} aria-label="Settings">
+              <h2 style={{ margin: "0 0 2px", fontSize: 14 }}>Settings</h2>
+              <div className="muted xs" style={{ marginBottom: 8 }}>Part of what you approve. Changing any of these later reopens sign-off.</div>
+              <dl style={{ margin: 0, display: "grid", gridTemplateColumns: "auto 1fr", gap: "6px 12px" }} className="small">
+                {item.settings.map((s) => (
+                  <div key={s.label} style={{ display: "contents" }}>
+                    <dt className="muted">{s.label}</dt>
+                    <dd style={{ margin: 0, fontWeight: 500, color: s.value.startsWith("Not connected") ? "var(--bad-fg)" : undefined }}>{s.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
           {item.regulatory && (
             <section className="card" style={{ padding: 14 }}>
               <h2 style={{ margin: "0 0 6px", fontSize: 14, display: "flex", gap: 6, alignItems: "center" }}><Icon name="check" size={16} />rf-regulatory checked</h2>

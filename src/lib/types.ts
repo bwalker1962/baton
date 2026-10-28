@@ -102,6 +102,8 @@ export interface SignoffItem {
   body: string[]; // rendered asset paragraphs
   subject?: string;
   outcome?: string;
+  // Settings are part of what is signed off: changing one after approval reopens the gate.
+  settings?: { label: string; value: string }[];
 }
 
 export interface Topic {

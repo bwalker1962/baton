@@ -114,6 +114,8 @@ export interface SignoffItem {
   settings?: { label: string; value: string }[];
   // Slip checks: automated look for the common mistakes before a human ever sees the item.
   slips?: Slip[];
+  // Customer-first read: is the piece about the reader or about the client?
+  customerFirst?: { you: number; we: number; opener: "them" | "us"; note: string };
 }
 
 /** pass = checked and fine; flag = a human must look; block = cannot send until fixed. */

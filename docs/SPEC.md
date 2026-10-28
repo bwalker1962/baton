@@ -119,6 +119,21 @@ This spec grows with the build. Every feature carries a status, and each build a
 | Shipped-matches-approved check | Specified | |
 | Daily digest for in-guardrail machine adjustments | Specified | |
 
+### Advisor
+
+| Feature | Status | Notes |
+| --- | --- | --- |
+| Advisor page: pick a client, name any area, get ranked best practices | Prototyped | `/advisor`; sample guidance for 8 areas |
+| Ranked by impact, then least effort | Prototyped | Highest, High, Medium; Low, Medium, High effort |
+| Every item says what the customer gets, and what companies like this client do | Prototyped | Peer notes differ for B2B services, DTC subscription and medtech |
+| Peer set per client (who it's compared with, who its customers are) | Prototyped | From Direction; missing peer set prompts you to name competitors |
+| "Applies to everything" fundamentals and a five-question customer-first test | Prototyped | |
+| Top three moves on every project, by project type | Prototyped | Links to the full advice |
+| Customer-first check in sign-off: "you" vs "we", what the piece opens with | Prototyped | Sample counts; real reading Specified |
+| Live research of peer practice through rf-compete, with links and dates | Specified | Areas without a playbook researched on demand |
+| Advice refined by sign-off notes and results (rf-analyze) | Specified | What worked for this client outranks general practice |
+| Add a recommended move as a project step or a Today item | Specified | |
+
 ### Skills
 
 | Feature | Status | Notes |
@@ -167,6 +182,10 @@ Each result is OK, Check (you tick it to approve) or Blocks send. The four field
 Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
 
 ## Changelog
+
+### 2026-10-28: advisor
+- Advisor page ranks best practices for an area by impact, written from the customer's side, with notes on what companies like the client do.
+- Projects show their top three moves; sign-off shows a customer-first check.
 
 ### 2026-10-28: start a project by chat
 - "Start a project" box on Home and each client's Projects tab; type or talk, Baton asks clarifying questions.

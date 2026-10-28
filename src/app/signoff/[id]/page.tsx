@@ -17,6 +17,25 @@ const checksFor = (item?: SignoffItem) => [
 // The fields people most often get wrong, read back right above Approve.
 const READBACK = ["From", "Account", "Recipients", "Subject", "Send", "Schedule", "Submit to", "Destination"];
 
+function CustomerFirst({ cf }: { cf: NonNullable<SignoffItem["customerFirst"]> }) {
+  const share = cf.you / Math.max(1, cf.you + cf.we);
+  const ok = cf.opener === "them" && share >= 0.6;
+  return (
+    <section className="card" style={{ padding: 14 }} aria-label="Customer-first check">
+      <h2 style={{ margin: "0 0 2px", fontSize: 14, display: "flex", gap: 6, alignItems: "center" }}>
+        <span style={{ color: ok ? "var(--good-fg)" : "var(--warn-fg)" }}><Icon name={ok ? "check" : "alert"} size={16} /></span>Customer first
+      </h2>
+      <div className="muted xs" style={{ marginBottom: 8 }}>Is this about the reader, or about us?</div>
+      <div className="small" style={{ display: "flex", justifyContent: "space-between" }}><span>&ldquo;You&rdquo; {cf.you}</span><span>&ldquo;We&rdquo; {cf.we}</span></div>
+      <div aria-hidden="true" style={{ display: "flex", height: 6, borderRadius: 3, overflow: "hidden", margin: "4px 0 8px", background: "var(--surface-2)" }}>
+        <span style={{ width: `${share * 100}%`, background: "var(--good-dot)" }} /><span style={{ flex: 1, background: "var(--warn-dot)" }} />
+      </div>
+      <div className="small"><span className="muted">Opens with: </span><strong>{cf.opener === "them" ? "their problem" : "us"}</strong></div>
+      <p className="small" style={{ margin: "6px 0 0" }}>{cf.note}</p>
+    </section>
+  );
+}
+
 function SlipPanel({ slips }: { slips: Slip[] }) {
   const flags = slips.filter((x) => x.result !== "pass").length;
   const tone = { pass: "var(--good-fg)", flag: "var(--warn-fg)", block: "var(--bad-fg)" };
@@ -146,6 +165,7 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
         </div>
         <aside className="narrow" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {item.slips && <SlipPanel slips={item.slips} />}
+          {item.customerFirst && <CustomerFirst cf={item.customerFirst} />}
           {item.settings && (
             <section className="card" style={{ padding: 14 }} aria-label="Settings">
               <h2 style={{ margin: "0 0 2px", fontSize: 14 }}>Settings</h2>

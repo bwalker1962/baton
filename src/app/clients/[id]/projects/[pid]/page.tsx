@@ -8,6 +8,9 @@ import { Due } from "@/components/ui";
 import { Icon } from "@/components/Icon";
 import { buildSteps } from "@/components/ProjectStarter";
 import { CERTAINTY, dateLabel, type Certainty } from "@/lib/intake";
+import { PEERS, ranked, topicForTemplate } from "@/lib/advisor";
+import { AdviceRow } from "@/components/Advice";
+import { getClient } from "@/lib/data";
 
 export default function ProjectPage({ params }: { params: Promise<{ id: string; pid: string }> }) {
   const { id, pid } = use(params);
@@ -63,6 +66,20 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
           {project.source && <div className="xs muted">Started from: &ldquo;{project.source}&rdquo;</div>}
         </section>
       )}
+
+      {(() => {
+        const topic = topicForTemplate(project.templateId);
+        if (!topic) return null;
+        return (
+          <section className="card" aria-label="Advisor">
+            <div className="card-head">
+              <h2 style={{ display: "flex", gap: 8, alignItems: "center" }}><Icon name="bulb" size={18} />What matters most</h2>
+              <Link className="small" href={`/advisor?client=${id}&topic=${topic.id}`}>All {topic.name.toLowerCase()} advice</Link>
+            </div>
+            {ranked(topic.items).slice(0, 3).map((c, n) => <AdviceRow key={c.id} c={c} rank={n + 1} segment={PEERS[id]?.segment} clientName={getClient(id)?.name} />)}
+          </section>
+        );
+      })()}
 
       <section className="card">
         <div className="card-head"><h2>Details</h2></div>

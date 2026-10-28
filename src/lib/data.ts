@@ -193,6 +193,7 @@ export const signoffItems: SignoffItem[] = [
       { field: "Links", result: "pass", detail: "4 links open; tracking tags present" },
       { field: "Send", result: "flag", detail: "10:00 am Mountain is noon for these recipients (Eastern). Intended?" },
     ],
+    customerFirst: { you: 9, we: 3, opener: "them", note: "Opens on their scaling problem. The ask is one small step." },
     settings: [
       { label: "From", value: "[Pentara sender] <[address]>" },
       { label: "Reply-to", value: "[address]" },
@@ -213,6 +214,7 @@ export const signoffItems: SignoffItem[] = [
       { field: "First comment", result: "flag", detail: "The link returns \"page not found\"" },
       { field: "Alt text", result: "pass", detail: "Present and describes the image" },
     ],
+    customerFirst: { you: 4, we: 0, opener: "them", note: "Shows the routine from the customer's morning." },
     settings: [
       { label: "Account", value: "[Morning Miracle Instagram]" },
       { label: "First comment", value: "[Link and FDA disclaimer]" },
@@ -250,6 +252,7 @@ export const signoffItems: SignoffItem[] = [
       { field: "Name", result: "flag", detail: "\"Photopharmics\" appears twice; their style is PhotoPharmics" },
       { field: "Recipients", result: "pass", detail: "Only the CEO; no outside addresses" },
     ],
+    customerFirst: { you: 2, we: 14, opener: "us", note: "Opens with company history. Lead with the problem clinicians and patients face, then where the company fits." },
     settings: [
       { label: "Destination", value: "Shared with CEO as a doc" },
       { label: "Recipients", value: "[CEO name]" },
@@ -263,6 +266,7 @@ export const signoffItems: SignoffItem[] = [
       { field: "Account", result: "pass", detail: "Pentara company page, not your personal profile" },
       { field: "Dates", result: "flag", detail: "Slide 6 says \"Tuesday, Nov 4\". Nov 4, 2026 is a Wednesday" },
     ],
+    customerFirst: { you: 6, we: 5, opener: "them", note: "Cover slide is about them; slides 5 to 7 drift into our process. Reframe as what the reader gets." },
     settings: [
       { label: "Account", value: "[Pentara company page]" },
       { label: "Slides", value: "8" },

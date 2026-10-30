@@ -27,6 +27,12 @@ This spec grows with the build. Every feature carries a status, and each build a
 
 | Feature | Status | Notes |
 | --- | --- | --- |
+| Search or jump: click the bar, ⌘K / Ctrl+K, or / from anywhere | Built | Was a placeholder until Oct 30 |
+| Finds clients and their tabs, sign-off items, tasks, projects, note lines, chats, skills and best-practice guides | Built | Grouped, every word must match, closest title first |
+| Quick actions: new note, open a client's 1:1 agenda, start a project, switch appearance | Built | The client you're in comes first |
+| Lands exactly where you meant: a task opens with its pop-over, Start a project opens the starter | Built | |
+| Keyboard: arrows, Enter, Esc; screen readers hear it as a list of options | Built | |
+| Searches the full text of files, emails and chat transcripts | Specified | Needs the real backend |
 | Home: four status counts, clients worst first, coming up | Prototyped | `/` |
 | All-clear state when nothing needs you | Prototyped | Shows when the sign-off queue is empty |
 | Your time per client this week | Prototyped | Sample minutes; real tracking Specified |
@@ -268,6 +274,9 @@ Each result is OK, Check (you tick it to approve) or Blocks send. The four field
 Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
 
 ## Changelog
+
+### 2026-10-30: search works
+- The search bar was a placeholder. It now opens Search or jump (click, ⌘K / Ctrl+K, or /) across clients, tabs, sign-off, tasks, projects, notes, chats, skills and advice, with quick actions.
 
 ### 2026-10-28: coach
 - Coach icon on key cards and client headers: hover for reminders and coaching about late promises, backlog, missed or overdue 1:1s, the tone of your notes, and each CEO's working style.

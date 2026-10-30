@@ -184,6 +184,8 @@ export function ProjectStarter({ clientId, onClose }: { clientId?: string; onClo
 /** "Start a project" as a pill that opens only when you need it. */
 export function StartProjectPill({ clientId, children }: { clientId?: string; children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  // Arriving from search (?start=1) opens it straight away.
+  useEffect(() => { if (new URLSearchParams(window.location.search).get("start")) setOpen(true); }, []);
   return (
     <>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>

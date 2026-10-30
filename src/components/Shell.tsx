@@ -5,6 +5,7 @@ import { clients, firm } from "@/lib/data";
 import { useStore, UNDO_SECONDS, type Mode } from "@/lib/store";
 import { Icon } from "./Icon";
 import { DropDocs } from "./DropDocs";
+import { CommandPalette } from "./CommandPalette";
 import { OneOnOne } from "./OneOnOne";
 import { ClientTile } from "./ui";
 import { useEffect, useState } from "react";
@@ -49,6 +50,18 @@ function Toast() {
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const { items, brand } = useStore();
+  const [searching, setSearching] = useState(false);
+  const [mac, setMac] = useState(true);
+  useEffect(() => {
+    setMac(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent));
+    const onKey = (e: KeyboardEvent) => {
+      const typing = (e.target as HTMLElement)?.closest?.("input, textarea, select, [contenteditable=true]");
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setSearching((s) => !s); }
+      else if (e.key === "/" && !typing) { e.preventDefault(); setSearching(true); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
   const eyes = items.filter((i) => i.state === "needs").length;
   const clientId = path.startsWith("/clients/") ? path.split("/")[2] : null;
   const active = clientId ? clients.find((c) => c.id === clientId) : null;
@@ -66,10 +79,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <span className="brand-name">Baton</span>
           <span className="brand-sub">{firm.name}</span>
         </Link>
-        <button className="search" aria-label="Search or jump">
+        <button className="search" aria-label="Search or jump" aria-keyshortcuts="Meta+K Control+K" onClick={() => setSearching(true)}>
           <Icon name="search" size={16} />
           <span>Search or jump to a client, task, chat…</span>
-          <kbd>⌘K</kbd>
+          <kbd>{mac ? "⌘K" : "Ctrl K"}</kbd>
         </button>
         {active && (
           <span className="switcher hide-mobile">
@@ -113,6 +126,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </nav>
       <Toast />
       <DropDocs here={active?.id} />
+      <CommandPalette open={searching} onClose={() => setSearching(false)} here={active?.id} />
       <OneOnOne here={active?.id} />
     </div>
   );

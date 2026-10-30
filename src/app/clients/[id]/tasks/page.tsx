@@ -1,5 +1,5 @@
 "use client";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { TODAY } from "@/lib/data";
 import { TaskPopover, anchorOf, type Anchor } from "@/components/TaskPopover";
 import { useStore } from "@/lib/store";
@@ -17,6 +17,16 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
   const [newOwner, setNewOwner] = useState("");
   const { snoozed, snooze, tasks, editTask } = useStore();
   const [pop, setPop] = useState<{ id: string; anchor: Anchor } | null>(null);
+  // Arriving from search (?task=…): open that task's settings next to it.
+  useEffect(() => {
+    const want = new URLSearchParams(window.location.search).get("task");
+    if (!want) return;
+    const t = setTimeout(() => {
+      const el = document.querySelector(`[data-task="${want}"]`);
+      if (el) { el.scrollIntoView({ block: "center" }); setPop({ id: want, anchor: anchorOf(el) }); }
+    }, 50);
+    return () => clearTimeout(t);
+  }, []);
   const addToAgenda = useAddToAgenda();
   const [added, setAdded] = useState<string[]>([]);
   // Includes tasks sent back from a 1:1; edits made anywhere show here.
@@ -68,7 +78,7 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
             {visible.map((t) => (
               <tr key={t.id} {...dragInto1on1({ kind: "task", title: t.title, href: `/clients/${id}/tasks`, refId: t.id, clientId: id })}>
                 <td>
-                  <button className="title-btn" aria-haspopup="dialog" onClick={(e) => setPop({ id: t.id, anchor: anchorOf(e.currentTarget) })}>{t.title}</button>
+                  <button className="title-btn" data-task={t.id} aria-haspopup="dialog" onClick={(e) => setPop({ id: t.id, anchor: anchorOf(e.currentTarget) })}>{t.title}</button>
                   {t.promised && <span className="badge b-info" style={{ marginLeft: 6 }}>Promised to {t.promised.to}</span>}
                   <br /><span className="muted small">{t.dept}</span>
                 </td>

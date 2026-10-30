@@ -6,7 +6,7 @@ import { useStore } from "@/lib/store";
 import type { Health } from "@/lib/types";
 import { healthLabel } from "@/lib/format";
 import { Icon } from "@/components/Icon";
-import { CrewChip, Due, Progress, StatusBadge, StatusIcon } from "@/components/ui";
+import { CrewChip, Due, Progress, StatusBadge, StatusIcon, CardHead } from "@/components/ui";
 
 const BLOCKER: Record<string, string> = { client: "Waiting on", you: "Waiting on you", task: "Depends on", access: "Needs" };
 
@@ -118,7 +118,7 @@ export function Score({ clientId }: { clientId: string }) {
             if (!laneRows.length) return null;
             return (
               <section key={l.key} className="card scroll-x fade" aria-label={l.name}>
-                <div className="card-head"><h2 style={{ fontSize: 14 }}>{l.name} · {laneRows.length}</h2></div>
+                <CardHead title={l.name} count={laneRows.length} />
                 {laneRows.map((r) => (
                   <div className="row" key={r.key} style={{ flexWrap: "wrap" }}>
                     {show.icons && (r.health === "eyes" ? <span style={{ color: "var(--eyes-fg)", display: "inline-flex" }}><Icon name="eye" /></span> : <StatusIcon health={r.health} />)}

@@ -47,3 +47,23 @@ export function Progress({ pct, health }: { pct: number; health: Health }) {
     </span>
   );
 }
+
+/** One header for every card: icon, title, count, then a note and actions on the right.
+ *  Same in every client, so your eye learns one layout. Client color never appears here. */
+export function CardHead({ icon, title, count, sub, children }: { icon?: string; title: React.ReactNode; count?: number; sub?: React.ReactNode; children?: React.ReactNode }) {
+  return (
+    <div className="card-head">
+      <h2 className="card-title">
+        {icon && <span className="card-icon"><Icon name={icon} size={16} /></span>}
+        {title}
+        {count !== undefined && <span className="card-count">{count}</span>}
+      </h2>
+      {(sub || children) && (
+        <span className="card-actions">
+          {sub && <span className="muted small hide-mobile">{sub}</span>}
+          {children}
+        </span>
+      )}
+    </div>
+  );
+}

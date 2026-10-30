@@ -1,5 +1,6 @@
 "use client";
 // The coach icon: hover (or tap) for reminders and coaching that fit the card you're on.
+import { CardHead } from "./ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { coach, CONTEXT_KINDS, KIND_LABEL, clientName, type CoachContext, type CoachTip } from "@/lib/coach";
@@ -110,9 +111,10 @@ export function WorkingStyle({ clientId }: { clientId: string }) {
     setTrait("");
   };
   return (
-    <section className="card" style={{ padding: 14, display: "flex", flexDirection: "column", gap: 8 }} aria-label="Working style">
+    <section className="card" aria-label="Working style">
+      <CardHead icon="coach" title="Working style" count={mine.length} />
+      <div style={{ padding: "0 18px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
       <div>
-        <h2 style={{ margin: 0, fontSize: 14, display: "flex", gap: 6, alignItems: "center" }}><Icon name="coach" size={15} />Working style</h2>
         <div className="xs muted">Private to you. Describe what they do, not what they are: &ldquo;pushes back on dates&rdquo; coaches better than &ldquo;difficult.&rdquo;</div>
       </div>
       {mine.map((s) => (
@@ -127,6 +129,7 @@ export function WorkingStyle({ clientId }: { clientId: string }) {
         <input className="input" value={trait} onChange={(e) => setTrait(e.target.value)} placeholder="e.g. wants the bottom line first" aria-label="How they work" style={{ flex: 1, padding: "4px 6px", fontSize: 13 }} />
         <button className="btn" type="submit" style={{ minHeight: 30 }}>Add</button>
       </form>
+      </div>
     </section>
   );
 }

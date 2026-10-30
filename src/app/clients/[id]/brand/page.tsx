@@ -1,4 +1,5 @@
 "use client";
+import { CardHead } from "@/components/ui";
 import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { getClient } from "@/lib/data";
@@ -44,10 +45,7 @@ export default function Brand({ params }: { params: Promise<{ id: string }> }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 960 }}>
       <section className="card">
-        <div className="card-head">
-          <h2>Pull brand from website</h2>
-          <span className="muted small">Gathered automatically; adjust anything</span>
-        </div>
+        <CardHead icon="search" title="Pull brand from website" sub="Gathered automatically; adjust anything" />
         <div style={{ display: "flex", gap: 8, padding: "0 18px 16px", flexWrap: "wrap" }}>
           <label style={{ flex: 1, minWidth: 240 }}>
             <span style={{ position: "absolute", left: -9999 }}>Client website</span>
@@ -64,7 +62,7 @@ export default function Brand({ params }: { params: Promise<{ id: string }> }) {
         <div className="split fade">
           <div className="wide" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <section className="card">
-              <div className="card-head"><h2>Logo</h2></div>
+              <CardHead icon="file" title="Logo" />
               <div className="grid-auto" style={{ padding: "0 18px 16px", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}>
                 {[...client.detected.logos, { id: "monogram", source: "Monogram", kind: "logo" as const }].map((l) => (
                   <label key={l.id} className={`option ${logo === l.id ? "selected" : ""}`} style={{ flexDirection: "column", alignItems: "flex-start", padding: 12 }}>
@@ -88,7 +86,7 @@ export default function Brand({ params }: { params: Promise<{ id: string }> }) {
             </section>
 
             <section className="card">
-              <div className="card-head"><h2>Color</h2><span className="muted small">Used for this client&apos;s tile, top bar and accents</span></div>
+              <CardHead icon="grid" title="Color" sub="Used for this client's tile, top bar and header" />
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", padding: "0 18px 12px" }}>
                 {client.detected.palette.map((p) => (
                   <button key={p.hex} onClick={() => setColor(p.hex)} aria-pressed={color === p.hex} className="card" style={{ padding: 8, display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-start", borderWidth: 2, borderColor: color === p.hex ? "var(--text)" : "var(--border)", width: 130 }}>
@@ -113,7 +111,7 @@ export default function Brand({ params }: { params: Promise<{ id: string }> }) {
 
             {client.detected.fonts.length > 0 && (
               <section className="card">
-                <div className="card-head"><h2>Fonts found</h2><span className="muted small">For reference in briefs and designs</span></div>
+                <CardHead icon="file" title="Fonts found" sub="For reference in briefs and designs" />
                 <div style={{ display: "flex", gap: 8, padding: "0 18px 16px", flexWrap: "wrap" }}>{client.detected.fonts.map((f) => <span key={f} className="badge b-neutral">{f}</span>)}</div>
               </section>
             )}
@@ -121,7 +119,7 @@ export default function Brand({ params }: { params: Promise<{ id: string }> }) {
 
           <aside className="narrow" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <section className="card" style={{ overflow: "hidden" }} aria-label="Preview">
-              <div className="card-head"><h2>How it looks in Baton</h2></div>
+              <CardHead icon="eye" title="How it looks in Baton" />
               <div style={{ borderTop: `4px solid ${accent.color}`, padding: 14, display: "flex", flexDirection: "column", gap: 12 }}>
                 <div style={{ display: "flex", gap: 10, alignItems: "center", background: "var(--nav-bg)", borderRadius: 9, padding: "8px 12px" }}>
                   {tile(22, 6)}<span style={{ fontWeight: 600 }}>{client.name}</span>
@@ -132,13 +130,12 @@ export default function Brand({ params }: { params: Promise<{ id: string }> }) {
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <span className="badge" style={{ background: accent.color, color: "#fff" }}>Grow</span>
-                  <span className="badge badge-accent" style={{ ["--accent" as string]: accent.color }}>Strategy</span>
-                  <button className="btn" style={{ background: accent.color, borderColor: accent.color, color: "#fff", minHeight: 34 }}>Send</button>
+                  <span className="muted xs">Cards inside stay neutral, the same for every client.</span>
                 </div>
               </div>
             </section>
             <button className="btn btn-primary btn-lg" onClick={save}>{savedNote ? "Saved" : "Use this brand"}</button>
-            <p className="muted xs" style={{ margin: 0 }}>Applies to this client everywhere in Baton. You can also send these to the client&apos;s Moda brand kit.</p>
+            <p className="muted xs" style={{ margin: 0 }}>Colors this client's tile, top bar and header. Cards stay neutral so every client reads the same way. You can also send these to the client&apos;s Moda brand kit.</p>
           </aside>
         </div>
       )}

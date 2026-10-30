@@ -7,7 +7,7 @@ import { SnoozeButton, wakeLabel } from "@/components/Snooze";
 import { dragInto1on1 } from "@/lib/agenda";
 import { useAddToAgenda } from "@/components/OneOnOne";
 import type { CrewKind } from "@/lib/types";
-import { Due, Progress, StatusBadge } from "@/components/ui";
+import { Due, Progress, StatusBadge, CardHead } from "@/components/ui";
 import { Icon } from "@/components/Icon";
 
 export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
@@ -51,13 +51,9 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <section className="card scroll-x">
-      <div className="card-head">
-        <h2>Tasks</h2>
-        <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <span className="muted small hide-mobile">Click a task to adjust it</span>
-          {asleep.length > 0 && <button className="btn" style={{ minHeight: 32 }} aria-pressed={showSnoozed} onClick={() => setShowSnoozed((v) => !v)}><Icon name="clock" size={15} />Snoozed · {asleep.length}</button>}
-        </span>
-      </div>
+      <CardHead icon="tasks" title="Tasks" count={visible.length} sub="Click a task to adjust it">
+        {asleep.length > 0 && <button className="btn" style={{ minHeight: 32 }} aria-pressed={showSnoozed} onClick={() => setShowSnoozed((v) => !v)}><Icon name="clock" size={15} />Snoozed · {asleep.length}</button>}
+      </CardHead>
       {showSnoozed && asleep.length > 0 && (
         <div style={{ background: "var(--surface-2)" }}>
           {asleep.map((t) => (

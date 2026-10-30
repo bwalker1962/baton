@@ -240,6 +240,10 @@ This spec grows with the build. Every feature carries a status, and each build a
 | Phase 2: roles for collaborators and client teams | Future | Owner, Collaborator, Client admin, Client viewer |
 | Away mode | Future | |
 
+## Principle: client color identifies, it never styles the work
+
+Each client's color appears only on the frame: the top bar rule, the client tile, the header and phase, the active tab and the sidebar. Every card inside uses the same neutral design in every client, with one header pattern (icon, title, count, then notes and actions on the right). Your eye learns one layout and finds the same thing in the same place whichever client you're in. The one exception is Home's note stacks, where notes from several clients sit together and color tells them apart.
+
 ## Principle: the order of priorities
 
 Every screen is ordered the same way: accountability to each CEO first, your own peace of mind second, project and task views third.
@@ -274,6 +278,11 @@ Each result is OK, Check (you tick it to approve) or Blocks send. The four field
 Baton reads the client's public website: the header logo, favicon and app icon (`link rel="icon"`, `apple-touch-icon`), the social share image (`og:image`), the theme color (`meta name="theme-color"`, web manifest) and the most-used colors and fonts in its styles. Where a connected tool already does this well (Brevo's brand fetch, a Moda brand kit), Baton uses it. Every result is a suggestion: you pick, adjust and save. Colors too light for white text get a deeper shade for Baton's own accents so the screen stays readable.
 
 ## Changelog
+
+### 2026-10-30: one card design across clients
+- Client color moved out of cards: chat labels, buttons, notes inside a client and the CEO report header are now neutral; the client shows in the frame only.
+- One card header everywhere (icon, title, count, actions) across dashboards, Sign-off, Today, Tasks, Projects, Notes, Chats, Apps, Score and Brand.
+- Notes: Who no longer truncates; Updated moved to its own line.
 
 ### 2026-10-30: search works
 - The search bar was a placeholder. It now opens Search or jump (click, ⌘K / Ctrl+K, or /) across clients, tabs, sign-off, tasks, projects, notes, chats, skills and advice, with quick actions.

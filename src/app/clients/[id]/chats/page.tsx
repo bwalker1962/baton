@@ -1,4 +1,5 @@
 "use client";
+import { CardHead } from "@/components/ui";
 import { use, useState } from "react";
 import { topics } from "@/lib/data";
 import { shortDate } from "@/lib/format";
@@ -19,12 +20,12 @@ export default function Chats({ params }: { params: Promise<{ id: string }> }) {
           <button aria-pressed={sort === "recent"} onClick={() => setSort("recent")}>Most recent</button>
           <button aria-pressed={sort === "category"} onClick={() => setSort("category")}>By category</button>
         </div>
-        <button className="btn btn-accent">New chat</button>
+        <button className="btn btn-primary">New chat</button>
       </div>
       {list.length === 0 && <section className="card empty"><h3>No chats yet</h3><p>Chats appear here as topics, with the decision and follow-ups from each.</p></section>}
       {groups.map((g) => (
         <section key={g.name} className="card fade">
-          <div className="card-head"><h2 style={{ fontSize: 14 }}>{g.name}</h2><span className="muted small">{g.items.length} topics</span></div>
+          <CardHead icon="chat" title={g.name} count={g.items.length} />
           {g.items.map((t) => {
             const d = shortDate(t.date);
             return (
@@ -36,7 +37,7 @@ export default function Chats({ params }: { params: Promise<{ id: string }> }) {
                 <span className="grow" style={{ flexBasis: 280, display: "flex", flexDirection: "column", gap: 6 }}>
                   <span style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                     <strong>{t.title}</strong>
-                    <span className="badge badge-accent">{t.category}</span>
+                    <span className="badge b-neutral">{t.category}</span>
                   </span>
                   <span className="muted">{t.summary}</span>
                   <span style={{ background: "var(--surface-2)", borderRadius: 8, padding: "6px 10px" }}><strong>Decision</strong> · {t.decision}</span>

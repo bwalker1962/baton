@@ -5,7 +5,7 @@ import { departments, getClient, tasks } from "@/lib/data";
 import { healthLabel } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { Icon } from "@/components/Icon";
-import { Progress, StatusBadge } from "@/components/ui";
+import { Progress, StatusBadge, ClientTile } from "@/components/ui";
 
 export default function Report({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -30,9 +30,12 @@ export default function Report({ params }: { params: Promise<{ id: string }> }) 
       </div>
 
       <article className="card" style={{ overflow: "hidden" }}>
-        <header style={{ background: client.color, color: "#fff", padding: "20px 24px" }}>
-          <div className="small" style={{ opacity: 0.85 }}>Weekly update · week of Oct 26</div>
-          <h2 style={{ margin: "2px 0 0", fontSize: 22 }}>How things are going at {client.name}</h2>
+        <header style={{ background: "var(--surface-2)", borderTop: `4px solid ${client.color}`, padding: "18px 24px", display: "flex", gap: 14, alignItems: "center" }}>
+          <ClientTile client={client} size={40} />
+          <div>
+            <div className="small muted">Weekly update · week of Oct 26</div>
+            <h2 style={{ margin: "2px 0 0", fontSize: 22 }}>How things are going at {client.name}</h2>
+          </div>
         </header>
         <section className="row" style={{ alignItems: "flex-start", padding: "18px 24px" }}>
           <StatusBadge health={client.health} />

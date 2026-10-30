@@ -1,4 +1,5 @@
 "use client";
+import { CardHead } from "@/components/ui";
 import Link from "next/link";
 import { use } from "react";
 import { templates } from "@/lib/templates";
@@ -18,7 +19,7 @@ export default function Projects({ params }: { params: Promise<{ id: string }> }
       <StartProjectPill clientId={id} />
       {mine.length > 0 && (
         <section className="card">
-          <div className="card-head"><h2>Projects</h2></div>
+          <CardHead icon="layers" title="Projects" count={mine.length} />
           {mine.map((p) => {
             const open = p.steps.filter((s) => s.status === "open").length;
             const done = p.steps.filter((s) => s.status === "done").length;
@@ -34,10 +35,7 @@ export default function Projects({ params }: { params: Promise<{ id: string }> }
         </section>
       )}
       <section className="card">
-        <div className="card-head">
-          <h2>Or start from a template</h2>
-          <span className="muted small">Templates suggest what usually matters. Every field and step is optional.</span>
-        </div>
+        <CardHead icon="plus" title="Or start from a template" sub="Every field and step is optional" />
         <div className="grid-auto" style={{ padding: "4px 18px 18px" }}>
           {templates.map((t) => (
             <Link key={t.id} href={`/clients/${id}/projects/new/${t.id}`} className="card" style={{ padding: 14, color: "var(--text)", display: "flex", flexDirection: "column", gap: 6 }}>

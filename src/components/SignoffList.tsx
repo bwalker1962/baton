@@ -6,7 +6,7 @@ import { useStore } from "@/lib/store";
 import type { SignoffItem } from "@/lib/types";
 import { Icon } from "./Icon";
 import { dragInto1on1 } from "@/lib/agenda";
-import { ClientTile, Due } from "./ui";
+import { ClientTile, Due, CardHead } from "./ui";
 
 const DONE_LABEL: Record<string, { cls: string; text: string }> = {
   approved: { cls: "b-good", text: "Approved" },
@@ -50,7 +50,7 @@ export function SignoffList({ clientId }: { clientId?: string }) {
     <>
       <section className="card">
         <div className="card-head">
-          <h2 style={{ display: "flex", gap: 8, alignItems: "center" }}><span style={{ color: "var(--eyes-fg)", display: "inline-flex" }}><Icon name="eye" /></span>Needs your eyes · {needs.length}</h2>
+          <h2 className="card-title"><span className="card-icon"><Icon name="eye" size={16} /></span>Needs your eyes<span className="card-count">{needs.length}</span></h2>
           <span style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <span className="seg" role="group" aria-label="Filter by tier">
               <button aria-pressed={tier === 0} onClick={() => setTier(0)}>All</button>
@@ -70,14 +70,14 @@ export function SignoffList({ clientId }: { clientId?: string }) {
 
       {held.length > 0 && (
         <section className="card">
-          <div className="card-head"><h2>Held for discussion · {held.length}</h2><span className="muted small">Approved in principle; nothing sends until you confirm the changes</span></div>
+          <CardHead icon="clock" title="Held for discussion" count={held.length} sub="Nothing sends until you confirm the changes" />
           {held.map((i) => <ItemRow key={i.id} i={i} scope={clientId} />)}
         </section>
       )}
 
       {done.length > 0 && (
         <section className="card">
-          <div className="card-head"><h2>Decided today · {done.length}</h2></div>
+          <CardHead icon="check" title="Decided today" count={done.length} />
           {done.map((i) => <ItemRow key={i.id} i={i} scope={clientId} />)}
         </section>
       )}

@@ -1,3 +1,4 @@
+import { CardHead } from "@/components/ui";
 import { notFound } from "next/navigation";
 import { getClient } from "@/lib/data";
 import { Icon } from "@/components/Icon";
@@ -16,7 +17,7 @@ export default async function Apps({ params }: { params: Promise<{ id: string }>
   return (
     <>
       <section className="card">
-        <div className="card-head"><h2>{client.name}&apos;s apps</h2><button className="btn">+ Connect app</button></div>
+        <CardHead icon="plug" title="Apps" count={client.apps.length}><button className="btn">+ Connect app</button></CardHead>
         <div className="grid-auto" style={{ padding: "4px 18px 18px" }}>
           {client.apps.map((a) => (
             <div key={a.role} style={{ border: "1px solid var(--border)", borderRadius: 12, padding: 12 }}>
@@ -29,7 +30,7 @@ export default async function Apps({ params }: { params: Promise<{ id: string }>
         <div className="row muted small">Skills in this workspace can reach only the apps listed here. Skills ask for a role, such as Social or Email, and this list decides which app answers.</div>
       </section>
       <section className="card">
-        <div className="card-head"><h2>Key files</h2><button className="btn">+ Pin a file</button></div>
+        <CardHead icon="file" title="Key files" count={client.keyFiles.length}><button className="btn">+ Pin a file</button></CardHead>
         {client.keyFiles.map((f) => (
           <div className="row" key={f.label}>
             <Icon name={f.isLogin ? "lock" : "file"} />

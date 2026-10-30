@@ -101,11 +101,11 @@ export function Dashboard({ storageKey, scope, clientId, defaults }: { storageKe
               onDragOver={(e) => { if (accepts(e)) { e.preventDefault(); setOver(n); } }}
               onDrop={(e) => drop(e, n)}>
               <div className="card-head widget-head">
-                <h2 style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 15 }}>
+                <h2 className="card-title">
                   <span className="grip" role="button" tabIndex={0} aria-label={`Move ${w.title}`} title="Drag to move"
                     onPointerDown={() => setArmed(n)} onPointerUp={() => setArmed(null)}
                     onKeyDown={(e) => { if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); move(n, n - 1); } if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); move(n, n + 2); } }}>⋮⋮</span>
-                  <Icon name={w.icon} size={16} />{w.title}
+                  <span className="card-icon"><Icon name={w.icon} size={16} /></span>{w.title}
                 </h2>
                 <span style={{ display: "flex", gap: 6, alignItems: "center" }}>
                   {editing ? (

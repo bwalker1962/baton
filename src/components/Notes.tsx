@@ -58,6 +58,7 @@ function EntryRow({ e, editable, onText, onToggle, onKey, inputRef }: {
 
 /** One note on the pad, edited in place. Who and every entry are editable; each entry carries its time. */
 export function PostIt({ note, showClient, editable, clamp }: { note: Note; showClient?: boolean; editable?: boolean; clamp?: boolean }) {
+  // Client color only where it tells clients apart (Home's mixed stacks); inside a client every note looks the same.
   const { saveNote, removeNote } = useStore();
   const look = useClientLook(clientOf(note.clientId));
   const [showDone, setShowDone] = useState(false);
@@ -97,19 +98,20 @@ export function PostIt({ note, showClient, editable, clamp }: { note: Note; show
   };
 
   return (
-    <article className="postit" style={{ ["--note" as string]: look.color }} aria-label={`Note with ${note.with}, ${when(note.date)}`}>
+    <article className="postit" style={showClient ? { ["--note" as string]: look.color } : undefined} aria-label={`Note with ${note.with}, ${when(note.date)}`}>
       <div className="who">
         {editable ? (
           <span style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 0 }}>
             <span style={{ opacity: 0.8 }}>Who</span>
             <input className="inline-who" list="note-with" value={note.with} aria-label="Who the conversation was with"
-              onChange={(e) => save(note.entries, { with: e.target.value })} size={Math.max(4, note.with.length + 1)} />
+              onChange={(e) => save(note.entries, { with: e.target.value })} style={{ width: `${Math.max(5, note.with.length + 2)}ch` }} />
             <datalist id="note-with">{WITH_OPTIONS.map((w) => <option key={w} value={w} />)}</datalist>
-            <span>· {when(note.date)}</span>
+            <span style={{ whiteSpace: "nowrap" }}>· {when(note.date)}</span>
           </span>
         ) : <span>{showClient ? `${clientOf(note.clientId).name} · ` : ""}{note.with}</span>}
-        <span title={`Last updated ${stamp(note.updated)}`}>{editable ? `Updated ${stamp(note.updated)}` : when(note.date)}</span>
+        {!editable && <span>{when(note.date)}</span>}
       </div>
+      {editable && <div className="xs" style={{ opacity: 0.7, marginTop: -4, marginBottom: 6 }}>Updated {stamp(note.updated)}</div>}
 
       <div className={clamp ? "clamp" : undefined}>
         {active.map((e) => (
@@ -166,7 +168,7 @@ export function Composer({ clientId, onDone }: { clientId?: string; onDone?: () 
     onDone?.();
   };
   return (
-    <form className="postit" style={{ ["--note" as string]: cid ? look.color : "#9a9a9a", display: "flex", flexDirection: "column", gap: 8 }} onSubmit={(e) => { e.preventDefault(); save(); }} aria-label="New note">
+    <form className="postit" style={{ ...(!clientId && cid ? { ["--note" as string]: look.color } : {}), display: "flex", flexDirection: "column", gap: 8 }} onSubmit={(e) => { e.preventDefault(); save(); }} aria-label="New note">
       {!clientId && (
         <div role="radiogroup" aria-label="Client" style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {clients.map((c) => (

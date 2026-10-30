@@ -6,7 +6,7 @@ import { DAY_HOURS, PLANNING_GOAL, leadSeed, todaySeed, type DayItem, type DayKi
 import { addDays } from "@/lib/templates";
 import { daysFromToday, minutesLabel, shortDate } from "@/lib/format";
 import { Icon } from "@/components/Icon";
-import { ClientTile } from "@/components/ui";
+import { ClientTile, CardHead } from "@/components/ui";
 import { SnoozeButton, wakeLabel } from "@/components/Snooze";
 import { DRAG_TYPE } from "@/lib/agenda";
 import { CoachButton } from "@/components/Coach";
@@ -100,7 +100,7 @@ export default function Today() {
       </div>
 
       <section className="card" aria-label="Today's list">
-        <div className="card-head"><h2>Your order for today</h2><span className="muted small hide-mobile">Drag to reorder, or use the arrows</span></div>
+        <CardHead icon="tasks" title="Your order for today" count={ordered.length} sub="Drag to reorder, or use the arrows" />
         <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
           {ordered.map((it, n) => {
             const c = it.clientId ? clients.find((x) => x.id === it.clientId) : undefined;
@@ -163,10 +163,7 @@ export default function Today() {
       </section>
 
       <section className="card" aria-label="Long-lead radar">
-        <div className="card-head">
-          <h2>Long-lead radar</h2>
-          <span className="muted small">Due later, but the work starts now. These are what quietly sink a quarter.</span>
-        </div>
+        <CardHead icon="clock" title="Long-lead radar" count={radar.length} sub="Due later, but the work starts now" />
         {radar.length === 0 && <div className="row muted small">Everything on the radar is on today&apos;s list.</div>}
         {radar.map((l) => {
           const c = clients.find((x) => x.id === l.clientId)!;

@@ -74,7 +74,8 @@ export function parse(text: string): Slots {
   if (c) s.clientId = c.id;
   const t = TYPE_WORDS.find(([, re]) => re.test(text));
   if (t) s.templateId = t[0];
-  else if (/other|something else|blank|custom/i.test(text)) s.templateId = "blank";
+  else if (/other|something else|blank|custom|book|writing|novel|manuscript/i.test(text)) s.templateId = "blank";
+  if (/personal project|no client|not for a client|my own project/i.test(text)) s.clientId = "personal";
   // "Not official yet" is a hedge, not a confirmation; and any hedge outranks a firm word.
   const negated = /\b(not|isn'?t|aren'?t|wasn'?t|un|no|never)\s*(yet\s*|really\s*)?(official|confirmed|signed|approved|booked|decided|final)/i.test(text);
   const cert = negated ? (["heard"] as const) : CERTAINTY_WORDS.find(([, re]) => re.test(text));
@@ -99,8 +100,8 @@ export interface Question { slot: SlotKey; text: string; chips: string[] }
 
 /** The next thing to ask, or null when the project is described well enough. */
 export function nextQuestion(s: Slots, guessed: Partial<Record<SlotKey, boolean>>): Question | null {
-  if (!s.clientId) return { slot: "clientId", text: "Which client is this for?", chips: clients.map((c) => c.name) };
-  if (!s.templateId) return { slot: "templateId", text: "What kind of project is it?", chips: [...templates.map((t) => t.name), "Something else"] };
+  if (!s.clientId) return { slot: "clientId", text: "Which Space is this for?", chips: ["Personal", "RidgeFront", ...clients.map((c) => c.name)] };
+  if (!s.templateId) return { slot: "templateId", text: "What kind of project is it?", chips: [...templates.map((t) => t.name), "Blank project"] };
   if (!s.certainty || guessed.certainty)
     return {
       slot: "certainty",
@@ -126,11 +127,16 @@ export function answer(slot: SlotKey, text: string, s: Slots): Slots {
   const next: Slots = { ...s };
   // Fill anything newly mentioned that was still empty.
   (Object.keys(p) as (keyof Slots)[]).forEach((k) => { if (next[k] === undefined) (next as Record<string, unknown>)[k] = p[k]; });
+  if (slot === "clientId") {
+    if (/personal|no client|none listed|my own|for me/i.test(text)) next.clientId = "personal";
+    else if (/ridgefront|ridge front/i.test(text)) next.clientId = "ridgefront";
+    else next.clientId = clients.find(c => c.name.toLowerCase() === text.trim().toLowerCase())?.id ?? p.clientId;
+  }
   if (slot === "certainty") {
     const byLabel = (Object.keys(CERTAINTY) as Certainty[]).find((k) => CERTAINTY[k].label.toLowerCase() === text.trim().toLowerCase());
     next.certainty = byLabel ?? p.certainty ?? (/^(yes|yep|right|correct|that'?s right)/i.test(text) ? s.certainty : s.certainty);
   }
-  if (slot === "templateId") next.templateId = templates.find((t) => t.name === text)?.id ?? p.templateId ?? (text === "Something else" ? "blank" : s.templateId);
+  if (slot === "templateId") next.templateId = templates.find((t) => t.name === text)?.id ?? p.templateId ?? (/blank|something else/i.test(text) ? "blank" : s.templateId);
   if (slot === "date" && next.date === undefined) next.date = parseDate(text) ?? null;
   if (slot === "role") next.role = p.role ?? (text.trim() || "Not decided");
   if (slot === "checkBack") {

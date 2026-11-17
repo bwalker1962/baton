@@ -33,17 +33,19 @@ export default function Today() {
   const [drag, setDrag] = useState<string | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
+  const [critical, setCritical] = useState<string[]>([]);
+  const [pulsePaused, setPulsePaused] = useState(false);
   const [draftKind, setDraftKind] = useState<DayKind>("planning");
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) { const s: Saved = JSON.parse(raw); setList(s.list); setDone(s.done); setAdded(s.added); setAsleep(s.asleep ?? {}); }
+      if (raw) { const s: Saved = JSON.parse(raw); setList(s.list); setDone(s.done); setAdded(s.added); setAsleep(s.asleep ?? {}); setCritical((s as Saved & { critical?: string[] }).critical ?? []); setPulsePaused((s as Saved & { pulsePaused?: boolean }).pulsePaused ?? false); }
     } catch { /* storage unavailable: start from the sample day */ }
   }, []);
   useEffect(() => {
-    try { localStorage.setItem(KEY, JSON.stringify({ list, done, added, asleep } satisfies Saved)); } catch { /* ignore */ }
-  }, [list, done, added, asleep]);
+    try { localStorage.setItem(KEY, JSON.stringify({ list, done, added, asleep, critical, pulsePaused })); } catch { /* ignore */ }
+  }, [list, done, added, asleep, critical, pulsePaused]);
 
   const move = (id: string, to: number) => setList((all) => {
     const from = all.findIndex((i) => i.id === id);
@@ -59,12 +61,15 @@ export default function Today() {
     setAdded((a) => [...a, l.id]);
   };
   const remove = (id: string) => { setList((all) => all.filter((i) => i.id !== id)); setAdded((a) => a.filter((x) => x !== id)); };
-  const reset = () => { setList(todaySeed); setDone([]); setAdded([]); setAsleep({}); };
+  const reset = () => { setList(todaySeed); setDone([]); setAdded([]); setAsleep({}); setCritical([]); setPulsePaused(false); };
   const awake = (i: DayItem) => !asleep[i.id] || asleep[i.id] <= TODAY;
 
   const today = list.filter(awake);
   const sleeping = list.filter((i) => !awake(i)).sort((a, b) => asleep[a.id].localeCompare(asleep[b.id]));
   const ordered = [...today.filter((i) => !done.includes(i.id)), ...today.filter((i) => done.includes(i.id))];
+  const urgent = today.filter(i => critical.includes(i.id) && !done.includes(i.id));
+  const pending = today.filter(i => !done.includes(i.id));
+  const blocked = pending.filter(i => /block|unblock|waiting|access/i.test(i.title + " " + (i.why ?? "")));
   const total = today.reduce((n, i) => n + i.minutes, 0);
   const planning = today.filter((i) => i.kind === "planning").reduce((n, i) => n + i.minutes, 0);
   const share = total ? planning / total : 0;
@@ -72,7 +77,7 @@ export default function Today() {
   const radar = leadSeed.filter((l) => !added.includes(l.id)).sort((a, b) => startBy(a).localeCompare(startBy(b)));
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 1040 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 1400 }}>
       <div className="pagehead">
         <div>
           <div className="eyebrow">{new Date(TODAY + "T12:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</div>
@@ -80,10 +85,25 @@ export default function Today() {
         </div>
         <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <CoachButton context="peace" />
+          <Link className="btn" href="/plan">Plan my day</Link>
           <button className="btn" onClick={reset}>Reset sample day</button>
         </span>
       </div>
 
+      <section className="baton-command" aria-label="Daily command dashboard">
+        <div className="baton-command-grid">
+          <div className={urgent.length ? "baton-signal baton-critical" : "baton-signal"}>
+            <span className="baton-signal-label">CRITICAL · NEEDS ACTION</span>
+            <strong>{urgent.length}</strong>
+            <span>{urgent.length ? "Flagged priorities need your attention" : "No manually flagged critical tasks"}</span>
+            {urgent.length > 0 && <button className="btn" onClick={() => setPulsePaused(p => !p)}>{pulsePaused ? "Resume pulse" : "Pause pulse"}</button>}
+          </div>
+          <div className="baton-signal baton-warning"><span className="baton-signal-label">BLOCKED / WAITING</span><strong>{blocked.length}</strong><span>Potential blockers · review status</span></div>
+          <div className="baton-signal baton-focus"><span className="baton-signal-label">TO FINISH TODAY</span><strong>{pending.length}</strong><span>{done.length} marked complete</span></div>
+          <div className="baton-signal baton-capacity"><span className="baton-signal-label">CAPACITY</span><strong>{minutesLabel(total)}</strong><span>of {DAY_HOURS}h planned</span></div>
+        </div>
+        <div className="baton-legend"><span><i className="baton-key critical" /> Critical: manually flagged</span><span><i className="baton-key warning" /> Possible blocker</span><span><i className="baton-key focus" /> Scheduled work</span><span>Client colors identify ownership, not urgency</span></div>
+      </section>
       <div className="grid-auto" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
         <section className="card" style={{ padding: 14 }} aria-label="Time planned">
           <div className="muted xs" style={{ fontWeight: 700, letterSpacing: "0.04em" }}>TIME PLANNED</div>
@@ -106,6 +126,8 @@ export default function Today() {
             const c = it.clientId ? clients.find((x) => x.id === it.clientId) : undefined;
             const isDone = done.includes(it.id);
             const k = KIND[it.kind];
+            const isCritical = critical.includes(it.id) && !isDone;
+            const isBlocked = !isDone && /block|unblock|waiting|access/i.test(it.title + " " + (it.why ?? ""));
             return (
               <li key={it.id}
                 draggable={!isDone}
@@ -118,8 +140,8 @@ export default function Today() {
                 onDragLeave={() => setOver((o) => (o === it.id ? null : o))}
                 onDrop={(e) => { e.preventDefault(); dropOn(it.id); }}
                 onDragEnd={() => { setDrag(null); setOver(null); }}
-                className="row"
-                style={{ opacity: drag === it.id ? 0.4 : isDone ? 0.55 : 1, boxShadow: over === it.id && drag !== it.id ? "inset 0 2px 0 var(--text)" : undefined, cursor: isDone ? "default" : "grab", flexWrap: "wrap" }}>
+                className={`row baton-task-row ${isCritical ? "baton-task-critical" : isBlocked ? "baton-task-blocked" : ""} ${isCritical && !pulsePaused ? "baton-task-pulse" : ""}`}
+                style={{ borderLeft: `5px solid ${isCritical ? "var(--bad-dot)" : isBlocked ? "var(--warn-dot)" : c?.color ?? "var(--gray-dot)"}`, opacity: drag === it.id ? 0.4 : isDone ? 0.55 : 1, boxShadow: over === it.id && drag !== it.id ? "inset 0 2px 0 var(--text)" : undefined, cursor: isDone ? "default" : "grab", flexWrap: "wrap" }}>
                 <span aria-hidden="true" className="muted hide-mobile" style={{ letterSpacing: -2, fontWeight: 700, width: 14 }}>⋮⋮</span>
                 <span className="muted small" style={{ width: 18, textAlign: "right" }}>{n + 1}</span>
                 <input type="checkbox" aria-label={`Done: ${it.title}`} checked={isDone} onChange={() => setDone((d) => (isDone ? d.filter((x) => x !== it.id) : [...d, it.id]))} style={{ width: 18, height: 18 }} />
@@ -128,9 +150,12 @@ export default function Today() {
                   <span style={{ fontWeight: 600, textDecoration: isDone ? "line-through" : undefined }}><button className="title-btn" onClick={(e) => setPop({ id: it.id, anchor: anchorOf(e.currentTarget) })} aria-haspopup="dialog">{it.title}</button></span>
                   <span className="muted small" style={{ display: "block" }}>{c?.name ?? "All clients"}{it.why ? ` · ${it.why}` : ""}</span>
                 </span>
+                {isCritical && <span className="badge b-bad"><Icon name="alert" size={13} />Critical</span>}
+                {!isCritical && isBlocked && <span className="badge b-warn"><Icon name="alert" size={13} />Check blocker</span>}
                 <span className={`badge ${k.cls}`}><Icon name={k.icon} size={13} />{k.label}</span>
                 <span className="small muted" style={{ width: 52, textAlign: "right" }}>{minutesLabel(it.minutes)}</span>
                 <span style={{ display: "flex", gap: 2 }}>
+                  <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-pressed={critical.includes(it.id)} aria-label={`${critical.includes(it.id) ? "Unflag" : "Flag"} ${it.title} as critical`} title={critical.includes(it.id) ? "Remove critical flag" : "Mark critical"} onClick={() => setCritical(ids => ids.includes(it.id) ? ids.filter(x => x !== it.id) : [...ids, it.id])}>{critical.includes(it.id) ? "★" : "☆"}</button>
                   <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-label={`Move ${it.title} up`} disabled={isDone || n === 0} onClick={() => move(it.id, list.findIndex((i) => i.id === it.id) - 1)}>↑</button>
                   <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-label={`Move ${it.title} down`} disabled={isDone} onClick={() => move(it.id, list.findIndex((i) => i.id === it.id) + 1)}>↓</button>
                   <SnoozeButton label={it.title} compact onSnooze={(until) => setAsleep((a) => ({ ...a, [it.id]: until }))} />

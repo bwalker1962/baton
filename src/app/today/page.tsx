@@ -90,18 +90,16 @@ export default function Today() {
         </span>
       </div>
 
-      <section className="baton-command" aria-label="Daily command dashboard">
-        <div className="baton-command-grid">
-          <div className={urgent.length ? "baton-signal baton-critical" : "baton-signal"}>
-            <span className="baton-signal-label">CRITICAL · NEEDS ACTION</span>
-            <strong>{urgent.length}</strong>
-            <span>{urgent.length ? "Flagged priorities need your attention" : "No manually flagged critical tasks"}</span>
-            {urgent.length > 0 && <button className="btn" onClick={() => setPulsePaused(p => !p)}>{pulsePaused ? "Resume pulse" : "Pause pulse"}</button>}
-          </div>
-          <div className="baton-signal baton-warning"><span className="baton-signal-label">BLOCKED / WAITING</span><strong>{blocked.length}</strong><span>Potential blockers · review status</span></div>
-          <div className="baton-signal baton-focus"><span className="baton-signal-label">TO FINISH TODAY</span><strong>{pending.length}</strong><span>{done.length} marked complete</span></div>
-          <div className="baton-signal baton-capacity"><span className="baton-signal-label">CAPACITY</span><strong>{minutesLabel(total)}</strong><span>of {DAY_HOURS}h planned</span></div>
-        </div>
+      <section className="baton-status-strip" aria-label="Daily status">
+        <span className={urgent.length ? "baton-status-item is-critical" : "baton-status-item"} title="Tasks manually marked critical">
+          <span className="baton-status-dot" aria-hidden="true" />Critical <strong>{urgent.length}</strong>
+        </span>
+        <span className={blocked.length ? "baton-status-item is-blocked" : "baton-status-item"} title="Possible blockers detected from task wording; review to confirm">
+          <span className="baton-status-dot" aria-hidden="true" />Blocked <strong>{blocked.length}</strong>
+        </span>
+        <span className="baton-status-item" title={`${done.length} completed today`}>Remaining <strong>{pending.length}</strong></span>
+        <span className="baton-status-item" title="Planned time versus daily capacity">Planned <strong>{minutesLabel(total)} <span className="baton-status-muted">/ {DAY_HOURS}h</span></strong></span>
+        {urgent.length > 0 && <button className="baton-status-pause" onClick={() => setPulsePaused(p => !p)}>{pulsePaused ? "Resume alerts" : "Pause alerts"}</button>}
       </section>
       <section className="card" aria-label="Today's list">
         <CardHead icon="tasks" title="Your order for today" count={ordered.length}  />

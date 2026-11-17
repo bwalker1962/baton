@@ -98,6 +98,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <nav className="sidenav" aria-label="Main">
           <Link href="/" aria-current={is("/")}><Icon name="home" />Home</Link>
           <Link href="/today" aria-current={is("/today")}><Icon name="tasks" />Today</Link>
+          <Link href="/plan" aria-current={is("/plan")}><Icon name="calendar" />Plan my day</Link>
           <Link href="/signoff" aria-current={is("/signoff")}><Icon name="eye" />Sign-off{eyes > 0 && <span className="navcount">{eyes}</span>}</Link>
           <Link href="/advisor" aria-current={is("/advisor")}><Icon name="bulb" />Advisor</Link>
           <Link href="/skills" aria-current={is("/skills")}><Icon name="layers" />Skills</Link>

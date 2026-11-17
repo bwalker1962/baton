@@ -74,7 +74,7 @@ export default function Today() {
   const today = list.filter(awake);
   const sleeping = list.filter((i) => !awake(i)).sort((a, b) => asleep[a.id].localeCompare(asleep[b.id]));
   const ordered = [...today.filter((i) => !done.includes(i.id)), ...today.filter((i) => done.includes(i.id))];
-  const visible = expanded ? ordered : ordered.filter(i => !done.includes(i.id)).slice(0, 5);
+  const visible = expanded ? ordered : ordered.filter(i => !done.includes(i.id));
   const urgent = today.filter(i => critical.includes(i.id) && !done.includes(i.id));
   const pending = today.filter(i => !done.includes(i.id));
   const blocked = pending.filter(i => /block|unblock|waiting|access/i.test(i.title + " " + (i.why ?? "")));
@@ -85,11 +85,10 @@ export default function Today() {
   const radar = leadSeed.filter((l) => !added.includes(l.id)).sort((a, b) => startBy(a).localeCompare(startBy(b)));
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 1400 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 1600 }}>
       <div className="pagehead">
         <div>
-          <div className="eyebrow">{new Date(currentDay + "T12:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</div>
-          <h1 className="title">Today</h1>
+          <h1 className="title">Today <span className="baton-inline-date">{new Date(currentDay + "T12:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span></h1>
         </div>
         <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <CoachButton context="peace" />
@@ -98,7 +97,8 @@ export default function Today() {
         </span>
       </div>
 
-      <section className="baton-status-strip" aria-label="Daily status" aria-live="polite">
+      <section className="card" aria-label="Today's list">
+        <div className="baton-cockpit-bar"><div className="baton-cockpit-metrics">      
         <span className={`baton-status-item ${urgent.length ? "is-critical" : "is-clear"}`} style={{backgroundColor: urgent.length ? "var(--bad-bg)" : "var(--good-bg)"}} title="Manually flagged critical tasks">
           <span className="baton-status-dot" aria-hidden="true" />Critical <strong>{urgent.length}</strong>
         </span>
@@ -107,9 +107,8 @@ export default function Today() {
         </span>
         <span className={`baton-status-item ${pending.length ? "is-active" : "is-clear"}`} style={{backgroundColor: pending.length ? "var(--info-bg)" : "var(--good-bg)"}} title="Unfinished, unsnoozed items">Remaining <strong>{pending.length}</strong></span>
         {urgent.length > 0 && <button className="baton-status-pause" onClick={() => setPulsePaused(p => !p)}>{pulsePaused ? "Resume alerts" : "Pause alerts"}</button>}
-      </section>
-      <section className="card" aria-label="Today's list">
-        <div className="baton-focus-head"><div><h2>Next up</h2><span className="muted small">{pending.length === 0 ? "All caught up" : `${pending.length} remaining · in your chosen order`}</span></div><button className="btn" onClick={() => setExpanded(v => !v)}>{expanded ? "Focus view" : "Show all"}</button></div>
+      
+</div><button className="btn" onClick={() => setExpanded(v => !v)}>{expanded ? "Focus view" : "Show all"}</button></div>
         <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
           {visible.map((it, n) => {
             const c = it.clientId ? clients.find((x) => x.id === it.clientId) : undefined;
@@ -133,17 +132,17 @@ export default function Today() {
                 style={{ borderLeft: `5px solid ${isCritical ? "var(--bad-dot)" : isBlocked ? "var(--warn-dot)" : c?.color ?? "var(--gray-dot)"}`, opacity: drag === it.id ? 0.4 : isDone ? 0.55 : 1, boxShadow: over === it.id && drag !== it.id ? "inset 0 2px 0 var(--text)" : undefined, cursor: isDone ? "default" : "grab", flexWrap: "wrap" }}>
 
 
-                <input type="checkbox" aria-label={`Done: ${it.title}`} checked={isDone} onChange={() => setDone((d) => (isDone ? d.filter((x) => x !== it.id) : [...d, it.id]))} style={{ width: 18, height: 18 }} />
-                {c ? <ClientTile client={c} small /> : <span className="tile tile-sm" style={{ background: "var(--text)" }} aria-hidden="true">B</span>}
-                <span style={{ flex: 1, minWidth: 180 }}>
+                <input type="checkbox" aria-label={`Done: ${it.title}`} checked={isDone} onChange={() => setDone((d) => (isDone ? d.filter((x) => x !== it.id) : [...d, it.id]))} style={{ width: 17, height: 17 }} />
+                <span title={c?.name ?? "Personal"}>{c ? <ClientTile client={c} small /> : <span className="tile tile-sm" style={{ background: "var(--text)" }} aria-hidden="true">P</span>}</span>
+                <span className="baton-cockpit-task" style={{ flex: 1, minWidth: 180 }}>
                   <span style={{ fontWeight: 600, textDecoration: isDone ? "line-through" : undefined }}><button className="title-btn" onClick={(e) => setPop({ id: it.id, anchor: anchorOf(e.currentTarget) })} aria-haspopup="dialog">{it.title}</button></span>
-                  <span className="muted small" style={{ display: "block" }}>{c?.name ?? "Personal"}</span>
+                  <span className="baton-cockpit-space">{c?.name ?? "Personal"}</span>
                 </span>
                 {isCritical && <span className="badge b-bad"><Icon name="alert" size={13} />Critical</span>}
                 {!isCritical && isBlocked && <span className="badge b-warn"><Icon name="alert" size={13} />Check blocker</span>}
 
 
-                <details className="baton-more"><summary aria-label={`Actions for ${it.title}`}>•••</summary><span className="baton-more-actions">
+                <details className="baton-more"><summary aria-label={`Actions for ${it.title}`}>···</summary><span className="baton-more-actions">
                   <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-pressed={critical.includes(it.id)} aria-label={`${critical.includes(it.id) ? "Unflag" : "Flag"} ${it.title} as critical`} title={critical.includes(it.id) ? "Remove critical flag" : "Mark critical"} onClick={() => setCritical(ids => ids.includes(it.id) ? ids.filter(x => x !== it.id) : [...ids, it.id])}>{critical.includes(it.id) ? "★" : "☆"}</button>
                   <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-label={`Move ${it.title} up`} disabled={isDone || n === 0} onClick={() => move(it.id, list.findIndex((i) => i.id === it.id) - 1)}>↑</button>
                   <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-label={`Move ${it.title} down`} disabled={isDone} onClick={() => move(it.id, list.findIndex((i) => i.id === it.id) + 1)}>↓</button>

@@ -569,3 +569,40 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .baton-task-row .baton-more > summary {padding:3px 7px;border-color:transparent}
 .baton-task-row:hover .baton-more > summary,.baton-task-row:focus-within .baton-more > summary {border-color:var(--border)}
 @media(max-width:680px){.baton-inline-date{display:block;margin-left:0;margin-top:3px}.baton-cockpit-task{display:block}.baton-cockpit-space{display:none}.baton-task-row{gap:6px}.baton-task-row .badge{max-width:90px}.baton-cockpit-bar{flex-wrap:wrap}}
+
+/* Cockpit system: action first, progressive disclosure, restrained chrome. */
+.main {max-width:none; width:100%; padding:20px clamp(16px,2.4vw,36px) 88px; gap:14px}
+.topbar {height:54px;gap:12px}
+.layout {min-height:calc(100vh - 54px)}
+.sidenav {width:212px;padding:10px 8px}
+.sidenav a,.sidenav .navitem {min-height:36px;padding-inline:10px}
+.baton-top-date {color:var(--chrome-muted);font-size:12px;white-space:nowrap}
+.baton-nav-hint {font-size:10px;font-weight:400;letter-spacing:0;text-transform:none}
+.baton-nav-more {margin:2px 0}
+.baton-nav-more > summary {display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;padding:9px 10px;border-radius:9px;color:var(--nav-text);font-weight:500}
+.baton-nav-more > summary::-webkit-details-marker {display:none}
+.baton-nav-more > summary:hover {background:var(--nav-active)}
+.baton-nav-more > div {padding-left:12px}
+.baton-nav-more > div a {min-height:34px}
+.pagehead {align-items:center;min-height:38px}
+.pagehead .title {font-size:24px;margin:0}
+.baton-cockpit-bar {background:var(--surface-2);min-height:40px}
+.baton-cockpit-metrics .baton-status-item {background:transparent!important;border:0;border-radius:6px;padding:5px 9px}
+.baton-cockpit-metrics .baton-status-item.is-critical {background:var(--bad-bg)!important}
+.baton-cockpit-metrics .baton-status-item.is-blocked {background:var(--warn-bg)!important}
+.baton-cockpit-metrics .baton-status-item.is-active {background:var(--info-bg)!important}
+.baton-cockpit-metrics .baton-status-item.is-clear {background:var(--good-bg)!important}
+.baton-cockpit-toggle {min-height:30px;font-size:12px;padding:0 9px}
+.baton-task-row {min-height:44px;padding:7px 12px;transition:background .12s ease}
+.baton-task-row:hover {background:var(--surface-2)}
+.baton-task-row .title-btn {font-size:13px;font-weight:600}
+.baton-cockpit-space {font-size:11px}
+.baton-home-actions {display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.baton-home-dashboard {background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.baton-home-dashboard > summary {cursor:pointer;list-style:none;padding:14px 16px;font-weight:650}
+.baton-home-dashboard > summary::-webkit-details-marker {display:none}
+.baton-home-dashboard > summary:before {content:"›";margin-right:10px;display:inline-block}
+.baton-home-dashboard[open] > summary:before {transform:rotate(90deg)}
+.baton-home-dashboard > div {padding:12px;border-top:1px solid var(--divider)}
+@media(max-width:850px){.baton-top-date{display:none}.main{padding:16px 14px 88px}.sidenav{width:192px}}
+@media(max-width:650px){.main{padding:12px 10px 90px}.baton-home-actions{gap:6px}.baton-cockpit-bar{gap:4px}.baton-cockpit-metrics .baton-status-item{padding:5px 6px}.baton-task-row .title-btn{font-size:13px}}

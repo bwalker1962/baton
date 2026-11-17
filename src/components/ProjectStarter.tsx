@@ -148,7 +148,7 @@ export function ProjectStarter({ clientId, onClose }: { clientId?: string; onClo
               </dl>
               <div className="note" style={{ background: "var(--surface-2)", fontWeight: 500 }}><Icon name="clock" size={16} />{CERTAINTY[slots.certainty].next}</div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                {slots.templateId && <Link className="btn" href={`/clients/${slots.clientId}/projects/new/${slots.templateId}`}>Open the full form</Link>}
+                {slots.templateId && client && <Link className="btn" href={`/clients/${slots.clientId}/projects/new/${slots.templateId}`}>Open the full form</Link>}
                 <button className="btn btn-primary" onClick={create}>Create project</button>
               </div>
             </div>

@@ -514,3 +514,17 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .baton-more[open] > summary { color: var(--text); }
 .baton-more-actions { position: absolute; right: 0; top: 100%; z-index: 15; display: flex; gap: 4px; padding: 8px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
 .baton-more:focus-within > summary { outline: 2px solid var(--info-fg); outline-offset: 2px; }
+
+/* Compact, glanceable daily status — task list gets the vertical space. */
+.baton-status-strip { display:flex; align-items:center; gap:0; flex-wrap:wrap; min-height:44px; padding:5px 10px; border:1px solid var(--border); border-radius:11px; background:var(--surface); }
+.baton-status-item { display:inline-flex; align-items:center; gap:7px; padding:5px 14px; font-size:13px; color:var(--muted); white-space:nowrap; }
+.baton-status-item + .baton-status-item { border-left:1px solid var(--divider); }
+.baton-status-item strong { font-size:15px; color:var(--text); font-variant-numeric:tabular-nums; }
+.baton-status-muted { color:var(--muted); font-weight:400; }
+.baton-status-dot { width:7px; height:7px; border-radius:50%; background:var(--gray-dot); flex:none; }
+.baton-status-item.is-critical .baton-status-dot { background:var(--bad-dot); }
+.baton-status-item.is-blocked .baton-status-dot { background:var(--warn-dot); }
+.baton-status-item.is-critical { color:var(--bad-fg); }
+.baton-status-item.is-blocked { color:var(--warn-fg); }
+.baton-status-pause { margin-left:auto; border:0; background:transparent; color:var(--muted); text-decoration:underline; cursor:pointer; font-size:12px; }
+@media(max-width:650px) { .baton-status-strip { gap:3px; padding:5px; } .baton-status-item { padding:5px 8px; font-size:12px; } .baton-status-item + .baton-status-item { border-left:0; } }

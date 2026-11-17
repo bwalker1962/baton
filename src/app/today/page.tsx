@@ -36,16 +36,19 @@ export default function Today() {
   const [critical, setCritical] = useState<string[]>([]);
   const [pulsePaused, setPulsePaused] = useState(false);
   const [draftKind, setDraftKind] = useState<DayKind>("planning");
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) { const s: Saved = JSON.parse(raw); setList(s.list); setDone(s.done); setAdded(s.added); setAsleep(s.asleep ?? {}); setCritical((s as Saved & { critical?: string[] }).critical ?? []); setPulsePaused((s as Saved & { pulsePaused?: boolean }).pulsePaused ?? false); }
     } catch { /* storage unavailable: start from the sample day */ }
+    setLoaded(true);
   }, []);
   useEffect(() => {
+    if (!loaded) return;
     try { localStorage.setItem(KEY, JSON.stringify({ list, done, added, asleep, critical, pulsePaused })); } catch { /* ignore */ }
-  }, [list, done, added, asleep, critical, pulsePaused]);
+  }, [list, done, added, asleep, critical, pulsePaused, loaded]);
 
   const move = (id: string, to: number) => setList((all) => {
     const from = all.findIndex((i) => i.id === id);
@@ -86,23 +89,22 @@ export default function Today() {
         <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <CoachButton context="peace" />
           <Link className="btn" href="/plan">Plan my day</Link>
-          <button className="btn" onClick={reset}>Reset sample day</button>
+          <details className="baton-more"><summary>More</summary><button className="btn" onClick={reset}>Reset sample day</button></details>
         </span>
       </div>
 
-      <section className="baton-status-strip" aria-label="Daily status">
-        <span className={urgent.length ? "baton-status-item is-critical" : "baton-status-item"} title="Tasks manually marked critical">
+      <section className="baton-status-strip" aria-label="Daily status" aria-live="polite">
+        <span className={`baton-status-item ${urgent.length ? "is-critical" : "is-clear"}`} title="Manually flagged critical tasks">
           <span className="baton-status-dot" aria-hidden="true" />Critical <strong>{urgent.length}</strong>
         </span>
-        <span className={blocked.length ? "baton-status-item is-blocked" : "baton-status-item"} title="Possible blockers detected from task wording; review to confirm">
+        <span className={`baton-status-item ${blocked.length ? "is-blocked" : "is-clear"}`} title="Possible blockers based on task wording">
           <span className="baton-status-dot" aria-hidden="true" />Blocked <strong>{blocked.length}</strong>
         </span>
-        <span className="baton-status-item" title={`${done.length} completed today`}>Remaining <strong>{pending.length}</strong></span>
-        <span className="baton-status-item" title="Planned time versus daily capacity">Planned <strong>{minutesLabel(total)} <span className="baton-status-muted">/ {DAY_HOURS}h</span></strong></span>
+        <span className={`baton-status-item ${pending.length ? "is-active" : "is-clear"}`} title="Unfinished, unsnoozed items">Remaining <strong>{pending.length}</strong></span>
         {urgent.length > 0 && <button className="baton-status-pause" onClick={() => setPulsePaused(p => !p)}>{pulsePaused ? "Resume alerts" : "Pause alerts"}</button>}
       </section>
       <section className="card" aria-label="Today's list">
-        <CardHead icon="tasks" title="Your order for today" count={ordered.length}  />
+        <CardHead icon="tasks" title="Your order for today" count={pending.length}  />
         <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
           {ordered.map((it, n) => {
             const c = it.clientId ? clients.find((x) => x.id === it.clientId) : undefined;

@@ -94,13 +94,13 @@ export default function Today() {
       </div>
 
       <section className="baton-status-strip" aria-label="Daily status" aria-live="polite">
-        <span className={`baton-status-item ${urgent.length ? "is-critical" : "is-clear"}`} title="Manually flagged critical tasks">
+        <span className={`baton-status-item ${urgent.length ? "is-critical" : "is-clear"}`} style={{backgroundColor: urgent.length ? "var(--bad-bg)" : "var(--good-bg)"}} title="Manually flagged critical tasks">
           <span className="baton-status-dot" aria-hidden="true" />Critical <strong>{urgent.length}</strong>
         </span>
-        <span className={`baton-status-item ${blocked.length ? "is-blocked" : "is-clear"}`} title="Possible blockers based on task wording">
+        <span className={`baton-status-item ${blocked.length ? "is-blocked" : "is-clear"}`} style={{backgroundColor: blocked.length ? "var(--warn-bg)" : "var(--good-bg)"}} title="Possible blockers based on task wording">
           <span className="baton-status-dot" aria-hidden="true" />Blocked <strong>{blocked.length}</strong>
         </span>
-        <span className={`baton-status-item ${pending.length ? "is-active" : "is-clear"}`} title="Unfinished, unsnoozed items">Remaining <strong>{pending.length}</strong></span>
+        <span className={`baton-status-item ${pending.length ? "is-active" : "is-clear"}`} style={{backgroundColor: pending.length ? "var(--info-bg)" : "var(--good-bg)"}} title="Unfinished, unsnoozed items">Remaining <strong>{pending.length}</strong></span>
         {urgent.length > 0 && <button className="baton-status-pause" onClick={() => setPulsePaused(p => !p)}>{pulsePaused ? "Resume alerts" : "Pause alerts"}</button>}
       </section>
       <section className="card" aria-label="Today's list">

@@ -37,8 +37,12 @@ export default function Today() {
   const [pulsePaused, setPulsePaused] = useState(false);
   const [draftKind, setDraftKind] = useState<DayKind>("planning");
   const [loaded, setLoaded] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [showCaptureOptions, setShowCaptureOptions] = useState(false);
+  const [currentDay, setCurrentDay] = useState(TODAY);
 
   useEffect(() => {
+    setCurrentDay(new Date().toLocaleDateString("en-CA"));
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) { const s: Saved = JSON.parse(raw); setList(s.list); setDone(s.done); setAdded(s.added); setAsleep(s.asleep ?? {}); setCritical((s as Saved & { critical?: string[] }).critical ?? []); setPulsePaused((s as Saved & { pulsePaused?: boolean }).pulsePaused ?? false); }
@@ -65,11 +69,12 @@ export default function Today() {
   };
   const remove = (id: string) => { setList((all) => all.filter((i) => i.id !== id)); setAdded((a) => a.filter((x) => x !== id)); };
   const reset = () => { setList(todaySeed); setDone([]); setAdded([]); setAsleep({}); setCritical([]); setPulsePaused(false); };
-  const awake = (i: DayItem) => !asleep[i.id] || asleep[i.id] <= TODAY;
+  const awake = (i: DayItem) => !asleep[i.id] || asleep[i.id] <= currentDay;
 
   const today = list.filter(awake);
   const sleeping = list.filter((i) => !awake(i)).sort((a, b) => asleep[a.id].localeCompare(asleep[b.id]));
   const ordered = [...today.filter((i) => !done.includes(i.id)), ...today.filter((i) => done.includes(i.id))];
+  const visible = expanded ? ordered : ordered.filter(i => !done.includes(i.id)).slice(0, 5);
   const urgent = today.filter(i => critical.includes(i.id) && !done.includes(i.id));
   const pending = today.filter(i => !done.includes(i.id));
   const blocked = pending.filter(i => /block|unblock|waiting|access/i.test(i.title + " " + (i.why ?? "")));
@@ -83,12 +88,12 @@ export default function Today() {
     <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 1400 }}>
       <div className="pagehead">
         <div>
-          <div className="eyebrow">{new Date(TODAY + "T12:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</div>
+          <div className="eyebrow">{new Date(currentDay + "T12:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</div>
           <h1 className="title">Today</h1>
         </div>
         <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <CoachButton context="peace" />
-          <Link className="btn" href="/plan">Plan my day</Link>
+          <Link className="btn" href="/plan">Plan</Link>
           <details className="baton-more"><summary>More</summary><button className="btn" onClick={reset}>Reset sample day</button></details>
         </span>
       </div>
@@ -104,9 +109,9 @@ export default function Today() {
         {urgent.length > 0 && <button className="baton-status-pause" onClick={() => setPulsePaused(p => !p)}>{pulsePaused ? "Resume alerts" : "Pause alerts"}</button>}
       </section>
       <section className="card" aria-label="Today's list">
-        <CardHead icon="tasks" title="Your order for today" count={pending.length}  />
+        <div className="baton-focus-head"><div><h2>Next up</h2><span className="muted small">{pending.length === 0 ? "All caught up" : `${pending.length} remaining · in your chosen order`}</span></div><button className="btn" onClick={() => setExpanded(v => !v)}>{expanded ? "Focus view" : "Show all"}</button></div>
         <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
-          {ordered.map((it, n) => {
+          {visible.map((it, n) => {
             const c = it.clientId ? clients.find((x) => x.id === it.clientId) : undefined;
             const isDone = done.includes(it.id);
             const k = KIND[it.kind];
@@ -126,8 +131,8 @@ export default function Today() {
                 onDragEnd={() => { setDrag(null); setOver(null); }}
                 className={`row baton-task-row ${isCritical ? "baton-task-critical" : isBlocked ? "baton-task-blocked" : ""} ${isCritical && !pulsePaused ? "baton-task-pulse" : ""}`}
                 style={{ borderLeft: `5px solid ${isCritical ? "var(--bad-dot)" : isBlocked ? "var(--warn-dot)" : c?.color ?? "var(--gray-dot)"}`, opacity: drag === it.id ? 0.4 : isDone ? 0.55 : 1, boxShadow: over === it.id && drag !== it.id ? "inset 0 2px 0 var(--text)" : undefined, cursor: isDone ? "default" : "grab", flexWrap: "wrap" }}>
-                <span aria-hidden="true" className="muted hide-mobile" style={{ letterSpacing: -2, fontWeight: 700, width: 14 }}>⋮⋮</span>
-                <span className="muted small" style={{ width: 18, textAlign: "right" }}>{n + 1}</span>
+
+
                 <input type="checkbox" aria-label={`Done: ${it.title}`} checked={isDone} onChange={() => setDone((d) => (isDone ? d.filter((x) => x !== it.id) : [...d, it.id]))} style={{ width: 18, height: 18 }} />
                 {c ? <ClientTile client={c} small /> : <span className="tile tile-sm" style={{ background: "var(--text)" }} aria-hidden="true">B</span>}
                 <span style={{ flex: 1, minWidth: 180 }}>
@@ -164,14 +169,15 @@ export default function Today() {
         <form className="row" onSubmit={(e) => { e.preventDefault(); if (!draft.trim()) return; setList((all) => [...all, { id: `n${Date.now()}`, title: draft.trim(), kind: draftKind, minutes: 30 }]); setDraft(""); }} style={{ gap: 8, flexWrap: "wrap" }}>
           <Icon name="plus" size={16} />
           <input className="input" style={{ flex: 1, minWidth: 200 }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Add to today, e.g. Plan January webinar topics" aria-label="New item" />
-          <select className="input" style={{ width: "auto" }} value={draftKind} onChange={(e) => setDraftKind(e.target.value as DayKind)} aria-label="Kind">
+          {showCaptureOptions && <select className="input" style={{ width: "auto" }} value={draftKind} onChange={(e) => setDraftKind(e.target.value as DayKind)} aria-label="Kind">
             {(Object.keys(KIND) as DayKind[]).map((k) => <option key={k} value={k}>{KIND[k].label}</option>)}
-          </select>
+          </select>}
+          <button className="btn" type="button" aria-expanded={showCaptureOptions} onClick={() => setShowCaptureOptions(v => !v)}>Options</button>
           <button className="btn btn-primary" type="submit">Add</button>
         </form>
       </section>
 
-      <section className="card" aria-label="Long-lead radar">
+      <details className="card baton-radar-disclosure" aria-label="Long-lead radar"><summary>Upcoming work <span className="muted">· {radar.length}</span></summary><div>
         <CardHead icon="clock" title="Long-lead radar" count={radar.length} sub="Due later, but the work starts now" />
         {radar.length === 0 && <div className="row muted small">Everything on the radar is on today&apos;s list.</div>}
         {radar.map((l) => {
@@ -196,7 +202,7 @@ export default function Today() {
             </div>
           );
         })}
-      </section>
+      </div></details>
       {pop && (() => {
         const it = list.find((x) => x.id === pop.id);
         return it ? (

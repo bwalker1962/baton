@@ -528,3 +528,13 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .baton-status-item.is-blocked { color:var(--warn-fg); }
 .baton-status-pause { margin-left:auto; border:0; background:transparent; color:var(--muted); text-decoration:underline; cursor:pointer; font-size:12px; }
 @media(max-width:650px) { .baton-status-strip { gap:3px; padding:5px; } .baton-status-item { padding:5px 8px; font-size:12px; } .baton-status-item + .baton-status-item { border-left:0; } }
+
+/* Status semantics: faint hue when clear, stronger hue only with work to address. */
+.baton-status-strip { padding: 4px; gap: 5px; border: 0; background: transparent; min-height: 38px; }
+.baton-status-item { border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; min-height: 34px; background: var(--surface); }
+.baton-status-item + .baton-status-item { border-left: 1px solid var(--border); }
+.baton-status-item.is-clear { background: color-mix(in srgb, var(--good-dot) 5%, var(--surface)); border-color: color-mix(in srgb, var(--good-dot) 16%, var(--border)); }
+.baton-status-item.is-clear .baton-status-dot { background: var(--good-dot); }
+.baton-status-item.is-critical { background: color-mix(in srgb, var(--bad-dot) 19%, var(--surface)); border-color: color-mix(in srgb, var(--bad-dot) 35%, var(--border)); }
+.baton-status-item.is-blocked { background: color-mix(in srgb, var(--warn-dot) 19%, var(--surface)); border-color: color-mix(in srgb, var(--warn-dot) 35%, var(--border)); }
+.baton-status-item.is-active { background: color-mix(in srgb, var(--info-fg) 10%, var(--surface)); border-color: color-mix(in srgb, var(--info-fg) 20%, var(--border)); }

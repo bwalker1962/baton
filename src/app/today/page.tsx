@@ -35,7 +35,7 @@ export default function Today() {
   const [draft, setDraft] = useState("");
   const [critical, setCritical] = useState<string[]>([]);
   const [pulsePaused, setPulsePaused] = useState(false);
-  const [draftKind, setDraftKind] = useState<DayKind>("planning");
+  const [draftKind, setDraftKind] = useState<DayKind>("task");
   const [loaded, setLoaded] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [showCaptureOptions, setShowCaptureOptions] = useState(false);
@@ -77,7 +77,7 @@ export default function Today() {
   const visible = expanded ? ordered : ordered.filter(i => !done.includes(i.id));
   const urgent = today.filter(i => critical.includes(i.id) && !done.includes(i.id));
   const pending = today.filter(i => !done.includes(i.id));
-  const blocked = pending.filter(i => /block|unblock|waiting|access/i.test(i.title + " " + (i.why ?? "")));
+  const blocked = pending.filter(i => /\b(blocked|blocking|unblock)\b/i.test(i.title + " " + (i.why ?? "")));
   const total = today.reduce((n, i) => n + i.minutes, 0);
   const planning = today.filter((i) => i.kind === "planning").reduce((n, i) => n + i.minutes, 0);
   const share = total ? planning / total : 0;
@@ -88,11 +88,11 @@ export default function Today() {
     <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 1600 }}>
       <div className="pagehead">
         <div>
-          <h1 className="title">Today <span className="baton-inline-date">{new Date(currentDay + "T12:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span></h1>
+          <h1 className="title">Today</h1>
         </div>
         <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <CoachButton context="peace" />
-          <Link className="btn" href="/plan">Plan</Link>
+          <Link className="btn" href="/plan">Plan day</Link>
           <details className="baton-more"><summary>More</summary><button className="btn" onClick={reset}>Reset sample day</button></details>
         </span>
       </div>
@@ -108,14 +108,14 @@ export default function Today() {
         <span className={`baton-status-item ${pending.length ? "is-active" : "is-clear"}`} style={{backgroundColor: pending.length ? "var(--info-bg)" : "var(--good-bg)"}} title="Unfinished, unsnoozed items">Remaining <strong>{pending.length}</strong></span>
         {urgent.length > 0 && <button className="baton-status-pause" onClick={() => setPulsePaused(p => !p)}>{pulsePaused ? "Resume alerts" : "Pause alerts"}</button>}
       
-</div><button className="btn" onClick={() => setExpanded(v => !v)}>{expanded ? "Focus view" : "Show all"}</button></div>
+</div><button className="btn baton-cockpit-toggle" onClick={() => setExpanded(v => !v)}>{expanded ? "Hide completed" : `Completed ${done.filter(id => today.some(t => t.id === id)).length}`}</button></div>
         <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
           {visible.map((it, n) => {
             const c = it.clientId ? clients.find((x) => x.id === it.clientId) : undefined;
             const isDone = done.includes(it.id);
             const k = KIND[it.kind];
             const isCritical = critical.includes(it.id) && !isDone;
-            const isBlocked = !isDone && /block|unblock|waiting|access/i.test(it.title + " " + (it.why ?? ""));
+            const isBlocked = !isDone && /\b(blocked|blocking|unblock)\b/i.test(it.title + " " + (it.why ?? ""));
             return (
               <li key={it.id}
                 draggable={!isDone}
@@ -139,7 +139,7 @@ export default function Today() {
                   <span className="baton-cockpit-space">{c?.name ?? "Personal"}</span>
                 </span>
                 {isCritical && <span className="badge b-bad"><Icon name="alert" size={13} />Critical</span>}
-                {!isCritical && isBlocked && <span className="badge b-warn"><Icon name="alert" size={13} />Check blocker</span>}
+                {!isCritical && isBlocked && <span className="badge b-warn"><Icon name="alert" size={13} />Blocked?</span>}
 
 
                 <details className="baton-more"><summary aria-label={`Actions for ${it.title}`}>···</summary><span className="baton-more-actions">
@@ -167,11 +167,11 @@ export default function Today() {
         )}
         <form className="row" onSubmit={(e) => { e.preventDefault(); if (!draft.trim()) return; setList((all) => [...all, { id: `n${Date.now()}`, title: draft.trim(), kind: draftKind, minutes: 30 }]); setDraft(""); }} style={{ gap: 8, flexWrap: "wrap" }}>
           <Icon name="plus" size={16} />
-          <input className="input" style={{ flex: 1, minWidth: 200 }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Add to today, e.g. Plan January webinar topics" aria-label="New item" />
+          <input className="input" style={{ flex: 1, minWidth: 200 }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Capture a task…" aria-label="New item" />
           {showCaptureOptions && <select className="input" style={{ width: "auto" }} value={draftKind} onChange={(e) => setDraftKind(e.target.value as DayKind)} aria-label="Kind">
             {(Object.keys(KIND) as DayKind[]).map((k) => <option key={k} value={k}>{KIND[k].label}</option>)}
           </select>}
-          <button className="btn" type="button" aria-expanded={showCaptureOptions} onClick={() => setShowCaptureOptions(v => !v)}>Options</button>
+          <button className="btn baton-capture-options" type="button" aria-expanded={showCaptureOptions} onClick={() => setShowCaptureOptions(v => !v)}>Type</button>
           <button className="btn btn-primary" type="submit">Add</button>
         </form>
       </section>

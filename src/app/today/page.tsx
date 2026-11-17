@@ -102,25 +102,9 @@ export default function Today() {
           <div className="baton-signal baton-focus"><span className="baton-signal-label">TO FINISH TODAY</span><strong>{pending.length}</strong><span>{done.length} marked complete</span></div>
           <div className="baton-signal baton-capacity"><span className="baton-signal-label">CAPACITY</span><strong>{minutesLabel(total)}</strong><span>of {DAY_HOURS}h planned</span></div>
         </div>
-        <div className="baton-legend"><span><i className="baton-key critical" /> Critical: manually flagged</span><span><i className="baton-key warning" /> Possible blocker</span><span><i className="baton-key focus" /> Scheduled work</span><span>Client colors identify ownership, not urgency</span></div>
       </section>
-      <div className="grid-auto" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-        <section className="card" style={{ padding: 14 }} aria-label="Time planned">
-          <div className="muted xs" style={{ fontWeight: 700, letterSpacing: "0.04em" }}>TIME PLANNED</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: over_ ? "var(--bad-fg)" : undefined }}>{minutesLabel(total)} <span className="muted small" style={{ fontWeight: 500 }}>of {DAY_HOURS}h</span></div>
-          <Meter value={total / (DAY_HOURS * 60)} tone={over_ ? "var(--bad-dot)" : "var(--text)"} />
-          {over_ && <div className="xs" style={{ color: "var(--bad-fg)", marginTop: 6 }}>Over your day. Snooze something.</div>}
-        </section>
-        <section className="card" style={{ padding: 14 }} aria-label="Planning share">
-          <div className="muted xs" style={{ fontWeight: 700, letterSpacing: "0.04em" }}>LONG-LEAD AND PLANNING</div>
-          <div style={{ fontSize: 22, fontWeight: 700 }}>{Math.round(share * 100)}% <span className="muted small" style={{ fontWeight: 500 }}>goal {PLANNING_GOAL * 100}%+</span></div>
-          <Meter value={share} goal={PLANNING_GOAL} tone={share >= PLANNING_GOAL ? "var(--good-dot)" : "var(--warn-dot)"} />
-          <div className="xs muted" style={{ marginTop: 6 }}>{share >= PLANNING_GOAL ? "Future work is protected today." : "Urgent work is crowding out next month. Pull one in from the radar."}</div>
-        </section>
-      </div>
-
       <section className="card" aria-label="Today's list">
-        <CardHead icon="tasks" title="Your order for today" count={ordered.length} sub="Drag to reorder, or use the arrows" />
+        <CardHead icon="tasks" title="Your order for today" count={ordered.length}  />
         <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
           {ordered.map((it, n) => {
             const c = it.clientId ? clients.find((x) => x.id === it.clientId) : undefined;
@@ -148,18 +132,18 @@ export default function Today() {
                 {c ? <ClientTile client={c} small /> : <span className="tile tile-sm" style={{ background: "var(--text)" }} aria-hidden="true">B</span>}
                 <span style={{ flex: 1, minWidth: 180 }}>
                   <span style={{ fontWeight: 600, textDecoration: isDone ? "line-through" : undefined }}><button className="title-btn" onClick={(e) => setPop({ id: it.id, anchor: anchorOf(e.currentTarget) })} aria-haspopup="dialog">{it.title}</button></span>
-                  <span className="muted small" style={{ display: "block" }}>{c?.name ?? "All clients"}{it.why ? ` · ${it.why}` : ""}</span>
+                  <span className="muted small" style={{ display: "block" }}>{c?.name ?? "Personal"}</span>
                 </span>
                 {isCritical && <span className="badge b-bad"><Icon name="alert" size={13} />Critical</span>}
                 {!isCritical && isBlocked && <span className="badge b-warn"><Icon name="alert" size={13} />Check blocker</span>}
-                <span className={`badge ${k.cls}`}><Icon name={k.icon} size={13} />{k.label}</span>
-                <span className="small muted" style={{ width: 52, textAlign: "right" }}>{minutesLabel(it.minutes)}</span>
-                <span style={{ display: "flex", gap: 2 }}>
+
+
+                <details className="baton-more"><summary aria-label={`Actions for ${it.title}`}>•••</summary><span className="baton-more-actions">
                   <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-pressed={critical.includes(it.id)} aria-label={`${critical.includes(it.id) ? "Unflag" : "Flag"} ${it.title} as critical`} title={critical.includes(it.id) ? "Remove critical flag" : "Mark critical"} onClick={() => setCritical(ids => ids.includes(it.id) ? ids.filter(x => x !== it.id) : [...ids, it.id])}>{critical.includes(it.id) ? "★" : "☆"}</button>
                   <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-label={`Move ${it.title} up`} disabled={isDone || n === 0} onClick={() => move(it.id, list.findIndex((i) => i.id === it.id) - 1)}>↑</button>
                   <button className="btn" style={{ minHeight: 32, padding: "0 8px" }} aria-label={`Move ${it.title} down`} disabled={isDone} onClick={() => move(it.id, list.findIndex((i) => i.id === it.id) + 1)}>↓</button>
                   <SnoozeButton label={it.title} compact onSnooze={(until) => setAsleep((a) => ({ ...a, [it.id]: until }))} />
-                </span>
+                </span></details>
               </li>
             );
           })}

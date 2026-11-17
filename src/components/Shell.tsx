@@ -52,8 +52,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const { items, brand } = useStore();
   const [searching, setSearching] = useState(false);
   const [mac, setMac] = useState(true);
+  const [dateLabel, setDateLabel] = useState("");
   useEffect(() => {
     setMac(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent));
+    setDateLabel(new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }));
     const onKey = (e: KeyboardEvent) => {
       const typing = (e.target as HTMLElement)?.closest?.("input, textarea, select, [contenteditable=true]");
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setSearching((s) => !s); }
@@ -84,6 +86,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <span>Search or jump to a client, task, chat…</span>
           <kbd>{mac ? "⌘K" : "Ctrl K"}</kbd>
         </button>
+        <span className="baton-top-date" aria-label="Current date">{dateLabel}</span>
         {active && (
           <span className="switcher hide-mobile">
             <ClientTile client={active} small />
@@ -98,11 +101,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <nav className="sidenav" aria-label="Main">
           <Link href="/" aria-current={is("/")}><Icon name="home" />Home</Link>
           <Link href="/today" aria-current={is("/today")}><Icon name="tasks" />Today</Link>
-          <Link href="/plan" aria-current={is("/plan")}><Icon name="calendar" />Plan my day</Link>
+
           <Link href="/signoff" aria-current={is("/signoff")}><Icon name="eye" />Sign-off{eyes > 0 && <span className="navcount">{eyes}</span>}</Link>
-          <Link href="/advisor" aria-current={is("/advisor")}><Icon name="bulb" />Advisor</Link>
-          <Link href="/skills" aria-current={is("/skills")}><Icon name="layers" />Skills</Link>
-          <div className="navlabel">CLIENTS</div>
+          <details className="baton-nav-more"><summary><Icon name="layers" />Tools</summary><div><Link href="/advisor" aria-current={is("/advisor")}><Icon name="bulb" />Advisor</Link><Link href="/skills" aria-current={is("/skills")}><Icon name="layers" />Skills</Link><Link href="/plan" aria-current={is("/plan")}><Icon name="calendar" />Plan day</Link></div></details>
+          <div className="navlabel">SPACES <span className="baton-nav-hint">Client workspaces</span></div>
+          <Link href="/plan"><Icon name="home" />Personal</Link>
           {clients.map((c) => {
             const dot = { good: "var(--good-dot)", warn: "var(--warn-dot)", bad: "var(--bad-dot)", none: "var(--gray-dot)" }[c.health];
             return (

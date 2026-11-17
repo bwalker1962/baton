@@ -551,3 +551,21 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .baton-radar-disclosure[open] > summary::before { transform:rotate(90deg); }
 .baton-radar-disclosure > div { border-top:1px solid var(--divider); }
 @media(max-width:650px){ .baton-focus-head{padding:10px 12px;} .baton-task-row{gap:8px;} }
+
+/* Compact cockpit: one information band, one-line actions, details on demand. */
+.baton-inline-date {font-size:13px;font-weight:500;color:var(--muted);margin-left:12px;vertical-align:middle;letter-spacing:0}
+.baton-cockpit-bar {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 10px;border-bottom:1px solid var(--divider);min-height:42px}
+.baton-cockpit-metrics {display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.baton-cockpit-metrics .baton-status-item {padding:4px 9px;min-height:28px;font-size:12px}
+.baton-cockpit-metrics .baton-status-item strong {font-size:13px}
+.baton-cockpit-metrics .baton-status-pause {font-size:11px}
+.baton-task-row {min-height:43px;padding:5px 10px;gap:9px;flex-wrap:nowrap!important}
+.baton-task-row .tile {width:24px;height:24px;font-size:11px;flex-shrink:0}
+.baton-cockpit-task {display:flex;align-items:center;gap:10px;min-width:0!important}
+.baton-cockpit-task > span:first-child {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.baton-cockpit-task .title-btn {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.baton-cockpit-space {font-size:11px;color:var(--muted);white-space:nowrap}
+.baton-task-row .badge {font-size:11px;padding:3px 6px}
+.baton-task-row .baton-more > summary {padding:3px 7px;border-color:transparent}
+.baton-task-row:hover .baton-more > summary,.baton-task-row:focus-within .baton-more > summary {border-color:var(--border)}
+@media(max-width:680px){.baton-inline-date{display:block;margin-left:0;margin-top:3px}.baton-cockpit-task{display:block}.baton-cockpit-space{display:none}.baton-task-row{gap:6px}.baton-task-row .badge{max-width:90px}.baton-cockpit-bar{flex-wrap:wrap}}

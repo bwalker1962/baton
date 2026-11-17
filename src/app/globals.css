@@ -506,3 +506,11 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 @media (prefers-reduced-motion: reduce) { .baton-task-pulse { animation: none; } }
 @media (max-width: 850px) { .baton-command-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 420px) { .baton-command-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; } .baton-signal { padding: 10px; min-height: 96px; } .baton-signal strong { font-size: 24px; } }
+
+/* Progressive disclosure for task controls */
+.baton-more { position: relative; flex: none; }
+.baton-more > summary { list-style: none; cursor: pointer; border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px; font-weight: 700; color: var(--muted); }
+.baton-more > summary::-webkit-details-marker { display: none; }
+.baton-more[open] > summary { color: var(--text); }
+.baton-more-actions { position: absolute; right: 0; top: 100%; z-index: 15; display: flex; gap: 4px; padding: 8px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+.baton-more:focus-within > summary { outline: 2px solid var(--info-fg); outline-offset: 2px; }

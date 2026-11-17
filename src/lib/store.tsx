@@ -117,6 +117,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<SignoffItem[]>(seedItems);
   const [pending, setPending] = useState<Pending | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
+  useEffect(() => { try { const saved = localStorage.getItem("baton-projects-v1"); if (saved) setProjects(JSON.parse(saved)); } catch {} }, []);
   const [docs, setDocs] = useState<FiledDoc[]>([]);
   const [snoozed, setSnoozed] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState<Note[]>(noteSeed);
@@ -213,8 +214,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (timer.current) clearTimeout(timer.current);
   }, []);
 
-  const addProject = useCallback((p: Project) => setProjects((prev) => [p, ...prev]), []);
-  const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p))), []);
+  const addProject = useCallback((p: Project) => setProjects((prev) => { const next = [p, ...prev]; try { localStorage.setItem("baton-projects-v1", JSON.stringify(next)); } catch {} return next; }), []);
+  const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => { const next = prev.map((p) => (p.id === id ? { ...p, ...patch } : p)); try { localStorage.setItem("baton-projects-v1", JSON.stringify(next)); } catch {} return next; }), []);
 
   const value = useMemo(
     () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, openAgenda, tasks, editTask, styles, saveStyles, dismissed, dismissTip }),

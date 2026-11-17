@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useStore, type ProjectStep } from "@/lib/store";
 import { getTemplate } from "@/lib/templates";
 import { shortDate } from "@/lib/format";
@@ -20,6 +20,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
   const [skipping, setSkipping] = useState<string | null>(null);
   const [reason, setReason] = useState("");
   const [extra, setExtra] = useState("");
+  useEffect(() => { if (project) setSteps(project.steps); }, [project?.id]);
 
   if (!project) {
     return (
@@ -31,7 +32,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
     );
   }
   const tpl = getTemplate(project.templateId);
-  const set = (sid: string, patch: Partial<ProjectStep>) => setSteps((all) => all.map((s) => (s.id === sid ? { ...s, ...patch } : s)));
+  const set = (sid: string, patch: Partial<ProjectStep>) => setSteps((all) => { const next = all.map((s) => (s.id === sid ? { ...s, ...patch } : s)); updateProject(pid, { steps: next }); return next; });
   const phases = [...new Set(steps.map((s) => s.phase))];
   const done = steps.filter((s) => s.status !== "open").length;
   const filled = tpl?.fields.filter((f) => project.info[f.id]) ?? [];
@@ -123,7 +124,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
         <div className="row">
           <Icon name="plus" />
           <input className="input grow" value={extra} onChange={(e) => setExtra(e.target.value)} placeholder="Add a step" aria-label="Add a step"
-            onKeyDown={(e) => { if (e.key === "Enter" && extra.trim()) { setSteps((a) => [...a, { id: `x${Date.now()}`, title: extra.trim(), phase: "Added by you", due: null, owner: "BCW", status: "open" }]); setExtra(""); } }} />
+            onKeyDown={(e) => { if (e.key === "Enter" && extra.trim()) { setSteps((a) => { const next: ProjectStep[] = [...a, { id: `x${Date.now()}`, title: extra.trim(), phase: "Added by you", due: null, owner: "BCW", status: "open" }]; updateProject(pid, { steps: next }); return next; }); setExtra(""); } }} />
         </div>
       </section>
     </div>

@@ -54,6 +54,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const { items, brand } = useStore();
   const spaces = useSpaces();
   const [searching, setSearching] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  useEffect(() => { try { setSidebarCollapsed(localStorage.getItem("baton-sidebar-collapsed")==="true"); } catch {} }, []);
+  const toggleSidebar = () => setSidebarCollapsed(v => { const next=!v; try { localStorage.setItem("baton-sidebar-collapsed",String(next)); } catch {} return next; });
   const [mac, setMac] = useState(true);
   const [dateLabel, setDateLabel] = useState("");
   useEffect(() => {
@@ -84,6 +87,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <span className="brand-name">Baton</span>
           <span className="brand-sub">{firm.name}</span>
         </Link>
+        <button className="baton-sidebar-toggle" onClick={toggleSidebar} aria-label={sidebarCollapsed?"Expand sidebar":"Collapse sidebar"} aria-expanded={!sidebarCollapsed} title={sidebarCollapsed?"Show navigation":"Stow navigation"}><Icon name="menu" size={18}/></button>
         <button className="search" aria-label="Search or jump" aria-keyshortcuts="Meta+K Control+K" onClick={() => setSearching(true)}>
           <Icon name="search" size={16} />
           <span>Search or jump to a client, task, chat…</span>
@@ -101,7 +105,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <Link href="/login" className="avatar hide-mobile" aria-label="Brett Walker. Sign out" title="Sign out" style={{ textDecoration: "none" }}>BW</Link>
       </header>
 
-      <div className="layout">
+      <div className={`layout ${sidebarCollapsed?"baton-sidebar-stowed":""}`}>
         <nav className="sidenav" aria-label="Main">
           <Link href="/" aria-current={is("/")}><Icon name="home" />Home</Link>
           <Link href="/today" aria-current={is("/today")}><Icon name="tasks" />Today</Link>

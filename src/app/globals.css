@@ -644,3 +644,8 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .baton-timer-log small{display:block;color:var(--muted)}
 .baton-timer-panel p{margin:0}
 @media(max-width:650px){.baton-timer-trigger{padding:7px}.baton-timer-trigger:not(.is-running) span:last-child{display:none}.topbar .search{min-width:100px}}
+
+.baton-timer-alert{padding:10px;border:1px solid var(--warn-dot);border-radius:9px;background:var(--warn-bg);font-size:12px;line-height:1.5}
+.baton-timer-alert p{margin:6px 0 10px}
+.baton-timer-buttons{display:flex;flex-wrap:wrap;gap:7px}
+.baton-timer-buttons .btn{min-height:34px}

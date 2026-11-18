@@ -649,3 +649,6 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .baton-timer-alert p{margin:6px 0 10px}
 .baton-timer-buttons{display:flex;flex-wrap:wrap;gap:7px}
 .baton-timer-buttons .btn{min-height:34px}
+
+.baton-note-editor{display:block;width:100%;min-height:86px;max-height:45vh;resize:vertical;line-height:1.5;font:inherit;padding:10px 12px}
+.task-pop{max-height:calc(100dvh - 24px);overflow-y:auto}

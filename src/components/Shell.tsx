@@ -9,6 +9,7 @@ import { CommandPalette } from "./CommandPalette";
 import { OneOnOne } from "./OneOnOne";
 import { ClientTile } from "./ui";
 import { useEffect, useState } from "react";
+import { useSpaces } from "@/app/spaces/page";
 
 function ModeSwitch() {
   const { mode, setMode } = useStore();
@@ -50,6 +51,7 @@ function Toast() {
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const { items, brand } = useStore();
+  const spaces = useSpaces();
   const [searching, setSearching] = useState(false);
   const [mac, setMac] = useState(true);
   const [dateLabel, setDateLabel] = useState("");
@@ -104,18 +106,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
           <Link href="/signoff" aria-current={is("/signoff")}><Icon name="eye" />Sign-off{eyes > 0 && <span className="navcount">{eyes}</span>}</Link>
           <details className="baton-nav-more"><summary><Icon name="layers" />Tools</summary><div><Link href="/advisor" aria-current={is("/advisor")}><Icon name="bulb" />Advisor</Link><Link href="/skills" aria-current={is("/skills")}><Icon name="layers" />Skills</Link><Link href="/plan" aria-current={is("/plan")}><Icon name="calendar" />Plan day</Link></div></details>
-          <div className="navlabel">SPACES <span className="baton-nav-hint">Client workspaces</span></div>
-          <Link href="/plan"><Icon name="home" />Personal</Link>
-          {clients.map((c) => {
-            const dot = { good: "var(--good-dot)", warn: "var(--warn-dot)", bad: "var(--bad-dot)", none: "var(--gray-dot)" }[c.health];
-            return (
-              <Link key={c.id} href={`/clients/${c.id}`} aria-current={clientId === c.id ? "page" : undefined}>
-                <ClientTile client={c} small />
-                {c.name}
-                <span className="dot" style={{ marginLeft: "auto", background: dot }} aria-hidden="true" />
-              </Link>
-            );
-          })}
+          <div className="navlabel"><Link href="/spaces" className="baton-spaces-heading">SPACES <span aria-hidden="true">+</span></Link></div>
+          {spaces.filter(s=>!s.archived).map(sp=><Link key={sp.id} href={`/spaces/${sp.id}`} aria-current={path===`/spaces/${sp.id}`?"page":undefined}><span className="baton-nav-space-dot" style={{background:sp.color}} aria-hidden="true"/>{sp.name}</Link>)}
           <div style={{ marginTop: "auto", padding: "24px 12px 0" }} className="xs muted">© 2026 {firm.name}</div>
         </nav>
         <main className="main">{children}</main>
@@ -125,7 +117,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <Link href="/signoff" aria-current={is("/signoff")}><Icon name="eye" size={22} />Sign-off</Link>
         <Link href="/today" aria-current={is("/today")}><Icon name="tasks" size={22} />Today</Link>
         <Link href="/" aria-current={is("/")}><Icon name="check" size={22} />Glance</Link>
-        <Link href="/clients" aria-current={is("/clients")}><Icon name="grid" size={22} />Clients</Link>
+        <Link href="/spaces" aria-current={is("/spaces")}><Icon name="grid" size={22} />Spaces</Link>
         <Link href="/skills" aria-current={is("/skills")}><Icon name="user" size={22} />More</Link>
       </nav>
       <Toast />

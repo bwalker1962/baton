@@ -87,7 +87,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <span className="brand-name">Baton</span>
           <span className="brand-sub">{firm.name}</span>
         </Link>
-        <button className="baton-sidebar-toggle" onClick={toggleSidebar} aria-label={sidebarCollapsed?"Expand sidebar":"Collapse sidebar"} aria-expanded={!sidebarCollapsed} title={sidebarCollapsed?"Show navigation":"Stow navigation"}><Icon name="menu" size={18}/></button>
         <button className="search" aria-label="Search or jump" aria-keyshortcuts="Meta+K Control+K" onClick={() => setSearching(true)}>
           <Icon name="search" size={16} />
           <span>Search or jump to a client, task, chat…</span>
@@ -107,14 +106,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       <div className={`layout ${sidebarCollapsed?"baton-sidebar-stowed":""}`}>
         <nav className="sidenav" aria-label="Main">
-          <Link href="/" aria-current={is("/")}><Icon name="home" />Home</Link>
-          <Link href="/today" aria-current={is("/today")}><Icon name="tasks" />Today</Link>
+          <button className="baton-sidebar-toggle baton-nav-toggle" onClick={toggleSidebar} aria-label={sidebarCollapsed?"Expand navigation":"Collapse navigation"} aria-expanded={!sidebarCollapsed} title={sidebarCollapsed?"Expand navigation":"Collapse navigation"}><Icon name="sidebar" size={18}/></button>
+          <Link href="/" title="Home" aria-label="Home" aria-current={is("/")}><Icon name="home" /><span className="baton-nav-text">Home</span></Link>
+          <Link href="/today" title="Today" aria-label="Today" aria-current={is("/today")}><Icon name="tasks" /><span className="baton-nav-text">Today</span></Link>
 
-          <Link href="/signoff" aria-current={is("/signoff")}><Icon name="eye" />Sign-off{eyes > 0 && <span className="navcount">{eyes}</span>}</Link>
-          <details className="baton-nav-more"><summary><Icon name="layers" />Tools</summary><div><Link href="/advisor" aria-current={is("/advisor")}><Icon name="bulb" />Advisor</Link><Link href="/skills" aria-current={is("/skills")}><Icon name="layers" />Skills</Link><Link href="/plan" aria-current={is("/plan")}><Icon name="calendar" />Plan day</Link></div></details>
-          <div className="navlabel"><Link href="/spaces" className="baton-spaces-heading">SPACES <span aria-hidden="true">+</span></Link></div>
-          {spaces.filter(s=>!s.archived).map(sp=><Link key={sp.id} href={`/spaces/${sp.id}`} aria-current={path===`/spaces/${sp.id}`?"page":undefined}><span className="baton-nav-space-dot" style={{background:sp.color}} aria-hidden="true"/>{sp.name}</Link>)}
-          <div style={{ marginTop: "auto", padding: "24px 12px 0" }} className="xs muted">© 2026 {firm.name}</div>
+          <Link href="/signoff" title={`Sign-off${eyes ? ` · ${eyes} pending` : ""}`} aria-label={`Sign-off${eyes ? `, ${eyes} pending` : ""}`} aria-current={is("/signoff")}><Icon name="eye" /><span className="baton-nav-text">Sign-off</span>{eyes > 0 && <span className="navcount">{eyes}</span>}</Link>
+          <details className="baton-nav-more"><summary title="Tools"><Icon name="layers" /><span className="baton-nav-text">Tools</span></summary><div><Link href="/advisor" aria-current={is("/advisor")}><Icon name="bulb" />Advisor</Link><Link href="/skills" aria-current={is("/skills")}><Icon name="layers" />Skills</Link><Link href="/plan" aria-current={is("/plan")}><Icon name="calendar" />Plan day</Link></div></details>
+          <div className="navlabel"><Link href="/spaces" className="baton-spaces-heading" title="Manage spaces" aria-label="Manage spaces"><span className="baton-nav-text">SPACES</span><Icon name="grid" size={16}/><span className="baton-nav-add" aria-hidden="true">+</span></Link></div>
+          {spaces.filter(s=>!s.archived).map(sp=><Link key={sp.id} href={`/spaces/${sp.id}`} title={sp.name} aria-label={sp.name} aria-current={path===`/spaces/${sp.id}`?"page":undefined}><span className="baton-nav-space-icon" style={{background:sp.color}} aria-hidden="true">{sp.name.slice(0,1).toUpperCase()}</span><span className="baton-nav-text">{sp.name}</span></Link>)}
+          <div className="baton-nav-footer xs muted">© 2026 {firm.name}</div>
         </nav>
         <main className="main">{children}</main>
       </div>

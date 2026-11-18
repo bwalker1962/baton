@@ -5,11 +5,13 @@ import { StartProjectPill } from "@/components/ProjectStarter";
 import { Dashboard } from "@/components/Dashboard";
 import { DEFAULT_HOME } from "@/components/Widgets";
 import { useStore } from "@/lib/store";
+import { usePersisted } from "@/lib/persist";
 import { owedToCeos } from "@/lib/ceo";
 import { Icon } from "@/components/Icon";
 
 export default function Home() {
   const { items, tasks } = useStore();
+  const [dashOpen, setDashOpen] = usePersisted<boolean>("baton-home-dash-open-v1", true);
   const [date, setDate] = useState("");
   useEffect(() => setDate(new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })), []);
   const needs = items.filter((i) => i.state === "needs");
@@ -29,7 +31,13 @@ export default function Home() {
         {needs.length > 0 && <Link href="/signoff" className="btn btn-primary btn-lg"><Icon name="eye" />Start sign-off · {needs.length}</Link>}
       </div>
       <div className="baton-home-actions"><Link href="/today" className="btn btn-primary"><Icon name="tasks" />Work on today</Link><Link href="/plan" className="btn">Plan my day</Link><StartProjectPill /></div>
-      <details className="baton-home-dashboard"><summary>Portfolio dashboard <span className="muted small">· expand when needed</span></summary><Dashboard storageKey="baton-dash-home-v2" scope="home" defaults={DEFAULT_HOME} /></details>
+      {/* Open by default: this is the cockpit, and a cockpit that starts closed
+          is just a door. The collapse stays for anyone who wants a quiet
+          landing page, and the choice is remembered. */}
+      <details className="baton-home-dashboard" open={dashOpen} onToggle={(e) => setDashOpen(e.currentTarget.open)}>
+        <summary>Portfolio dashboard <span className="muted small">· {dashOpen ? "collapse to a quiet start" : "expand when needed"}</span></summary>
+        <Dashboard storageKey="baton-dash-home-v2" scope="home" defaults={DEFAULT_HOME} />
+      </details>
     </div>
   );
 }

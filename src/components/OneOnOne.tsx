@@ -122,10 +122,19 @@ export function OneOnOne({ here }: { here?: string }) {
 
   if (!open) {
     return (
-      <button className={`oneonone-pill ${hot ? "hot" : ""}`} onClick={() => setOpen(true)} onDragOver={onOver} onDragLeave={() => setHot(false)} onDrop={(e) => onDrop(e)}
-        style={{ ["--note" as string]: look.color }} aria-label={`Open 1:1 agenda for ${client.name}, ${open_} topics`}>
-        <ClientTile client={client} small />{hot ? "Drop to add to the 1:1" : `1:1 · ${open_} topic${open_ === 1 ? "" : "s"}`}
-        {flash && <span className="xs" style={{ fontWeight: 500, opacity: 0.8 }}>· {flash}</span>}
+      // Collapsed to a disc so it stops sitting on top of whatever you are
+      // reading; it opens out on hover, on keyboard focus, while a task is
+      // being dragged onto it, and whenever it has something to say.
+      <button className={`oneonone-pill ${hot ? "hot" : ""} ${flash ? "says" : ""}`} onClick={() => setOpen(true)} onDragOver={onOver} onDragLeave={() => setHot(false)} onDrop={(e) => onDrop(e)}
+        style={{ ["--note" as string]: look.color }} aria-label={`Open 1:1 agenda for ${client.name}, ${open_} topic${open_ === 1 ? "" : "s"}`}>
+        <span className="oneonone-pill-mark">
+          <ClientTile client={client} small />
+          {open_ > 0 && <span className="oneonone-pill-count" aria-hidden="true">{open_}</span>}
+        </span>
+        <span className="oneonone-pill-label">
+          {hot ? "Drop to add to the 1:1" : `1:1 · ${open_} topic${open_ === 1 ? "" : "s"}`}
+          {flash && <span className="xs" style={{ fontWeight: 500, opacity: 0.8 }}> · {flash}</span>}
+        </span>
       </button>
     );
   }

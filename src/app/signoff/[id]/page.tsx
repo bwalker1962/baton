@@ -150,8 +150,11 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
         </div>
       </div>
 
-      <div className="split">
-        <div className="wide" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {/* One grid rather than a two-column block with the decision below it.
+          The rail is much taller than the preview, so as siblings they left a
+          canyon of white space and pushed the approve controls off-screen. */}
+      <div className="review-grid">
+        <div className="review-main" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
             <span className="muted small">Exact version that will go out · {item.sendAt}</span>
             {item.kind === "email" && (
@@ -166,7 +169,7 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
           </div>
           <div className="muted xs">Rendered from the client&apos;s connected app. No sign-in needed to review.</div>
         </div>
-        <aside className="narrow" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <aside className="review-rail" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {item.slips && <SlipPanel slips={item.slips} />}
           {item.customerFirst && <CustomerFirst cf={item.customerFirst} />}
           {item.settings && (
@@ -201,14 +204,13 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
             <div className="note" style={{ background: "var(--bad-bg)", color: "var(--bad-fg)" }}><Icon name="stop" size={16} />Send step is blocked: no send tool connected.</div>
           )}
         </aside>
-      </div>
 
       {decided ? (
-        <section className="card" style={{ padding: 16 }}>
+        <section className="card review-decision" style={{ padding: 16 }}>
           <strong>Decided:</strong> {item.state.replace("-", " ")} {item.outcome && <span className="muted">· {item.outcome}</span>}
         </section>
       ) : (
-        <section id="decision" className="card" aria-label="Decision" style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12, borderWidth: 2, borderColor: "var(--text)" }}>
+        <section id="decision" className="card review-decision" aria-label="Decision" style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12, borderWidth: 2, borderColor: "var(--text)" }}>
           {readback.length > 0 && (
             <div aria-label="You're approving" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 8 }}>
               {readback.map((r) => (
@@ -250,6 +252,7 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
           {!ready && <div className="muted xs" style={{ textAlign: "right" }}>{blocked ? "Can't approve yet: a slip check blocks the send." : "Approve unlocks once every box is ticked, including each flagged slip."}</div>}
         </section>
       )}
+      </div>
 
       {!decided && (
         <div className="show-mobile sticky-actions" style={{ display: "flex", gap: 8 }}>

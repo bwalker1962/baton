@@ -5,7 +5,7 @@ import { departments, getClient, tasks } from "@/lib/data";
 import { healthLabel } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { minutesLabel } from "@/lib/format";
-import { pace, useTimeData, weekTotals, WEEKLY_TARGET_HOURS } from "@/lib/time";
+import { pace, useTimeData, weekStart, weekTotals, WEEKLY_TARGET_HOURS } from "@/lib/time";
 import { Icon } from "@/components/Icon";
 import { Progress, StatusBadge, ClientTile } from "@/components/ui";
 
@@ -23,6 +23,8 @@ export default function Report({ params }: { params: Promise<{ id: string }> }) 
   const { sessions } = useTimeData();
   const [reviewed, setReviewed] = useState(false);
   if (!client) notFound();
+  // The same Monday the time rollup uses, so the header and the hours agree.
+  const weekLabel = weekStart().toLocaleDateString("en-US", { month: "short", day: "numeric" });
   const week = weekTotals(sessions)[id];
   const minutes = Math.round((week?.ms ?? 0) / 60000);
   const verdict = pace(minutes);
@@ -62,7 +64,7 @@ export default function Report({ params }: { params: Promise<{ id: string }> }) 
         <header style={{ background: "var(--surface-2)", borderTop: `4px solid ${client.color}`, padding: "18px 24px", display: "flex", gap: 14, alignItems: "center" }}>
           <ClientTile client={client} size={40} />
           <div>
-            <div className="small muted">Weekly update · week of Oct 26</div>
+            <div className="small muted">Weekly update · week of {weekLabel}</div>
             <h2 style={{ margin: "2px 0 0", fontSize: 22 }}>How things are going at {client.name}</h2>
           </div>
         </header>
@@ -89,7 +91,12 @@ export default function Report({ params }: { params: Promise<{ id: string }> }) 
             <div key={s} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: 12, marginBottom: 8, display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
               <strong>{s}</strong>
               <Progress pct={i === 0 ? 60 : 15} health={i === 0 ? "good" : "warn"} />
-              <div className="muted small" style={{ flexBasis: "100%" }}>[Detail for this CEO: what happened this week, next milestone and date]</div>
+              {/* Empty until there is something real to say. A bracketed
+                  instruction to yourself does not belong in the artifact you
+                  hand a client's CEO. */}
+              <div className="muted small" style={{ flexBasis: "100%" }}>
+                Add this week&apos;s movement and the next milestone before sharing.
+              </div>
             </div>
           ))}
         </section>

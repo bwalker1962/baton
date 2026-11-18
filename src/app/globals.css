@@ -24,7 +24,9 @@
   --nav-bg: #f4f5f7;
   --nav-border: transparent;
   --nav-text: #2e3237;
-  --nav-muted: #6b7480;
+  /* 4.94:1 on --nav-bg. Was #6b7480 at 4.34:1, the only WCAG AA failure the
+     audit:contrast script reported, on every route. */
+  --nav-muted: #636b77;
   --nav-active: #ffffff;
   --nav-active-text: #15171a;
 
@@ -188,6 +190,22 @@ a.row:hover { text-decoration: none; background: var(--surface-2); }
 .split > .wide { flex: 3 1 560px; min-width: 0; }
 .split > .narrow { flex: 2 1 300px; min-width: 0; }
 
+/* Sign-off review: preview and decision stack in one column with the checks
+   rail alongside both, so the decision sits directly under what it is about
+   instead of below the longest column. */
+.review-grid { display: grid; gap: 16px; grid-template-columns: 1fr; align-items: start; }
+.review-grid > * { min-width: 0; }
+@media (min-width: 1000px) {
+  .review-grid {
+    grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr);
+    grid-template-areas: "main rail" "decision rail";
+    align-content: start;
+  }
+  .review-main { grid-area: main; }
+  .review-rail { grid-area: rail; }
+  .review-decision { grid-area: decision; }
+}
+
 .btn {
   display: inline-flex; gap: 8px; align-items: center; justify-content: center; min-height: 40px; padding: 0 14px;
   border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600;
@@ -337,12 +355,29 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .clamp { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
 
 /* Floating 1:1 agenda */
+/* Collapsed to a disc by default. A fixed element cannot be cleared by page
+   padding — content scrolls under it at every offset — so the fix is to make
+   its footprint small and open it out only on intent. */
 .oneonone-pill {
-  position: fixed; right: 20px; bottom: 20px; z-index: 55; display: flex; gap: 8px; align-items: center;
-  border: 0; border-left: 4px solid var(--note); border-radius: 999px; padding: 10px 16px 10px 12px; cursor: pointer;
+  position: fixed; right: 20px; bottom: 20px; z-index: 55; display: flex; gap: 0; align-items: center;
+  border: 0; border-left: 4px solid var(--note); border-radius: 999px; padding: 8px; cursor: pointer;
   background: var(--surface); color: var(--text); font-weight: 700; font-size: 13px; box-shadow: 0 8px 24px -8px rgba(0,0,0,.35), 0 0 0 1px var(--border);
   max-width: min(460px, calc(100vw - 32px));
 }
+.oneonone-pill-mark { position: relative; display: inline-flex; flex: none; }
+.oneonone-pill-count {
+  position: absolute; top: -6px; right: -7px; min-width: 16px; height: 16px; border-radius: 8px; padding: 0 4px;
+  font-size: 10px; font-weight: 800; line-height: 16px; text-align: center; background: var(--note); color: #1b1b1b;
+}
+.oneonone-pill-label {
+  max-width: 0; overflow: hidden; white-space: nowrap; opacity: 0;
+  transition: max-width .18s ease, opacity .14s ease, padding .18s ease;
+}
+.oneonone-pill:hover .oneonone-pill-label,
+.oneonone-pill:focus-visible .oneonone-pill-label,
+.oneonone-pill.hot .oneonone-pill-label,
+.oneonone-pill.says .oneonone-pill-label { max-width: 340px; opacity: 1; padding: 0 8px 0 10px; }
+@media (prefers-reduced-motion: reduce) { .oneonone-pill-label { transition: none; } }
 .oneonone {
   position: fixed; right: 20px; bottom: 20px; z-index: 55; width: 380px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 110px); overflow-y: auto;
   display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 14px;
@@ -604,7 +639,9 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .baton-home-dashboard > summary:before {content:"›";margin-right:10px;display:inline-block}
 .baton-home-dashboard[open] > summary:before {transform:rotate(90deg)}
 .baton-home-dashboard > div {padding:12px;border-top:1px solid var(--divider)}
-@media(max-width:850px){.baton-top-date{display:none}.main{padding:16px 14px 88px}.sidenav{width:192px}}
+/* Bottom padding clears the tab bar and the 1:1 disc above it, so the end of a
+   page can always be scrolled out from under both. */
+@media(max-width:850px){.baton-top-date{display:none}.main{padding:16px 14px 150px}.sidenav{width:192px}}
 @media(max-width:650px){.main{padding:12px 10px 90px}.baton-home-actions{gap:6px}.baton-cockpit-bar{gap:4px}.baton-cockpit-metrics .baton-status-item{padding:5px 6px}.baton-task-row .title-btn{font-size:13px}}
 
 /* Unified spaces and inline project editing */

@@ -150,7 +150,7 @@ export function DayItemPopover({ item, anchor, onClose, onChange, onSnooze, onRe
           </span>
         </Field>
         <Field label="NOTE" wide>
-          <input className="input" value={item.why ?? ""} onChange={(e) => onChange({ why: e.target.value })} placeholder="Why it's on today" />
+          <textarea className="input baton-note-editor" rows={3} value={item.why ?? ""} onChange={(e) => onChange({ why: e.target.value })} placeholder="Notes, context, links…" aria-label="Task notes" />
         </Field>
       </div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>

@@ -11,6 +11,7 @@ import { OneOnOne } from "./OneOnOne";
 import { ClientTile } from "./ui";
 import { useEffect, useState } from "react";
 import { useSpaces } from "@/app/spaces/page";
+import { HKToastView } from "./Housekeeping";
 
 function ModeSwitch() {
   const { mode, setMode } = useStore();
@@ -51,7 +52,7 @@ function Toast() {
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  const { items, brand } = useStore();
+  const { items, brand, pending: pendingDecision } = useStore();
   const spaces = useSpaces();
   const [searching, setSearching] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -111,7 +112,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/today" title="Today" aria-label="Today" aria-current={is("/today")}><Icon name="tasks" /><span className="baton-nav-text">Today</span></Link>
 
           <Link href="/signoff" title={`Sign-off${eyes ? ` · ${eyes} pending` : ""}`} aria-label={`Sign-off${eyes ? `, ${eyes} pending` : ""}`} aria-current={is("/signoff")}><Icon name="eye" /><span className="baton-nav-text">Sign-off</span>{eyes > 0 && <span className="navcount">{eyes}</span>}</Link>
-          <details className="baton-nav-more"><summary title="Tools"><Icon name="layers" /><span className="baton-nav-text">Tools</span></summary><div><Link href="/advisor" aria-current={is("/advisor")}><Icon name="bulb" />Advisor</Link><Link href="/skills" aria-current={is("/skills")}><Icon name="layers" />Skills</Link><Link href="/plan" aria-current={is("/plan")}><Icon name="calendar" />Plan day</Link></div></details>
+          <details className="baton-nav-more"><summary title="Tools"><Icon name="layers" /><span className="baton-nav-text">Tools</span></summary><div><Link href="/advisor" aria-current={is("/advisor")}><Icon name="bulb" />Advisor</Link><Link href="/skills" aria-current={is("/skills")}><Icon name="layers" />Skills</Link><Link href="/plan" aria-current={is("/plan")}><Icon name="calendar" />Plan day</Link><Link href="/settings" aria-current={is("/settings")}><Icon name="lock" />Settings &amp; Trash</Link></div></details>
           <div className="navlabel"><Link href="/spaces" className="baton-spaces-heading" title="Manage spaces" aria-label="Manage spaces"><span className="baton-nav-text">SPACES</span><Icon name="grid" size={16}/><span className="baton-nav-add" aria-hidden="true">+</span></Link></div>
           {spaces.filter(s=>!s.archived).map(sp=><Link key={sp.id} href={`/spaces/${sp.id}`} title={sp.name} aria-label={sp.name} aria-current={path===`/spaces/${sp.id}`?"page":undefined}><span className="baton-nav-space-icon" style={{background:sp.color}} aria-hidden="true">{sp.name.slice(0,1).toUpperCase()}</span><span className="baton-nav-text">{sp.name}</span></Link>)}
           <div className="baton-nav-footer xs muted">© 2026 {firm.name}</div>
@@ -127,6 +128,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <Link href="/skills" aria-current={is("/skills")}><Icon name="user" size={22} />More</Link>
       </nav>
       <Toast />
+      <HKToastView raised={!!pendingDecision} />
       <DropDocs here={active?.id} />
       <CommandPalette open={searching} onClose={() => setSearching(false)} here={active?.id} />
       <OneOnOne here={active?.id} />

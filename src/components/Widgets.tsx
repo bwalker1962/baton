@@ -3,7 +3,7 @@
 // Order of importance: what you owe CEOs, then peace of mind, then projects and tasks.
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { clients, getClient, TODAY } from "@/lib/data";
+import { activeClients, getClient, isHiddenClient, TODAY } from "@/lib/data";
 import { owedToCeos, peaceChecks, REPORT_DUE } from "@/lib/ceo";
 import { leadSeed, todaySeed, type DayItem } from "@/lib/day";
 import { addDays } from "@/lib/templates";
@@ -77,7 +77,7 @@ function OwedBody({ clientId, size }: { clientId?: string; size: Size }) {
 
 function NextOneOnOneBody({ clientId }: { clientId?: string }) {
   const { agendas, openAgenda } = useStore();
-  const scope = clients.filter((c) => !clientId || c.id === clientId);
+  const scope = activeClients().filter((c) => !clientId || c.id === clientId);
   return (
     <>
       {scope.map((c) => {
@@ -140,7 +140,7 @@ function SignoffBody({ clientId, size }: { clientId?: string; size: Size }) {
 }
 
 function ReportBody({ clientId }: { clientId?: string }) {
-  const scope = clients.filter((c) => !clientId || c.id === clientId);
+  const scope = activeClients().filter((c) => !clientId || c.id === clientId);
   return (
     <>
       {scope.map((c) => (
@@ -166,7 +166,7 @@ function TodayBody() {
   }, []);
   return (
     <>
-      {items.slice(0, 5).map((it, n) => (
+      {items.filter((it) => !isHiddenClient(it.clientId)).slice(0, 5).map((it, n) => (
         <Link key={it.id} href={it.href ?? "/today"} className="row small" style={{ gap: 10 }}>
           <span className="muted" style={{ width: 14 }}>{n + 1}</span>
           {it.clientId ? <ClientTile client={getClient(it.clientId)!} small /> : <span className="tile tile-sm" style={{ background: "var(--text)" }}>B</span>}
@@ -263,7 +263,7 @@ function EarBody({ clientId, size }: { clientId?: string; size: Size }) {
 
 function ClientsBody() {
   const { items } = useStore();
-  const sorted = [...clients].sort((a, b) => healthOrder[a.health] - healthOrder[b.health]);
+  const sorted = activeClients().sort((a, b) => healthOrder[a.health] - healthOrder[b.health]);
   return (
     <div className="scroll-x">
       <table className="tbl" style={{ minWidth: 520 }}>

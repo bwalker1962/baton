@@ -3,7 +3,7 @@
 // everywhere the task appears (Tasks, dashboards, Owed to the CEO).
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { clients, TODAY } from "@/lib/data";
+import { activeClients, clients, TODAY } from "@/lib/data";
 import { useStore } from "@/lib/store";
 import type { BlockerKind, DayKindLike, Health } from "./taskTypes";
 import { SnoozeButton, wakeLabel } from "./Snooze";
@@ -138,7 +138,7 @@ export function DayItemPopover({ item, anchor, onClose, onChange, onSnooze, onRe
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <Field label="CLIENT">
           <select className="input" value={item.clientId ?? ""} onChange={(e) => onChange({ clientId: e.target.value || undefined })}>
-            <option value="">All clients</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            <option value="">All clients</option>{activeClients().map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </Field>
         <Field label="TIME">

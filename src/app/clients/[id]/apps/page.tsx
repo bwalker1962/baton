@@ -1,7 +1,7 @@
 import { CardHead } from "@/components/ui";
 import { notFound } from "next/navigation";
 import { getClient } from "@/lib/data";
-import { Icon } from "@/components/Icon";
+import { FilesCard } from "@/components/KeyFiles";
 
 const STATE: Record<string, { cls: string; label: string }> = {
   connected: { cls: "b-good", label: "Connected" },
@@ -29,17 +29,7 @@ export default async function Apps({ params }: { params: Promise<{ id: string }>
         </div>
         <div className="row muted small">Skills in this workspace can reach only the apps listed here. Skills ask for a role, such as Social or Email, and this list decides which app answers.</div>
       </section>
-      <section className="card">
-        <CardHead icon="file" title="Key files" count={client.keyFiles.length}><button className="btn">+ Pin a file</button></CardHead>
-        {client.keyFiles.map((f) => (
-          <div className="row" key={f.label}>
-            <Icon name={f.isLogin ? "lock" : "file"} />
-            <span className="grow"><strong>{f.label}</strong><br /><span className="muted small">{f.source} · updated {f.updated}</span></span>
-            {f.isLogin ? <span className="badge b-neutral">Opens in your password manager</span> : <a href="#" className="btn" style={{ minHeight: 34 }}>Open</a>}
-          </div>
-        ))}
-        <div className="row muted small">Baton never stores passwords. Login pins point to a vault item; skills never see credentials.</div>
-      </section>
+      <FilesCard client={client} />
     </>
   );
 }

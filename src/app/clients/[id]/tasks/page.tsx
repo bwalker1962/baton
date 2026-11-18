@@ -1,6 +1,9 @@
 "use client";
 import { use, useEffect, useState } from "react";
-import { TODAY } from "@/lib/data";
+import { activeClients, TODAY } from "@/lib/data";
+import { ArchivedToggle, BulkBar, ItemMenu, SelectBox, useSelection } from "@/components/Housekeeping";
+import type { Ref } from "@/lib/housekeeping";
+import type { Task } from "@/lib/types";
 import { TaskPopover, anchorOf, type Anchor } from "@/components/TaskPopover";
 import { useStore } from "@/lib/store";
 import { SnoozeButton, wakeLabel } from "@/components/Snooze";
@@ -15,7 +18,8 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
   const [owners, setOwners] = useState<string[]>(["BCW", "Client", "PR contractor", "rf-copy", "rf-positioning", "rf-content"]);
   const [adding, setAdding] = useState<string | null>(null);
   const [newOwner, setNewOwner] = useState("");
-  const { snoozed, snooze, tasks, editTask } = useStore();
+  const { snoozed, snooze, allTasks, editTask, isArchived } = useStore();
+  const [showArchived, setShowArchived] = useState(false);
   const [pop, setPop] = useState<{ id: string; anchor: Anchor } | null>(null);
   // Arriving from search (?task=…): open that task's settings next to it.
   useEffect(() => {
@@ -30,11 +34,16 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
   const addToAgenda = useAddToAgenda();
   const [added, setAdded] = useState<string[]>([]);
   // Includes tasks sent back from a 1:1; edits made anywhere show here.
-  const all = tasks.filter((t) => t.clientId === id);
+  const mineAll = allTasks.filter((t) => t.clientId === id);
+  const archived = mineAll.filter((t) => isArchived("task", t.id));
+  const all = showArchived ? archived : mineAll.filter((t) => !isArchived("task", t.id));
   const [showSnoozed, setShowSnoozed] = useState(false);
   const isAsleep = (tid: string) => !!snoozed[tid] && snoozed[tid] > TODAY;
   const asleep = all.filter((t) => isAsleep(t.id));
-  const visible = all.filter((t) => !isAsleep(t.id));
+  const visible = showArchived ? all : all.filter((t) => !isAsleep(t.id));
+  const sel = useSelection(visible.map((t) => t.id));
+  const ref = (t: Task): Ref => ({ kind: "task", id: t.id, name: t.title, clientId: t.clientId });
+  const moveTo = activeClients().filter((c) => c.id !== id).map((c) => ({ id: c.id, name: c.name }));
 
   const setOwner = (taskId: string, owner: string) => {
     if (owner === "__new") return setAdding(taskId);
@@ -52,9 +61,12 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
   return (
     <section className="card scroll-x">
       <CardHead icon="tasks" title="Tasks" count={visible.length} sub="Click a task to adjust it">
-        {asleep.length > 0 && <button className="btn" style={{ minHeight: 32 }} aria-pressed={showSnoozed} onClick={() => setShowSnoozed((v) => !v)}><Icon name="clock" size={15} />Snoozed · {asleep.length}</button>}
+        <ArchivedToggle count={archived.length} on={showArchived} onChange={setShowArchived} />
+        {!showArchived && asleep.length > 0 && <button className="btn" style={{ minHeight: 32 }} aria-pressed={showSnoozed} onClick={() => setShowSnoozed((v) => !v)}><Icon name="clock" size={15} />Snoozed · {asleep.length}</button>}
       </CardHead>
-      {showSnoozed && asleep.length > 0 && (
+      <BulkBar refs={visible.filter((t) => sel.has(t.id)).map(ref)} onClear={sel.clear} archived={showArchived}
+        moveTo={moveTo} onMove={(cid) => visible.filter((t) => sel.has(t.id)).forEach((t) => editTask(t.id, { clientId: cid }))} />
+      {!showArchived && showSnoozed && asleep.length > 0 && (
         <div style={{ background: "var(--surface-2)" }}>
           {asleep.map((t) => (
             <div key={t.id} className="row small" style={{ gap: 10 }}>
@@ -66,13 +78,14 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
         </div>
       )}
       {all.length === 0 ? (
-        <div className="empty"><h3>No tasks yet</h3><p>Start a project from a template to create them.</p></div>
+        <div className="empty">{showArchived ? <h3>Nothing archived</h3> : <><h3>No tasks yet</h3><p>Start a project from a template to create them.</p></>}</div>
       ) : (
         <table className="tbl" style={{ minWidth: 760 }}>
-          <thead><tr><th>Task</th><th>Status</th><th>Owner</th><th>Due</th><th>Progress</th><th>Roadblock</th><th><span style={{ position: "absolute", left: -9999 }}>Snooze</span></th></tr></thead>
+          <thead><tr><th style={{ width: 34 }}><SelectBox checked={sel.all} onChange={sel.toggleAll} label="Select all tasks" /></th><th>Task</th><th>Status</th><th>Owner</th><th>Due</th><th>Progress</th><th>Roadblock</th><th><span style={{ position: "absolute", left: -9999 }}>Snooze</span></th><th><span style={{ position: "absolute", left: -9999 }}>More</span></th></tr></thead>
           <tbody>
             {visible.map((t) => (
-              <tr key={t.id} {...dragInto1on1({ kind: "task", title: t.title, href: `/clients/${id}/tasks`, refId: t.id, clientId: id })}>
+              <tr key={t.id} className={showArchived ? "hk-archived" : undefined} {...dragInto1on1({ kind: "task", title: t.title, href: `/clients/${id}/tasks`, refId: t.id, clientId: id })}>
+                <td><SelectBox checked={sel.has(t.id)} onChange={() => sel.toggle(t.id)} label={`Select ${t.title}`} /></td>
                 <td>
                   <button className="title-btn" data-task={t.id} aria-haspopup="dialog" onClick={(e) => setPop({ id: t.id, anchor: anchorOf(e.currentTarget) })}>{t.title}</button>
                   {t.promised && <span className="badge b-info" style={{ marginLeft: 6 }}>Promised to {t.promised.to}</span>}
@@ -103,6 +116,7 @@ export default function Tasks({ params }: { params: Promise<{ id: string }> }) {
                   </button>
                   <SnoozeButton label={t.title} compact onSnooze={(until) => snooze(t.id, until)} />
                 </td>
+                <td><ItemMenu item={ref(t)} compact onRename={(n) => editTask(t.id, { title: n })} moveTo={moveTo} onMove={(cid) => editTask(t.id, { clientId: cid })} /></td>
               </tr>
             ))}
           </tbody>

@@ -1,5 +1,7 @@
 "use client";
-import { useClientLook } from "@/lib/store";
+import { useClientLook, useStore } from "@/lib/store";
+import { ItemMenu } from "./Housekeeping";
+import { useSpaces } from "@/app/spaces/page";
 import type { Client } from "@/lib/types";
 import { ClientTile } from "./ClientTile";
 import { StatusBadge } from "./ui";
@@ -9,6 +11,8 @@ const PHASES = ["Align", "Shape", "Grow", "Optimize"] as const;
 
 export function ClientHeader({ client }: { client: Client }) {
   const look = useClientLook(client);
+  const { updateSpace } = useStore();
+  const name = useSpaces().find((s) => s.id === client.id)?.name ?? client.name;
   const at = PHASES.indexOf(client.phase);
   return (
     <div className="pagehead">
@@ -17,7 +21,8 @@ export function ClientHeader({ client }: { client: Client }) {
         <div>
           <div className="eyebrow">{client.retainer}{client.regulated ? " · regulated: compliance review on" : ""}</div>
           <h1 className="title" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            {client.name} <StatusBadge health={client.health} /> <CoachButton context="client" clientId={client.id} />
+            {name} <StatusBadge health={client.health} /> <CoachButton context="client" clientId={client.id} />
+            <ItemMenu item={{ kind: "workspace", id: client.id, name, clientId: client.id }} onRename={(n) => updateSpace(client.id, { id: client.id, name: n, kind: "client", color: client.color, website: client.website })} />
           </h1>
         </div>
       </div>

@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { clients, TODAY } from "@/lib/data";
+import { clients, isHiddenClient, TODAY } from "@/lib/data";
+import { useStore } from "@/lib/store";
 import { DAY_HOURS, PLANNING_GOAL, leadSeed, todaySeed, type DayItem, type DayKind, type LeadItem } from "@/lib/day";
 import { addDays } from "@/lib/templates";
 import { daysFromToday, minutesLabel, shortDate } from "@/lib/format";
@@ -71,7 +72,9 @@ export default function Today() {
   const reset = () => { setList(todaySeed); setDone([]); setAdded([]); setAsleep({}); setCritical([]); setPulsePaused(false); };
   const awake = (i: DayItem) => !asleep[i.id] || asleep[i.id] <= currentDay;
 
-  const today = list.filter(awake);
+  // Archived or deleted client workspaces drop off Today.
+  useStore(); // re-render when housekeeping changes
+  const today = list.filter(awake).filter((i) => !isHiddenClient(i.clientId));
   const sleeping = list.filter((i) => !awake(i)).sort((a, b) => asleep[a.id].localeCompare(asleep[b.id]));
   const ordered = [...today.filter((i) => !done.includes(i.id)), ...today.filter((i) => done.includes(i.id))];
   const visible = expanded ? ordered : ordered.filter(i => !done.includes(i.id));
@@ -82,7 +85,7 @@ export default function Today() {
   const planning = today.filter((i) => i.kind === "planning").reduce((n, i) => n + i.minutes, 0);
   const share = total ? planning / total : 0;
   const over_ = total > DAY_HOURS * 60;
-  const radar = leadSeed.filter((l) => !added.includes(l.id)).sort((a, b) => startBy(a).localeCompare(startBy(b)));
+  const radar = leadSeed.filter((l) => !added.includes(l.id) && !isHiddenClient(l.clientId)).sort((a, b) => startBy(a).localeCompare(startBy(b)));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 1600 }}>

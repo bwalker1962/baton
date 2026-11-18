@@ -5,15 +5,19 @@ import { useStore } from "@/lib/store";
 import { noteText, openActions } from "@/lib/notes";
 import { Composer, PostIt } from "@/components/Notes";
 import { WorkingStyle } from "@/components/Coach";
+import { ArchivedToggle } from "@/components/Housekeeping";
 
 export default function ClientNotes({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { notes, agendas } = useStore();
+  const { allNotes, agendas, isArchived } = useStore();
+  const [showArchived, setShowArchived] = useState(false);
   const agenda = agendas.find((a) => a.clientId === id);
   const topics = agenda?.items.filter((i) => !i.covered) ?? [];
   const [who, setWho] = useState("All");
   const [q, setQ] = useState("");
-  const mine = notes.filter((n) => n.clientId === id).sort((a, b) => b.updated.localeCompare(a.updated));
+  const ofClient = allNotes.filter((n) => n.clientId === id);
+  const archivedCount = ofClient.filter((n) => isArchived("note", n.id)).length;
+  const mine = ofClient.filter((n) => isArchived("note", n.id) === showArchived).sort((a, b) => b.updated.localeCompare(a.updated));
   const people = ["All", ...new Set(mine.map((n) => n.with))];
   const shown = mine.filter((n) => (who === "All" || n.with === who) && (!q || noteText(n).toLowerCase().includes(q.toLowerCase())));
   const open = mine.flatMap(openActions);
@@ -38,10 +42,11 @@ export default function ClientNotes({ params }: { params: Promise<{ id: string }
           {people.map((p) => <button key={p} aria-pressed={who === p} onClick={() => setWho(p)}>{p}</button>)}
         </div>
         <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search notes" aria-label="Search notes" style={{ maxWidth: 240 }} />
+        <ArchivedToggle count={archivedCount} on={showArchived} onChange={setShowArchived} />
         <span className="muted small" style={{ marginLeft: "auto" }}>{mine.length} note{mine.length === 1 ? "" : "s"} · {open.length} open action{open.length === 1 ? "" : "s"}</span>
       </div>
       {shown.length === 0 ? (
-        <section className="card empty"><h3>No notes yet</h3><p>Jot down what the CEO or staff said. Lines starting with → become action items.</p></section>
+        <section className="card empty"><h3>{showArchived ? "Nothing archived" : "No notes yet"}</h3><p>Jot down what the CEO or staff said. Lines starting with → become action items.</p></section>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 18, alignItems: "start" }}>
           {shown.map((n) => <PostIt key={n.id} note={n} editable />)}

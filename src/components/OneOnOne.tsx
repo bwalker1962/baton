@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { clients, TODAY } from "@/lib/data";
+import { activeClients, clients, TODAY } from "@/lib/data";
 import { entriesFromText, nowIso } from "@/lib/notes";
 import { DRAG_TYPE, KIND_ICON, OUTCOMES, type Agenda, type AgendaItem, type Draggable, type Outcome } from "@/lib/agenda";
 import { useClientLook, useStore } from "@/lib/store";
@@ -142,7 +142,7 @@ export function OneOnOne({ here }: { here?: string }) {
         </div>
         {!meeting && (
           <select className="input" aria-label="Which client's 1:1" value={cid} onChange={(e) => setCid(e.target.value)} style={{ width: "auto", padding: "4px 6px", fontSize: 12 }}>
-            {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {activeClients().map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         )}
         <button className="btn" aria-label="Minimize" title="Minimize" onClick={() => setOpen(false)} style={{ minHeight: 30, padding: "0 8px" }}>–</button>

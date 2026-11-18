@@ -2,7 +2,7 @@
 // Drag documents from your computer onto any Baton screen. Obvious ones file themselves;
 // anything unclear asks which client before it's stored.
 import { useCallback, useEffect, useRef, useState } from "react";
-import { clients, TODAY } from "@/lib/data";
+import { activeClients, clients, TODAY } from "@/lib/data";
 import { KINDS, classify, kindOf, looksSecret, readable, type Verdict } from "@/lib/filing";
 import { useStore } from "@/lib/store";
 import { Icon } from "./Icon";
@@ -105,7 +105,7 @@ export function DropDocs({ here }: { here?: string }) {
                 </div>
                 <div className="note" style={{ background: "var(--warn-bg)", color: "var(--warn-fg)" }}><Icon name="alert" size={16} />{current.verdict.reason}</div>
                 <div role="radiogroup" aria-label="Client" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {clients.map((c) => (
+                  {activeClients().map((c) => (
                     <label key={c.id} className={`option ${choice === c.id ? "selected" : ""}`}>
                       <input type="radio" name="drop-client" checked={choice === c.id} onChange={() => setChoice(c.id)} />
                       <ClientTile client={c} small />

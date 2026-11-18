@@ -17,6 +17,14 @@ export function setToday(iso: string) {
   TODAY = iso;
 }
 
+/** Client workspaces that are archived or in Trash. StoreProvider keeps this current, so
+ *  cross-client views (Home, Today, search) leave them out without each one asking the store. */
+let hiddenClients = new Set<string>();
+export function setHiddenClients(ids: string[]) {
+  hiddenClients = new Set(ids);
+}
+export const isHiddenClient = (id?: string) => !!id && hiddenClients.has(id);
+
 export const firm: Firm = { id: "ridgefront", name: "RidgeFront" };
 
 export const clients: Client[] = [
@@ -327,3 +335,6 @@ export const skills: Skill[] = [
 ];
 
 export const getClient = (id: string) => clients.find((c) => c.id === id);
+
+/** Clients whose workspace is live: not archived, not in Trash. */
+export const activeClients = () => clients.filter((c) => !hiddenClients.has(c.id));

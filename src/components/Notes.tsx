@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { clients, TODAY } from "@/lib/data";
+import { activeClients, clients, TODAY } from "@/lib/data";
 import { ACTION, WITH_OPTIONS, eid, entriesFromText, nowIso, openActions, type Entry, type Note } from "@/lib/notes";
 import { useClientLook, useStore } from "@/lib/store";
 import { shortDate } from "@/lib/format";
@@ -59,10 +59,11 @@ function EntryRow({ e, editable, onText, onToggle, onKey, inputRef }: {
 /** One note on the pad, edited in place. Who and every entry are editable; each entry carries its time. */
 export function PostIt({ note, showClient, editable, clamp }: { note: Note; showClient?: boolean; editable?: boolean; clamp?: boolean }) {
   // Client color only where it tells clients apart (Home's mixed stacks); inside a client every note looks the same.
-  const { saveNote, removeNote } = useStore();
+  const { saveNote, trash, archive, unarchive, isArchived } = useStore();
+  const noteRef = { kind: "note" as const, id: note.id, name: `Note with ${note.with}, ${when(note.date)}`, clientId: note.clientId };
+  const archived = isArchived("note", note.id);
   const look = useClientLook(clientOf(note.clientId));
   const [showDone, setShowDone] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const [draft, setDraft] = useState("");
   const refs = useRef<Record<string, HTMLTextAreaElement | null>>({});
   const focusNext = useRef<string | null>(null);
@@ -137,15 +138,10 @@ export function PostIt({ note, showClient, editable, clamp }: { note: Note; show
 
       {editable && (
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
-          {confirmDelete ? (
-            <>
-              <span className="xs" style={{ alignSelf: "center" }}>Delete this note?</span>
-              <button className="btn" style={{ minHeight: 26, padding: "0 8px" }} onClick={() => removeNote(note.id)}>Delete</button>
-              <button className="btn" style={{ minHeight: 26, padding: "0 8px" }} onClick={() => setConfirmDelete(false)}>Keep</button>
-            </>
-          ) : (
-            <button className="note-delete" aria-label="Delete note" title="Delete note" onClick={() => setConfirmDelete(true)}>Delete</button>
-          )}
+          {archived
+            ? <button className="note-delete" onClick={() => unarchive([noteRef])}>Unarchive</button>
+            : <button className="note-delete" title="Hide it, keep everything" onClick={() => archive([noteRef])}>Archive</button>}
+          <button className="note-delete" aria-label="Delete note" title="Delete note. Undo for 10 seconds; Trash for 30 days" onClick={() => trash([noteRef])}>Delete</button>
         </div>
       )}
     </article>
@@ -172,7 +168,7 @@ export function Composer({ clientId, onDone }: { clientId?: string; onDone?: () 
     <form className="postit" style={{ ...(!clientId && cid ? { ["--note" as string]: look.color } : {}), display: "flex", flexDirection: "column", gap: 8 }} onSubmit={(e) => { e.preventDefault(); save(); }} aria-label="New note">
       {!clientId && (
         <div role="radiogroup" aria-label="Client" style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {clients.map((c) => (
+          {activeClients().map((c) => (
             <button type="button" key={c.id} role="radio" aria-checked={cid === c.id} onClick={() => setCid(c.id)} className="btn"
               style={{ minHeight: 30, padding: "0 8px", background: cid === c.id ? "rgba(0,0,0,.08)" : "transparent", borderColor: cid === c.id ? "currentColor" : undefined }}>
               <ClientTile client={c} small />{c.name}

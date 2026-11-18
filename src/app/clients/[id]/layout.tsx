@@ -3,6 +3,7 @@ import { clients, getClient } from "@/lib/data";
 import { ClientTabs } from "@/components/ClientTabs";
 import { ClientHeader } from "@/components/ClientHeader";
 import { KeyFiles } from "@/components/KeyFiles";
+import { WorkspaceGate } from "@/components/WorkspaceGate";
 
 export function generateStaticParams() {
   return clients.map((c) => ({ id: c.id }));
@@ -15,10 +16,12 @@ export default async function ClientLayout({ children, params }: { children: Rea
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-      <ClientHeader client={client} />
-      <KeyFiles client={client} />
-      <ClientTabs id={client.id} />
-      {children}
+      <WorkspaceGate id={client.id} name={client.name}>
+        <ClientHeader client={client} />
+        <KeyFiles client={client} />
+        <ClientTabs id={client.id} />
+        {children}
+      </WorkspaceGate>
     </div>
   );
 }

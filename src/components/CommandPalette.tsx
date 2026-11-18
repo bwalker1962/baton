@@ -3,7 +3,7 @@
 // items, tasks, projects, notes, chats, skills and advice, plus a few quick actions.
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { clients, getClient, skills, topics } from "@/lib/data";
+import { activeClients, clients, getClient, isHiddenClient, skills, topics } from "@/lib/data";
 import { TOPICS } from "@/lib/advisor";
 import { useStore, type Mode } from "@/lib/store";
 import { Icon } from "./Icon";
@@ -31,7 +31,7 @@ function score(h: Hit, q: string): number {
 
 export function CommandPalette({ open, onClose, here }: { open: boolean; onClose: () => void; here?: string }) {
   const router = useRouter();
-  const { items, tasks, projects, notes, setMode, openAgenda } = useStore();
+  const { items, tasks, projects, notes, setMode, openAgenda, isGone, isArchived, nameOf, hk } = useStore();
   const [q, setQ] = useState("");
   const [active, setActive] = useState(0);
   const input = useRef<HTMLInputElement>(null);
@@ -44,7 +44,8 @@ export function CommandPalette({ open, onClose, here }: { open: boolean; onClose
     const hits: Hit[] = [];
     const cname = (id: string) => getClient(id)?.name ?? "";
     // Quick actions; the client you're in comes first.
-    const order = here ? [getClient(here)!, ...clients.filter((c) => c.id !== here)] : clients;
+    const live = activeClients();
+    const order = here && !isHiddenClient(here) ? [getClient(here)!, ...live.filter((c) => c.id !== here)] : live;
     for (const c of order) {
       hits.push({ id: `a-note-${c.id}`, group: "Actions", title: `New note for ${c.name}`, icon: "chat", clientId: c.id, keywords: "write jot conversation ceo", run: go(`/clients/${c.id}/notes`) });
       hits.push({ id: `a-1on1-${c.id}`, group: "Actions", title: `Open ${c.name} 1:1 agenda`, icon: "chat", clientId: c.id, keywords: "one on one meeting agenda topics", run: () => openAgenda(c.id) });
@@ -52,10 +53,10 @@ export function CommandPalette({ open, onClose, here }: { open: boolean; onClose
     }
     (["light", "half", "dark"] as Mode[]).forEach((m) => hits.push({ id: `a-mode-${m}`, group: "Actions", title: `Appearance: ${m === "half" ? "Half-dark" : m[0].toUpperCase() + m.slice(1)}`, icon: m === "light" ? "sun" : m === "dark" ? "moon" : "half", keywords: "theme mode dark light", run: () => setMode(m) }));
 
-    [["/", "Home", "home"], ["/today", "Today", "tasks"], ["/signoff", "Sign-off queue", "eye"], ["/advisor", "Advisor", "bulb"], ["/skills", "Skills", "layers"], ["/clients", "All clients", "grid"]]
+    [["/", "Home", "home"], ["/today", "Today", "tasks"], ["/settings", "Settings: Trash and activity log", "lock"], ["/signoff", "Sign-off queue", "eye"], ["/advisor", "Advisor", "bulb"], ["/skills", "Skills", "layers"], ["/clients", "All clients", "grid"]]
       .forEach(([href, title, icon]) => hits.push({ id: `p-${href}`, group: "Go to", title, icon, run: go(href) }));
 
-    for (const c of clients) {
+    for (const c of live) {
       hits.push({ id: `c-${c.id}`, group: "Clients", title: c.name, sub: `${c.phase} · ${c.retainer}`, icon: "grid", clientId: c.id, run: go(`/clients/${c.id}`) });
       TABS.slice(1).forEach(([seg, label]) => hits.push({ id: `c-${c.id}-${seg}`, group: "Clients", title: `${c.name}: ${label}`, icon: "link", clientId: c.id, run: go(`/clients/${c.id}/${seg}`) }));
     }
@@ -66,11 +67,11 @@ export function CommandPalette({ open, onClose, here }: { open: boolean; onClose
       const text = n.entries.map((e) => e.text).join(" · ");
       hits.push({ id: `n-${n.id}`, group: "Notes", title: n.entries[0]?.text ?? "Note", sub: `${cname(n.clientId)} · ${n.with} · ${n.date.slice(5).replace("-", "/")}`, icon: "chat", clientId: n.clientId, keywords: text, run: go(`/clients/${n.clientId}/notes`) });
     }
-    for (const t of topics) hits.push({ id: `ch-${t.id}`, group: "Chats", title: t.title, sub: `${cname(t.clientId)} · ${t.category}`, icon: "chat", clientId: t.clientId, keywords: `${t.summary} ${t.decision} ${t.program}`, run: go(`/clients/${t.clientId}/chats`) });
+    for (const t of topics.filter((x) => !isHiddenClient(x.clientId) && !isGone("chat", x.id) && !isArchived("chat", x.id))) hits.push({ id: `ch-${t.id}`, group: "Chats", title: nameOf("chat", t.id, t.title), sub: `${cname(t.clientId)} · ${t.category}`, icon: "chat", clientId: t.clientId, keywords: `${t.summary} ${t.decision} ${t.program}`, run: go(`/clients/${t.clientId}/chats`) });
     for (const s of skills) hits.push({ id: `k-${s.id}`, group: "Skills", title: s.id, sub: s.job, icon: "layers", keywords: s.dept, run: go("/skills") });
     for (const a of TOPICS) hits.push({ id: `ad-${a.id}`, group: "Advice", title: `Best practices: ${a.name}`, icon: "bulb", keywords: a.match.source.replace(/[|\\?()]/g, " "), run: go(`/advisor?topic=${a.id}${here ? `&client=${here}` : ""}`) });
     return hits;
-  }, [items, tasks, projects, notes, here, setMode, openAgenda]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [items, tasks, projects, notes, here, setMode, openAgenda, hk]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const results = useMemo(() => {
     if (!q.trim()) {

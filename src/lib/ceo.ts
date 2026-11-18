@@ -2,7 +2,7 @@
 // Priority order for every screen: accountability to the CEO first, your peace of mind
 // second, project and task views third.
 // © 2026 RidgeFront. All rights reserved.
-import { clients, TODAY } from "./data";
+import { activeClients, clients, isHiddenClient, TODAY } from "./data";
 import { leadSeed } from "./day";
 import { addDays } from "./templates";
 import type { Note } from "./notes";
@@ -35,7 +35,7 @@ export function owedToCeos(tasks: Task[], clientId?: string): Owed[] {
     id: t.id, clientId: t.clientId, title: t.title, to: t.promised!.to, due: t.due, promisedOn: t.promised!.on, kind: "promise",
     href: `/clients/${t.clientId}/tasks`, late: !!t.due && t.due < TODAY, blocked: t.blocker?.label,
   }));
-  const reports: Owed[] = clients.filter((c) => !clientId || c.id === clientId).map((c) => ({
+  const reports: Owed[] = activeClients().filter((c) => !clientId || c.id === clientId).map((c) => ({
     id: `report-${c.id}`, clientId: c.id, title: "CEO report", to: "CEO", due: REPORT_DUE[c.id].due, kind: "report",
     href: `/clients/${c.id}/report`, late: REPORT_DUE[c.id].due < TODAY,
   }));
@@ -52,8 +52,8 @@ export function peaceChecks(ctx: { items: SignoffItem[]; tasks: Task[]; notes: N
   const sendingToday = mine.filter((i) => i.sendAt.startsWith("Today"));
   const flags = mine.reduce((n, i) => n + (i.slips ?? []).filter((x) => x.result !== "pass").length, 0);
   const late = owedToCeos(tasks, clientId).filter((o) => o.late);
-  const leads = leadSeed.filter((l) => (!clientId || l.clientId === clientId) && addDays(l.due, -l.leadDays) < TODAY);
-  const scope = clients.filter((c) => !clientId || c.id === clientId);
+  const leads = leadSeed.filter((l) => !isHiddenClient(l.clientId) && (!clientId || l.clientId === clientId) && addDays(l.due, -l.leadDays) < TODAY);
+  const scope = activeClients().filter((c) => !clientId || c.id === clientId);
   const quiet = scope.filter((c) => {
     const last = notes.filter((n) => n.clientId === c.id).map((n) => n.date).sort().pop();
     return !last || last < addDays(TODAY, -7);

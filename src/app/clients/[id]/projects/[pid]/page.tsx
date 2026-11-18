@@ -12,10 +12,11 @@ import { PEERS, ranked, topicForTemplate } from "@/lib/advisor";
 import { AdviceRow } from "@/components/Advice";
 import { getClient, clients } from "@/lib/data";
 import { useSpaces } from "@/app/spaces/page";
+import { ItemMenu } from "@/components/Housekeeping";
 
 export default function ProjectPage({ params }: { params: Promise<{ id: string; pid: string }> }) {
   const { id, pid } = use(params);
-  const { projects, updateProject } = useStore();
+  const { allProjects: projects, updateProject, isArchived, unarchive } = useStore();
   const spaces = useSpaces();
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState("");
@@ -32,11 +33,13 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
     return (
       <section className="card empty">
         <h3>Project not found</h3>
-        <p>Check your Spaces directory. Projects saved in another browser will not appear here.</p>
+        <p>If you deleted it, it is in Trash under Settings for 30 days. Projects saved in another browser will not appear here.</p>
         <Link className="btn" href={`/clients/${id}/projects`}>Back to projects</Link>
       </section>
     );
   }
+  const archived = isArchived("project", project.id);
+  const ref = { kind: "project" as const, id: project.id, name: project.name, clientId: project.clientId };
   const tpl = getTemplate(project.templateId);
   const set = (sid: string, patch: Partial<ProjectStep>) => setSteps((all) => { const next = all.map((s) => (s.id === sid ? { ...s, ...patch } : s)); updateProject(pid, { steps: next }); return next; });
   const phases = [...new Set(steps.map((s) => s.phase))];
@@ -51,8 +54,10 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
           <Link className="eyebrow" href={`/spaces/${project.clientId}`}>{spaces.find(s=>s.id===project.clientId)?.name ?? "Space"}</Link>
           <h2 style={{ margin: "4px 0 0", fontSize: 22 }}>{project.name}</h2>
         </div>
-        <div style={{display:"flex",gap:8,alignItems:"center"}}><span className="badge b-neutral">{done} of {steps.length} steps handled</span><button className="btn" onClick={()=>{setEditName(project.name);setEditSpace(project.clientId);setEditNotes(project.info.notes??"");setEditing(v=>!v);}}>Edit project</button></div>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}><span className="badge b-neutral">{done} of {steps.length} steps handled</span><button className="btn" disabled={archived} onClick={()=>{setEditName(project.name);setEditSpace(project.clientId);setEditNotes(project.info.notes??"");setEditing(v=>!v);}}>Edit project</button><ItemMenu item={ref} onRename={(n) => updateProject(project.id, { name: n })} /></div>
       </div>
+      {archived && <div className="hk-banner" role="status"><Icon name="layers" size={16} /><span className="grow small"><strong>Archived.</strong> Its checklist is read-only and it is off your lists. Nothing is lost.</span><button className="btn" onClick={() => unarchive([ref])}>Unarchive</button></div>}
+      <fieldset disabled={archived} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: "flex", flexDirection: "column", gap: 16 }}>
 
       {editing && <form className="card baton-space-editor" onSubmit={e=>{e.preventDefault();if(!editName.trim())return;updateProject(project.id,{name:editName.trim(),clientId:editSpace,info:{...project.info,notes:editNotes}});setEditing(false);}}>
         <h2>Project settings</h2>
@@ -140,6 +145,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
             onKeyDown={(e) => { if (e.key === "Enter" && extra.trim()) { setSteps((a) => { const next: ProjectStep[] = [...a, { id: `x${Date.now()}`, title: extra.trim(), phase: "Added by you", due: null, owner: "BCW", status: "open" }]; updateProject(pid, { steps: next }); return next; }); setExtra(""); } }} />
         </div>
       </section>
+      </fieldset>
     </div>
   );
 }

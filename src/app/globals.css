@@ -661,3 +661,10 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .baton-timer-clock-small{font-variant-numeric:tabular-nums;white-space:nowrap;font-size:15px}
 .baton-timer-new{display:grid;gap:9px;padding-top:12px;border-top:1px solid var(--divider)}
 .baton-timer-new label{display:grid;gap:5px;font-size:12px;font-weight:600}
+
+/* Stowable navigation: preserve the full cockpit width. */
+.baton-sidebar-toggle{display:grid;place-items:center;width:34px;height:34px;flex:none;border:1px solid var(--chrome-line);background:var(--chrome-raised);color:var(--chrome-text);border-radius:8px;cursor:pointer}
+.layout.baton-sidebar-stowed .sidenav{display:none}
+.layout.baton-sidebar-stowed .main{width:100%;max-width:none;min-width:0}
+.baton-timer-session>label{display:grid;gap:5px;font-size:12px;font-weight:600}
+@media(max-width:650px){.baton-sidebar-toggle{display:none}}

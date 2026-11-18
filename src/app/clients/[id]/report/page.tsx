@@ -4,15 +4,29 @@ import { notFound } from "next/navigation";
 import { departments, getClient, tasks } from "@/lib/data";
 import { healthLabel } from "@/lib/format";
 import { useStore } from "@/lib/store";
+import { minutesLabel } from "@/lib/format";
+import { pace, useTimeData, weekTotals, WEEKLY_TARGET_HOURS } from "@/lib/time";
 import { Icon } from "@/components/Icon";
 import { Progress, StatusBadge, ClientTile } from "@/components/ui";
+
+const PACE_NOTE: Record<string, string> = {
+  under: `Below the ${WEEKLY_TARGET_HOURS.min}–${WEEKLY_TARGET_HOURS.max}h conductor budget. Either the week was light or time went untracked.`,
+  on: `Inside the ${WEEKLY_TARGET_HOURS.min}–${WEEKLY_TARGET_HOURS.max}h conductor budget this account is priced on.`,
+  over: `Above the ${WEEKLY_TARGET_HOURS.min}–${WEEKLY_TARGET_HOURS.max}h budget. Worth knowing why before it becomes the norm.`,
+  none: "No time tracked against this client this week.",
+};
 
 export default function Report({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const client = getClient(id);
-  const { items } = useStore();
+  const { items, projects } = useStore();
+  const { sessions } = useTimeData();
   const [reviewed, setReviewed] = useState(false);
   if (!client) notFound();
+  const week = weekTotals(sessions)[id];
+  const minutes = Math.round((week?.ms ?? 0) / 60000);
+  const verdict = pace(minutes);
+  const byProject = Object.entries(week?.byProject ?? {}).sort((a, b) => b[1] - a[1]);
   const depts = departments.filter((d) => d.clientId === id);
   const flagged = depts.filter((d) => d.health === "bad" || d.health === "warn");
   const shipped = items.filter((i) => i.clientId === id && (i.state === "approved" || i.state === "approved-changes"));
@@ -27,6 +41,21 @@ export default function Report({ params }: { params: Promise<{ id: string }> }) 
           <span className="badge b-eyes"><Icon name="eye" size={14} />Draft · needs your eyes before sharing</span>
         )}
         <button className="btn btn-primary" onClick={() => setReviewed(true)} disabled={reviewed}>{reviewed ? "Shared link copied" : "Reviewed · share with CEO"}</button>
+      </div>
+
+      {/* Your margin check. Not part of what the CEO sees. */}
+      <div
+        className="card small"
+        style={{ padding: "10px 14px", display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}
+      >
+        <span className="muted">For you only</span>
+        <strong>{minutes > 0 ? minutesLabel(minutes) : "No time tracked"}</strong>
+        {verdict !== "none" && (
+          <span className={`badge ${verdict === "over" ? "b-warn" : verdict === "under" ? "b-eyes" : "b-good"}`}>
+            {verdict === "over" ? "Over budget" : verdict === "under" ? "Under budget" : "On budget"}
+          </span>
+        )}
+        <span className="muted" style={{ flexBasis: "100%" }}>{PACE_NOTE[verdict]}</span>
       </div>
 
       <article className="card" style={{ overflow: "hidden" }}>
@@ -70,6 +99,32 @@ export default function Report({ params }: { params: Promise<{ id: string }> }) 
             <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.6 }}>{shipped.map((i) => <li key={i.id}>{i.title} <span className="muted">· {i.channel}</span></li>)}</ul>
           )}
         </section>
+        <section style={{ padding: "16px 24px", borderTop: "1px solid var(--divider)" }}>
+          <h3 className="muted" style={{ margin: "0 0 10px", fontSize: 13 }}>Where your time went</h3>
+          {minutes === 0 ? (
+            <p className="muted small" style={{ margin: 0 }}>
+              No time tracked against {client.name} this week. Start a timer from a task and it lands here.
+            </p>
+          ) : (
+            <>
+              <p style={{ margin: "0 0 10px", lineHeight: 1.6 }}>
+                <strong>{minutesLabel(minutes)}</strong> of senior marketing attention, across {week?.sessions ?? 0}{" "}
+                {week?.sessions === 1 ? "session" : "sessions"}.
+              </p>
+              {byProject.length > 0 && (
+                <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
+                  {byProject.map(([pid, ms]) => (
+                    <li key={pid || "none"}>
+                      {projects.find((p) => p.id === pid)?.name ?? "General account work"}
+                      <span className="muted"> · {minutesLabel(Math.round(ms / 60000))}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
+        </section>
+
         <section style={{ padding: "16px 24px 22px", borderTop: "1px solid var(--divider)" }}>
           <h3 className="muted" style={{ margin: "0 0 10px", fontSize: 13 }}>Decisions needed from you</h3>
           {decisions.length === 0 ? <p className="muted small" style={{ margin: 0 }}>None this week.</p> : (

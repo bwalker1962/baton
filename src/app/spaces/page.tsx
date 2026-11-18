@@ -1,18 +1,9 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { clients } from "@/lib/data";
+import { useSpaces } from "@/lib/spaces";
 import { useStore, type Space } from "@/lib/store";
 
-const defaults: Space[] = [
-  { id: "personal", name: "Personal", kind: "personal", color: "#64748b" },
-  { id: "ridgefront", name: "RidgeFront", kind: "business", color: "#334155" },
-  ...clients.map(c => ({ id: c.id, name: c.name, kind: "client" as const, color: c.color, website: c.website }))
-];
-export function useSpaces() {
-  const { spaces } = useStore();
-  return [...defaults.map(d => ({ ...d, ...spaces.find(s => s.id === d.id) })), ...spaces.filter(s => !defaults.some(d => d.id === s.id))];
-}
 export default function SpacesPage() {
   const { projects, addSpace, updateSpace } = useStore();
   const spaces = useSpaces();

@@ -10,12 +10,19 @@ import { addDays } from "@/lib/templates";
 import { CERTAINTY } from "@/lib/intake";
 import { healthOrder, minutesLabel, shortDate } from "@/lib/format";
 import { useStore } from "@/lib/store";
+import { useTimeData, weekTotals } from "@/lib/time";
 import { Icon } from "./Icon";
 import { ClientTile, Due, StatusBadge } from "./ui";
 import { NotesBoard, PostIt } from "./Notes";
 import { EAR, KIND_CLS } from "@/lib/ear";
 import { useAddToAgenda } from "./OneOnOne";
 import { TaskPopover, anchorOf, type Anchor } from "./TaskPopover";
+
+/** Tracked time for a client this week, or a dash when nothing has been logged. */
+function timeCell(ms: number | undefined): string {
+  if (!ms) return "—";
+  return minutesLabel(Math.round(ms / 60000));
+}
 
 /** Rows that open a task's pop-over instead of leaving the page. */
 function useTaskPop() {
@@ -262,6 +269,10 @@ function EarBody({ clientId, size }: { clientId?: string; size: Size }) {
 
 function ClientsBody() {
   const { items } = useStore();
+  // Real tracked time, not the seed number. A client with no sessions yet shows
+  // a dash rather than a fabricated figure.
+  const { sessions } = useTimeData();
+  const totals = weekTotals(sessions);
   const sorted = [...clients].sort((a, b) => healthOrder[a.health] - healthOrder[b.health]);
   return (
     <div className="scroll-x">
@@ -273,7 +284,7 @@ function ClientsBody() {
               <td><Link href={`/clients/${c.id}`} style={{ color: "var(--text)", fontWeight: 600, display: "flex", gap: 10, alignItems: "center" }}><ClientTile client={c} />{c.name}</Link></td>
               <td><StatusBadge health={c.health} /></td>
               <td className="muted">{c.phase}</td>
-              <td className="muted">{minutesLabel(c.minutesThisWeek)}</td>
+              <td className="muted">{timeCell(totals[c.id]?.ms)}</td>
               <td style={{ textAlign: "right", fontWeight: 600 }}>{items.filter((i) => i.state === "needs" && i.clientId === c.id).length}</td>
             </tr>
           ))}

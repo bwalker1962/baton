@@ -11,7 +11,7 @@ import { CERTAINTY, dateLabel, type Certainty } from "@/lib/intake";
 import { PEERS, ranked, topicForTemplate } from "@/lib/advisor";
 import { AdviceRow } from "@/components/Advice";
 import { getClient, clients } from "@/lib/data";
-import { useSpaces } from "@/app/spaces/page";
+import { useSpaces } from "@/lib/spaces";
 
 export default function ProjectPage({ params }: { params: Promise<{ id: string; pid: string }> }) {
   const { id, pid } = use(params);

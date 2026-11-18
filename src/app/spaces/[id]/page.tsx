@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { use, useState } from "react";
 import { useStore } from "@/lib/store";
-import { useSpaces } from "../page";
+import { useSpaces } from "@/lib/spaces";
 export default function SpaceDetail({params}:{params:Promise<{id:string}>}) {
  const {id}=use(params); const {projects,addProject}=useStore(); const space=useSpaces().find(s=>s.id===id);
  const [name,setName]=useState("");

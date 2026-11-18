@@ -1,6 +1,7 @@
 "use client";
 // Prototype state: appearance, sign-off decisions with undo, projects from templates.
-// In-memory only; a real build moves this to the database.
+// Everything here is kept on this device via usePersisted; a real build moves
+// the same shapes to the database and the components above do not change.
 // © 2026 RidgeFront. All rights reserved.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { signoffItems as seedItems, tasks as seedTasks } from "./data";
@@ -8,6 +9,7 @@ import type { SignoffItem, SignoffState } from "./types";
 import { migrate, noteSeed, type Note } from "./notes";
 import { agendaSeed, type Agenda } from "./agenda";
 import { styleSeed, type Style } from "./coach";
+import { usePersisted } from "./persist";
 import type { Task } from "./types";
 
 export type Mode = "light" | "half" | "dark";
@@ -43,6 +45,12 @@ interface Pending {
   label: string;
   previous: SignoffState;
   expires: number;
+}
+
+/** What you decided about a sign-off item, kept apart from the item itself. */
+interface Decision {
+  state: SignoffState;
+  outcome?: string;
 }
 
 /** A document dropped into Baton and filed to a client. */
@@ -117,72 +125,90 @@ const LABELS: Record<SignoffState, string> = {
 };
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
+  // Appearance keeps its own plain-string key so an existing choice survives.
   const [mode, setModeState] = useState<Mode>("light");
-  const [items, setItems] = useState<SignoffItem[]>(seedItems);
+
+  const [spaces, setSpaces] = usePersisted<Space[]>("baton-spaces-v1", []);
+  const [projects, setProjects] = usePersisted<Project[]>("baton-projects-v1", []);
+  const [docs, setDocs] = usePersisted<FiledDoc[]>("baton-docs-v1", []);
+  const [snoozed, setSnoozed] = usePersisted<Record<string, string>>("baton-snoozed-v1", {});
+  const [brand, setBrandState] = usePersisted<Record<string, BrandChoice>>("baton-brand-v1", {});
+  const [notes, setNotes] = usePersisted<Note[]>("baton-notes-v1", noteSeed, (raw) =>
+    Array.isArray(raw) ? (raw as unknown[]).map(migrate) : noteSeed,
+  );
+  const [agendas, setAgendas] = usePersisted<Agenda[]>("baton-agendas-v1", agendaSeed);
+  const [newTasks, setNewTasks] = usePersisted<Task[]>("baton-newtasks-v1", []);
+  const [taskEdits, setTaskEdits] = usePersisted<Record<string, Partial<Task>>>("baton-taskedits-v1", {});
+  const [styles, setStyles] = usePersisted<Style[]>("baton-styles-v1", styleSeed);
+  const [dismissed, setDismissed] = usePersisted<Record<string, string>>("baton-dismissed-v1", {});
+  // Decisions are stored as an overlay on the seed items, the same way task
+  // edits are. The alternative — persisting whole items — would freeze a copy
+  // of every asset body on the device and drift from the seed data.
+  const [decisions, setDecisions] = usePersisted<Record<string, Decision>>("baton-decisions-v1", {});
+
   const [pending, setPending] = useState<Pending | null>(null);
-  const [spaces, setSpaces] = useState<Space[]>([]);
-  useEffect(() => { try { const raw = localStorage.getItem("baton-spaces-v1"); if (raw) setSpaces(JSON.parse(raw)); } catch {} }, []);
-  const addSpace = useCallback((space: Space) => setSpaces(all => { const next = [...all, space]; try { localStorage.setItem("baton-spaces-v1", JSON.stringify(next)); } catch {} return next; }), []);
-  const updateSpace = useCallback((id: string, patch: Partial<Space>) => setSpaces(all => { const next = all.map(s => s.id === id ? { ...s, ...patch } : s); try { localStorage.setItem("baton-spaces-v1", JSON.stringify(next)); } catch {} return next; }), []);
-  const [projects, setProjects] = useState<Project[]>([]);
-  useEffect(() => { try { const saved = localStorage.getItem("baton-projects-v1"); if (saved) setProjects(JSON.parse(saved)); } catch {} }, []);
-  const [docs, setDocs] = useState<FiledDoc[]>([]);
-  const [snoozed, setSnoozed] = useState<Record<string, string>>({});
-  const [notes, setNotes] = useState<Note[]>(noteSeed);
-  // Notes are kept on this device in the prototype; the build stores them per client.
-  useEffect(() => {
-    try { const raw = localStorage.getItem("baton-notes-v1"); if (raw) setNotes((JSON.parse(raw) as unknown[]).map(migrate)); } catch {}
-  }, []);
-  const persist = (next: Note[]) => { try { localStorage.setItem("baton-notes-v1", JSON.stringify(next)); } catch {} return next; };
-  const saveNote = useCallback((n: Note) => setNotes((all) => persist(all.some((x) => x.id === n.id) ? all.map((x) => (x.id === n.id ? n : x)) : [n, ...all])), []);
-  const removeNote = useCallback((id: string) => setNotes((all) => persist(all.filter((x) => x.id !== id))), []);
-  const [agendas, setAgendas] = useState<Agenda[]>(agendaSeed);
-  const [newTasks, setNewTasks] = useState<Task[]>([]);
   const [agendaOpenFor, openAgenda] = useState<string | null>(null);
-  const [taskEdits, setTaskEdits] = useState<Record<string, Partial<Task>>>({});
-  useEffect(() => { try { const raw = localStorage.getItem("baton-taskedits-v1"); if (raw) setTaskEdits(JSON.parse(raw)); } catch {} }, []);
-  const editTask = useCallback((id: string, patch: Partial<Task>) => setTaskEdits((all) => {
-    const next = { ...all, [id]: { ...all[id], ...patch } };
-    try { localStorage.setItem("baton-taskedits-v1", JSON.stringify(next)); } catch {}
-    return next;
-  }), []);
-  const [styles, setStyles] = useState<Style[]>(styleSeed);
-  const [dismissed, setDismissed] = useState<Record<string, string>>({});
-  useEffect(() => {
-    try { const raw = localStorage.getItem("baton-styles-v1"); if (raw) setStyles(JSON.parse(raw)); } catch {}
-    try { const raw = localStorage.getItem("baton-dismissed-v1"); if (raw) setDismissed(JSON.parse(raw)); } catch {}
-  }, []);
-  const saveStyles = useCallback((s: Style[]) => { setStyles(s); try { localStorage.setItem("baton-styles-v1", JSON.stringify(s)); } catch {} }, []);
-  const dismissTip = useCallback((id: string) => setDismissed((all) => {
-    const next = { ...all, [id]: new Date().toISOString() };
-    try { localStorage.setItem("baton-dismissed-v1", JSON.stringify(next)); } catch {}
-    return next;
-  }), []);
-  const tasks = useMemo(() => [...seedTasks, ...newTasks].map((t) => (taskEdits[t.id] ? { ...t, ...taskEdits[t.id] } : t)), [newTasks, taskEdits]);
-  useEffect(() => {
-    try { const raw = localStorage.getItem("baton-agendas-v1"); if (raw) setAgendas(JSON.parse(raw)); } catch {}
-    try { const raw = localStorage.getItem("baton-newtasks-v1"); if (raw) setNewTasks(JSON.parse(raw)); } catch {}
-  }, []);
-  const saveAgenda = useCallback((a: Agenda) => setAgendas((all) => {
-    const next = all.some((x) => x.clientId === a.clientId) ? all.map((x) => (x.clientId === a.clientId ? a : x)) : [...all, a];
-    try { localStorage.setItem("baton-agendas-v1", JSON.stringify(next)); } catch {}
-    return next;
-  }), []);
-  const addTask = useCallback((t: Task) => setNewTasks((all) => {
-    const next = [...all, t];
-    try { localStorage.setItem("baton-newtasks-v1", JSON.stringify(next)); } catch {}
-    return next;
-  }), []);
-  const addDoc = useCallback((d: FiledDoc) => setDocs((all) => [d, ...all]), []);
-  const moveDoc = useCallback((id: string, clientId: string) => setDocs((all) => all.map((d) => (d.id === id ? { ...d, clientId } : d))), []);
-  const snooze = useCallback((id: string, until: string | null) => setSnoozed((all) => {
-    const next = { ...all };
-    if (until) next[id] = until; else delete next[id];
-    return next;
-  }), []);
-  const [brand, setBrandState] = useState<Record<string, BrandChoice>>({});
-  const setBrand = useCallback((clientId: string, b: BrandChoice) => setBrandState((all) => ({ ...all, [clientId]: b })), []);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const items = useMemo<SignoffItem[]>(
+    () => seedItems.map((i) => (decisions[i.id] ? { ...i, ...decisions[i.id] } : i)),
+    [decisions],
+  );
+  const tasks = useMemo(
+    () => [...seedTasks, ...newTasks].map((t) => (taskEdits[t.id] ? { ...t, ...taskEdits[t.id] } : t)),
+    [newTasks, taskEdits],
+  );
+
+  const addSpace = useCallback((space: Space) => setSpaces((all) => [...all, space]), [setSpaces]);
+  const updateSpace = useCallback(
+    (id: string, patch: Partial<Space>) => setSpaces((all) => all.map((s) => (s.id === id ? { ...s, ...patch } : s))),
+    [setSpaces],
+  );
+  const addProject = useCallback((p: Project) => setProjects((prev) => [p, ...prev]), [setProjects]);
+  const updateProject = useCallback(
+    (id: string, patch: Partial<Project>) => setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p))),
+    [setProjects],
+  );
+  const addDoc = useCallback((d: FiledDoc) => setDocs((all) => [d, ...all]), [setDocs]);
+  const moveDoc = useCallback(
+    (id: string, clientId: string) => setDocs((all) => all.map((d) => (d.id === id ? { ...d, clientId } : d))),
+    [setDocs],
+  );
+  const snooze = useCallback(
+    (id: string, until: string | null) =>
+      setSnoozed((all) => {
+        const next = { ...all };
+        if (until) next[id] = until;
+        else delete next[id];
+        return next;
+      }),
+    [setSnoozed],
+  );
+  const saveNote = useCallback(
+    (n: Note) => setNotes((all) => (all.some((x) => x.id === n.id) ? all.map((x) => (x.id === n.id ? n : x)) : [n, ...all])),
+    [setNotes],
+  );
+  const removeNote = useCallback((id: string) => setNotes((all) => all.filter((x) => x.id !== id)), [setNotes]);
+  const saveAgenda = useCallback(
+    (a: Agenda) =>
+      setAgendas((all) =>
+        all.some((x) => x.clientId === a.clientId) ? all.map((x) => (x.clientId === a.clientId ? a : x)) : [...all, a],
+      ),
+    [setAgendas],
+  );
+  const addTask = useCallback((t: Task) => setNewTasks((all) => [...all, t]), [setNewTasks]);
+  const editTask = useCallback(
+    (id: string, patch: Partial<Task>) => setTaskEdits((all) => ({ ...all, [id]: { ...all[id], ...patch } })),
+    [setTaskEdits],
+  );
+  const saveStyles = useCallback((s: Style[]) => setStyles(s), [setStyles]);
+  const dismissTip = useCallback(
+    (id: string) => setDismissed((all) => ({ ...all, [id]: new Date().toISOString() })),
+    [setDismissed],
+  );
+  const setBrand = useCallback(
+    (clientId: string, b: BrandChoice) => setBrandState((all) => ({ ...all, [clientId]: b })),
+    [setBrandState],
+  );
 
   useEffect(() => {
     try {
@@ -202,32 +228,39 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, []);
 
-  const decide = useCallback((id: string, state: SignoffState, outcome?: string) => {
-    setItems((prev) => {
-      const item = prev.find((i) => i.id === id);
-      if (item) {
-        if (timer.current) clearTimeout(timer.current);
-        setPending({ id, label: `${LABELS[state]}: ${item.title}`, previous: item.state, expires: Date.now() + UNDO_SECONDS * 1000 });
-        timer.current = setTimeout(() => setPending(null), UNDO_SECONDS * 1000);
-      }
-      return prev.map((i) => (i.id === id ? { ...i, state, outcome: outcome ?? i.outcome } : i));
-    });
-  }, []);
+  // --- Sign-off decisions, with a short window to take one back ------------
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const decisionsRef = useRef(decisions);
+  decisionsRef.current = decisions;
+  const pendingRef = useRef(pending);
+  pendingRef.current = pending;
+
+  useEffect(() => () => { if (undoTimer.current) clearTimeout(undoTimer.current); }, []);
+
+  const decide = useCallback(
+    (id: string, state: SignoffState, outcome?: string) => {
+      const seed = seedItems.find((i) => i.id === id);
+      if (!seed) return;
+      const previous = decisionsRef.current[id]?.state ?? seed.state;
+      if (undoTimer.current) clearTimeout(undoTimer.current);
+      setPending({ id, label: `${LABELS[state]}: ${seed.title}`, previous, expires: Date.now() + UNDO_SECONDS * 1000 });
+      undoTimer.current = setTimeout(() => setPending(null), UNDO_SECONDS * 1000);
+      setDecisions((prev) => ({ ...prev, [id]: { state, outcome: outcome ?? prev[id]?.outcome ?? seed.outcome } }));
+    },
+    [setDecisions],
+  );
 
   const undo = useCallback(() => {
-    setPending((p) => {
-      if (p) setItems((prev) => prev.map((i) => (i.id === p.id ? { ...i, state: p.previous } : i)));
-      return null;
-    });
-    if (timer.current) clearTimeout(timer.current);
-  }, []);
-
-  const addProject = useCallback((p: Project) => setProjects((prev) => { const next = [p, ...prev]; try { localStorage.setItem("baton-projects-v1", JSON.stringify(next)); } catch {} return next; }), []);
-  const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => { const next = prev.map((p) => (p.id === id ? { ...p, ...patch } : p)); try { localStorage.setItem("baton-projects-v1", JSON.stringify(next)); } catch {} return next; }), []);
+    const p = pendingRef.current;
+    if (!p) return;
+    setDecisions((prev) => ({ ...prev, [p.id]: { ...prev[p.id], state: p.previous } }));
+    setPending(null);
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+  }, [setDecisions]);
 
   const value = useMemo(
     () => ({ spaces, addSpace, updateSpace, brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, openAgenda, tasks, editTask, styles, saveStyles, dismissed, dismissTip }),
-    [spaces, addSpace, updateSpace, brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, tasks, editTask, styles, saveStyles, dismissed, dismissTip],
+    [spaces, addSpace, updateSpace, brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, openAgenda, tasks, editTask, styles, saveStyles, dismissed, dismissTip],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

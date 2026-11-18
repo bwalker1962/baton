@@ -10,7 +10,7 @@ import { WorkTimer } from "./WorkTimer";
 import { OneOnOne } from "./OneOnOne";
 import { ClientTile } from "./ui";
 import { useEffect, useState } from "react";
-import { useSpaces } from "@/app/spaces/page";
+import { useSpaces } from "@/lib/spaces";
 
 function ModeSwitch() {
   const { mode, setMode } = useStore();

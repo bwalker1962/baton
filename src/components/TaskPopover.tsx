@@ -9,6 +9,7 @@ import type { BlockerKind, DayKindLike, Health } from "./taskTypes";
 import { SnoozeButton, wakeLabel } from "./Snooze";
 import { useAddToAgenda } from "./OneOnOne";
 import { Icon } from "./Icon";
+import { startTaskTimer } from "./WorkTimer";
 
 export type Anchor = { top: number; left: number; bottom: number; right: number };
 export const anchorOf = (el: Element): Anchor => { const r = el.getBoundingClientRect(); return { top: r.top, left: r.left, bottom: r.bottom, right: r.right }; };
@@ -108,6 +109,7 @@ export function TaskPopover({ taskId, anchor, onClose }: { taskId: string; ancho
         {t.promised && !t.due && <span className="xs" style={{ color: "var(--warn-fg)", fontWeight: 600 }}>A promise needs a due date to be tracked.</span>}
       </div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+        <button className="btn" onClick={() => startTaskTimer({ taskId:t.id, task:t.title, spaceId:t.clientId })}>Start timer</button>
         <SnoozeButton label={t.title} onSnooze={(until) => snooze(t.id, until)} />
         {snoozed[t.id] > TODAY && <button className="btn" style={{ minHeight: 32 }} onClick={() => snooze(t.id, null)}>Wake (back {wakeLabel(snoozed[t.id])})</button>}
         <button className="btn" style={{ minHeight: 32 }} disabled={onAgenda} onClick={() => { addToAgenda(t.clientId, { title: t.title, kind: "task", refId: t.id, href: `/clients/${t.clientId}/tasks` }); setOnAgenda(true); }}>
@@ -154,6 +156,7 @@ export function DayItemPopover({ item, anchor, onClose, onChange, onSnooze, onRe
         </Field>
       </div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+        <button className="btn" onClick={() => startTaskTimer({ taskId:item.id, task:item.title, spaceId:item.clientId ?? "personal" })}>Start timer</button>
         <SnoozeButton label={item.title} onSnooze={(u) => { onSnooze(u); onClose(); }} />
         {item.clientId && (
           <button className="btn" style={{ minHeight: 32 }} disabled={onAgenda} onClick={() => { addToAgenda(item.clientId!, { title: item.title, kind: "task", href: item.href }); setOnAgenda(true); }}>

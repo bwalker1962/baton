@@ -668,3 +668,29 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .layout.baton-sidebar-stowed .main{width:100%;max-width:none;min-width:0}
 .baton-timer-session>label{display:grid;gap:5px;font-size:12px;font-weight:600}
 @media(max-width:650px){.baton-sidebar-toggle{display:none}}
+
+/* Shopify-style compact navigation rail: retain every destination. */
+.baton-nav-toggle{align-self:flex-end;margin:3px 6px 12px;min-height:34px}
+.baton-nav-space-icon{width:24px;height:24px;flex:none;border-radius:7px;display:grid;place-items:center;color:white;font-size:11px;font-weight:750}
+.baton-nav-footer{margin-top:auto;padding:24px 12px 0}
+.baton-spaces-heading>svg{display:none}
+.layout.baton-sidebar-stowed .sidenav{display:flex;width:58px;min-width:58px;padding:10px 5px;align-items:stretch;overflow-x:hidden}
+.layout.baton-sidebar-stowed .sidenav>a,
+.layout.baton-sidebar-stowed .sidenav .baton-nav-more>summary{width:42px;height:42px;min-height:42px;padding:0;display:flex;align-items:center;justify-content:center;gap:0;margin:1px auto;position:relative}
+.layout.baton-sidebar-stowed .sidenav>a>svg,
+.layout.baton-sidebar-stowed .baton-nav-more>summary>svg{flex:none}
+.layout.baton-sidebar-stowed .baton-nav-text,
+.layout.baton-sidebar-stowed .baton-nav-add,
+.layout.baton-sidebar-stowed .baton-nav-footer{display:none}
+.layout.baton-sidebar-stowed .baton-nav-toggle{align-self:center;margin:3px auto 12px}
+.layout.baton-sidebar-stowed .baton-nav-more{width:100%}
+.layout.baton-sidebar-stowed .baton-nav-more>div{padding:0;display:grid;gap:2px}
+.layout.baton-sidebar-stowed .baton-nav-more>div>a{font-size:0;min-height:40px;width:42px;margin:auto;padding:0;display:flex;justify-content:center}
+.layout.baton-sidebar-stowed .baton-nav-more>div>a svg{width:18px;height:18px}
+.layout.baton-sidebar-stowed .navlabel{margin:12px auto 4px;padding:0;width:42px;border-top:1px solid var(--nav-border)}
+.layout.baton-sidebar-stowed .baton-spaces-heading{height:40px!important;min-height:40px!important;display:flex!important;justify-content:center!important;align-items:center!important}
+.layout.baton-sidebar-stowed .baton-spaces-heading>svg{display:block}
+.layout.baton-sidebar-stowed .navcount{position:absolute;top:0;right:0;min-width:15px;height:15px;padding:0 3px;font-size:10px;line-height:15px}
+.layout.baton-sidebar-stowed .main{flex:1;min-width:0;width:auto;max-width:none}
+.layout.baton-sidebar-stowed .baton-nav-space-icon{width:25px;height:25px}
+@media(max-width:650px){.layout.baton-sidebar-stowed .sidenav{display:none}.baton-nav-toggle{display:none}}

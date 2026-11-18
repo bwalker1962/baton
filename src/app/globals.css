@@ -625,3 +625,22 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .baton-space-actions {display:flex;gap:8px;justify-content:flex-end}
 .baton-space-quickadd {padding:12px;display:flex;gap:8px;align-items:center}
 @media(max-width:650px){.baton-space-quickadd{flex-wrap:wrap}.baton-space-quickadd .input{min-width:100%}}
+
+/* Global optional work timer */
+.topbar .search{flex:1;max-width:none;min-width:160px}
+.baton-timer-wrap{position:relative;flex:none}
+.baton-timer-trigger{display:flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid var(--chrome-line);border-radius:9px;background:var(--chrome-raised);color:var(--chrome-text);font-size:12px;font-weight:650;cursor:pointer;font-variant-numeric:tabular-nums}
+.baton-timer-trigger.is-running{border-color:#39ad83;color:#b7f5d8}
+.baton-timer-trigger.is-running>span:first-child{color:#44d596;animation:baton-timer-beat 2s ease-in-out infinite}
+@keyframes baton-timer-beat{50%{opacity:.4}}
+@media(prefers-reduced-motion:reduce){.baton-timer-trigger.is-running>span:first-child{animation:none}}
+.baton-timer-panel{position:absolute;right:0;top:calc(100% + 10px);z-index:100;width:min(360px,calc(100vw - 24px));padding:16px;display:grid;gap:12px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--text);box-shadow:0 12px 36px rgba(0,0,0,.2)}
+.baton-timer-panel label{display:grid;gap:5px;font-size:12px;font-weight:600}
+.baton-timer-title{display:flex;justify-content:space-between;align-items:center}
+.baton-timer-title button{border:0;background:transparent;color:inherit;font-size:22px;cursor:pointer}
+.baton-timer-clock{font-size:32px;font-weight:750;font-variant-numeric:tabular-nums}
+.baton-timer-log{display:grid;gap:8px;border-top:1px solid var(--divider);padding-top:12px}
+.baton-timer-log>div{display:flex;justify-content:space-between;gap:8px;font-size:12px}
+.baton-timer-log small{display:block;color:var(--muted)}
+.baton-timer-panel p{margin:0}
+@media(max-width:650px){.baton-timer-trigger{padding:7px}.baton-timer-trigger:not(.is-running) span:last-child{display:none}.topbar .search{min-width:100px}}

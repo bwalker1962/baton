@@ -2,7 +2,20 @@
 // © 2026 RidgeFront. All rights reserved.
 import type { Client, Department, Firm, SignoffItem, Skill, Task, Topic } from "./types";
 
-export const TODAY = "2026-10-28";
+/** The date the sample data was written around. */
+export const SAMPLE_TODAY = "2026-10-28";
+
+/** Today's date (YYYY-MM-DD, local time). A live binding: it starts at the sample date so the
+ *  server render and the first browser render match, then StoreProvider sets it to the real
+ *  local date before any other effect runs. */
+export let TODAY = SAMPLE_TODAY;
+
+/** The real local date, as YYYY-MM-DD. */
+export const localToday = () => new Date().toLocaleDateString("en-CA");
+
+export function setToday(iso: string) {
+  TODAY = iso;
+}
 
 export const firm: Firm = { id: "ridgefront", name: "RidgeFront" };
 

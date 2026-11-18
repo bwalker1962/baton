@@ -285,10 +285,26 @@ export default function Review({ params }: { params: Promise<{ id: string }> }) 
                 {PATHS.find((p) => p.id === path)?.holds && !item.sendAt.startsWith("Blocked") && (
                   <div className="note" style={{ background: "var(--warn-bg)", color: "var(--warn-fg)" }}><Icon name="alert" size={16} />Send is set for {item.sendAt}. It will hold until you confirm the changes.</div>
                 )}
-                <button className="btn btn-primary btn-lg" onClick={() => {
+                {(() => {
+                  // Holding the send is always allowed; approving with changes is still an approval,
+                  // so it needs the same gate as Approve: every box ticked and no blocking slip.
                   const holds = PATHS.find((p) => p.id === path)?.holds;
-                  finish(holds ? "held" : "approved-changes", note || PATHS.find((p) => p.id === path)?.title);
-                }}>{PATHS.find((p) => p.id === path)?.holds ? "Hold send and request" : "Approve with these changes"}</button>
+                  const locked = !holds && !ready;
+                  return (
+                    <>
+                      {locked && (
+                        <div className="note" style={{ background: "var(--warn-bg)", color: "var(--warn-fg)" }}>
+                          <Icon name="alert" size={16} />
+                          {blocked ? "A slip check blocks the send. Talk it through, or use Changes and resubmit." : "Tick the sign-off checklist first. Approving with changes is still an approval."}
+                        </div>
+                      )}
+                      <button className="btn btn-primary btn-lg" disabled={locked} style={locked ? { opacity: 0.45, cursor: "not-allowed" } : undefined} onClick={() => {
+                        if (locked) return;
+                        finish(holds ? "held" : "approved-changes", note || PATHS.find((p) => p.id === path)?.title);
+                      }}>{holds ? "Hold send and request" : "Approve with these changes"}</button>
+                    </>
+                  );
+                })()}
               </>
             ) : (
               <>

@@ -2,8 +2,8 @@
 // Prototype state: appearance, sign-off decisions with undo, projects from templates.
 // In-memory only; a real build moves this to the database.
 // © 2026 RidgeFront. All rights reserved.
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { signoffItems as seedItems, tasks as seedTasks } from "./data";
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { localToday, setToday, signoffItems as seedItems, tasks as seedTasks, TODAY } from "./data";
 import type { SignoffItem, SignoffState } from "./types";
 import { migrate, noteSeed, type Note } from "./notes";
 import { agendaSeed, type Agenda } from "./agenda";
@@ -63,6 +63,8 @@ export interface BrandChoice {
 }
 
 interface Store {
+  /** Today's date (YYYY-MM-DD, local). Re-renders consumers when the real date is applied or the day rolls over. */
+  today: string;
   brand: Record<string, BrandChoice>;
   setBrand: (clientId: string, b: BrandChoice) => void;
   mode: Mode;
@@ -117,6 +119,15 @@ const LABELS: Record<SignoffState, string> = {
 };
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
+  // Use the real date. Applied in a layout effect so it lands before any child's effects
+  // read TODAY, and rechecked every minute so an open tab rolls over at midnight.
+  const [today, setTodayState] = useState(TODAY);
+  useLayoutEffect(() => {
+    const apply = () => { const d = localToday(); setToday(d); setTodayState(d); };
+    apply();
+    const t = setInterval(apply, 60_000);
+    return () => clearInterval(t);
+  }, []);
   const [mode, setModeState] = useState<Mode>("light");
   const [items, setItems] = useState<SignoffItem[]>(seedItems);
   const [pending, setPending] = useState<Pending | null>(null);
@@ -226,8 +237,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => { const next = prev.map((p) => (p.id === id ? { ...p, ...patch } : p)); try { localStorage.setItem("baton-projects-v1", JSON.stringify(next)); } catch {} return next; }), []);
 
   const value = useMemo(
-    () => ({ spaces, addSpace, updateSpace, brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, openAgenda, tasks, editTask, styles, saveStyles, dismissed, dismissTip }),
-    [spaces, addSpace, updateSpace, brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, tasks, editTask, styles, saveStyles, dismissed, dismissTip],
+    () => ({ today, spaces, addSpace, updateSpace, brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, openAgenda, tasks, editTask, styles, saveStyles, dismissed, dismissTip }),
+    [today, spaces, addSpace, updateSpace, brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, tasks, editTask, styles, saveStyles, dismissed, dismissTip],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

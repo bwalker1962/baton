@@ -223,8 +223,9 @@ function ClientNotesBody({ clientId }: { clientId?: string }) {
 function EarBody({ clientId, size }: { clientId?: string; size: Size }) {
   const addToAgenda = useAddToAgenda();
   const [added, setAdded] = useState<string[]>([]);
-  const horizon = addDays(TODAY, 75);
-  const list = EAR.filter((e) => (e.until ?? e.date) >= TODAY && e.date <= horizon && (!clientId || e.angles[clientId]))
+  const { today } = useStore();
+  const horizon = addDays(today, 75);
+  const list = EAR.filter((e) => (e.until ?? e.date) >= today && e.date <= horizon && (!clientId || e.angles[clientId]))
     .sort((a, b) => a.date.localeCompare(b.date));
   if (!list.length) return <Empty>Nothing on the horizon for this client.</Empty>;
   return (
@@ -235,7 +236,7 @@ function EarBody({ clientId, size }: { clientId?: string; size: Size }) {
           <div key={e.id} className="row" style={{ alignItems: "flex-start", gap: 10 }}>
             <span style={{ width: 40, flex: "none", textAlign: "center", border: "1px solid var(--border)", borderRadius: 8, padding: "2px 0" }}>
               <span style={{ display: "block", fontSize: 10, fontWeight: 700 }}>{shortDate(e.date).mon}</span>
-              <span style={{ display: "block", fontSize: 15, fontWeight: 700 }}>{e.date < TODAY ? "Now" : shortDate(e.date).day}</span>
+              <span style={{ display: "block", fontSize: 15, fontWeight: 700 }}>{e.date < today ? "Now" : shortDate(e.date).day}</span>
             </span>
             <span className="grow small" style={{ display: "flex", flexDirection: "column", gap: 3 }}>
               <span style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>

@@ -154,10 +154,11 @@ export function PostIt({ note, showClient, editable, clamp }: { note: Note; show
 
 /** Write a note. Client is fixed inside a client's space, chosen on Home. */
 export function Composer({ clientId, onDone }: { clientId?: string; onDone?: () => void }) {
-  const { saveNote } = useStore();
+  const { saveNote, today } = useStore();
   const [cid, setCid] = useState(clientId ?? "");
   const [who, setWho] = useState("CEO");
-  const [date, setDate] = useState(TODAY);
+  const [date, setDate] = useState(today);
+  useEffect(() => setDate(today), [today]);
   const [text, setText] = useState("");
   const look = useClientLook(clientOf(cid || clients[0].id));
   const save = () => {

@@ -606,3 +606,22 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .baton-home-dashboard > div {padding:12px;border-top:1px solid var(--divider)}
 @media(max-width:850px){.baton-top-date{display:none}.main{padding:16px 14px 88px}.sidenav{width:192px}}
 @media(max-width:650px){.main{padding:12px 10px 90px}.baton-home-actions{gap:6px}.baton-cockpit-bar{gap:4px}.baton-cockpit-metrics .baton-status-item{padding:5px 6px}.baton-task-row .title-btn{font-size:13px}}
+
+/* Unified spaces and inline project editing */
+.baton-spaces-heading {display:flex!important;justify-content:space-between;align-items:center;min-height:24px!important;padding:0!important;color:var(--nav-muted)!important;font-size:11px;letter-spacing:.05em}
+.baton-spaces-heading span {font-size:18px;line-height:1}
+.baton-nav-space-dot {width:10px;height:10px;border-radius:4px;flex:none}
+.baton-space-page {display:flex;flex-direction:column;gap:14px;max-width:1000px}
+.baton-space-page .pagehead p {margin:4px 0 0}
+.baton-space-list {display:grid;gap:7px}
+.baton-space-line {display:flex;align-items:center;gap:12px;padding:10px 12px;min-height:62px}
+.baton-space-line > a {display:flex;flex-direction:column;gap:2px;color:var(--text);min-width:0}
+.baton-space-line > a:hover {text-decoration:none}
+.baton-space-mark {width:34px;height:34px;display:grid;place-items:center;border-radius:9px;color:white;font-weight:700;flex:none}
+.baton-space-editor {padding:18px;display:grid;gap:12px;max-width:640px}
+.baton-space-editor h2 {font-size:17px;margin:0}
+.baton-space-editor label {display:grid;gap:5px;font-weight:600;font-size:12px}
+.baton-space-editor input[type=color] {height:34px;width:60px;cursor:pointer}
+.baton-space-actions {display:flex;gap:8px;justify-content:flex-end}
+.baton-space-quickadd {padding:12px;display:flex;gap:8px;align-items:center}
+@media(max-width:650px){.baton-space-quickadd{flex-wrap:wrap}.baton-space-quickadd .input{min-width:100%}}

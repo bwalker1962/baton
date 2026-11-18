@@ -11,6 +11,7 @@ import { styleSeed, type Style } from "./coach";
 import type { Task } from "./types";
 
 export type Mode = "light" | "half" | "dark";
+export interface Space { id: string; name: string; kind: "personal" | "business" | "client"; color: string; website?: string; archived?: boolean; }
 
 export interface ProjectStep {
   id: string;
@@ -70,6 +71,9 @@ interface Store {
   decide: (id: string, state: SignoffState, outcome?: string) => void;
   pending: Pending | null;
   undo: () => void;
+  spaces: Space[];
+  addSpace: (space: Space) => void;
+  updateSpace: (id: string, patch: Partial<Space>) => void;
   projects: Project[];
   addProject: (p: Project) => void;
   updateProject: (id: string, patch: Partial<Project>) => void;
@@ -116,6 +120,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [mode, setModeState] = useState<Mode>("light");
   const [items, setItems] = useState<SignoffItem[]>(seedItems);
   const [pending, setPending] = useState<Pending | null>(null);
+  const [spaces, setSpaces] = useState<Space[]>([]);
+  useEffect(() => { try { const raw = localStorage.getItem("baton-spaces-v1"); if (raw) setSpaces(JSON.parse(raw)); } catch {} }, []);
+  const addSpace = useCallback((space: Space) => setSpaces(all => { const next = [...all, space]; try { localStorage.setItem("baton-spaces-v1", JSON.stringify(next)); } catch {} return next; }), []);
+  const updateSpace = useCallback((id: string, patch: Partial<Space>) => setSpaces(all => { const next = all.map(s => s.id === id ? { ...s, ...patch } : s); try { localStorage.setItem("baton-spaces-v1", JSON.stringify(next)); } catch {} return next; }), []);
   const [projects, setProjects] = useState<Project[]>([]);
   useEffect(() => { try { const saved = localStorage.getItem("baton-projects-v1"); if (saved) setProjects(JSON.parse(saved)); } catch {} }, []);
   const [docs, setDocs] = useState<FiledDoc[]>([]);
@@ -218,8 +226,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const updateProject = useCallback((id: string, patch: Partial<Project>) => setProjects((prev) => { const next = prev.map((p) => (p.id === id ? { ...p, ...patch } : p)); try { localStorage.setItem("baton-projects-v1", JSON.stringify(next)); } catch {} return next; }), []);
 
   const value = useMemo(
-    () => ({ brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, openAgenda, tasks, editTask, styles, saveStyles, dismissed, dismissTip }),
-    [brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, tasks, editTask, styles, saveStyles, dismissed, dismissTip],
+    () => ({ spaces, addSpace, updateSpace, brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, openAgenda, tasks, editTask, styles, saveStyles, dismissed, dismissTip }),
+    [spaces, addSpace, updateSpace, brand, setBrand, mode, setMode, items, decide, pending, undo, projects, addProject, updateProject, docs, addDoc, moveDoc, snoozed, snooze, notes, saveNote, removeNote, agendas, saveAgenda, newTasks, addTask, agendaOpenFor, tasks, editTask, styles, saveStyles, dismissed, dismissTip],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

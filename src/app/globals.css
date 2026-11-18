@@ -664,8 +664,6 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 
 /* Stowable navigation: preserve the full cockpit width. */
 .baton-sidebar-toggle{display:grid;place-items:center;width:34px;height:34px;flex:none;border:1px solid var(--chrome-line);background:var(--chrome-raised);color:var(--chrome-text);border-radius:8px;cursor:pointer}
-.layout.baton-sidebar-stowed .sidenav{display:none}
-.layout.baton-sidebar-stowed .main{width:100%;max-width:none;min-width:0}
 .baton-timer-session>label{display:grid;gap:5px;font-size:12px;font-weight:600}
 @media(max-width:650px){.baton-sidebar-toggle{display:none}}
 
@@ -693,4 +691,10 @@ textarea.input, input.input, select.input { width: 100%; font: inherit; font-siz
 .layout.baton-sidebar-stowed .navcount{position:absolute;top:0;right:0;min-width:15px;height:15px;padding:0 3px;font-size:10px;line-height:15px}
 .layout.baton-sidebar-stowed .main{flex:1;min-width:0;width:auto;max-width:none}
 .layout.baton-sidebar-stowed .baton-nav-space-icon{width:25px;height:25px}
-@media(max-width:650px){.layout.baton-sidebar-stowed .sidenav{display:none}.baton-nav-toggle{display:none}}
+@media(max-width:650px){.layout .sidenav{display:none}.baton-nav-toggle{display:none}}
+
+/* Ensure collapsed desktop navigation remains a visible rail, not a hidden drawer. */
+@media(min-width:651px){
+  .layout.baton-sidebar-stowed > .sidenav{display:flex!important;flex-direction:column!important;visibility:visible!important;flex:0 0 58px!important;width:58px!important;min-width:58px!important;max-width:58px!important}
+  .layout.baton-sidebar-stowed > .main{flex:1 1 0!important;min-width:0!important;width:calc(100% - 58px)!important}
+}

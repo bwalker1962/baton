@@ -10,11 +10,17 @@ import { buildSteps } from "@/components/ProjectStarter";
 import { CERTAINTY, dateLabel, type Certainty } from "@/lib/intake";
 import { PEERS, ranked, topicForTemplate } from "@/lib/advisor";
 import { AdviceRow } from "@/components/Advice";
-import { getClient } from "@/lib/data";
+import { getClient, clients } from "@/lib/data";
+import { useSpaces } from "@/app/spaces/page";
 
 export default function ProjectPage({ params }: { params: Promise<{ id: string; pid: string }> }) {
   const { id, pid } = use(params);
   const { projects, updateProject } = useStore();
+  const spaces = useSpaces();
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editSpace, setEditSpace] = useState("");
+  const [editNotes, setEditNotes] = useState("");
   const project = projects.find((p) => p.id === pid);
   const [steps, setSteps] = useState<ProjectStep[]>(project?.steps ?? []);
   const [skipping, setSkipping] = useState<string | null>(null);
@@ -26,7 +32,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
     return (
       <section className="card empty">
         <h3>Project not found</h3>
-        <p>This prototype keeps projects in memory, so they reset when the page reloads.</p>
+        <p>Check your Spaces directory. Projects saved in another browser will not appear here.</p>
         <Link className="btn" href={`/clients/${id}/projects`}>Back to projects</Link>
       </section>
     );
@@ -42,12 +48,19 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string; 
     <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 900 }}>
       <div className="pagehead">
         <div>
-          <div className="eyebrow">{tpl?.name ?? "Project"}</div>
+          <Link className="eyebrow" href={`/spaces/${project.clientId}`}>{spaces.find(s=>s.id===project.clientId)?.name ?? "Space"}</Link>
           <h2 style={{ margin: "4px 0 0", fontSize: 22 }}>{project.name}</h2>
         </div>
-        <span className="badge b-neutral">{done} of {steps.length} steps handled</span>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}><span className="badge b-neutral">{done} of {steps.length} steps handled</span><button className="btn" onClick={()=>{setEditName(project.name);setEditSpace(project.clientId);setEditNotes(project.info.notes??"");setEditing(v=>!v);}}>Edit project</button></div>
       </div>
 
+      {editing && <form className="card baton-space-editor" onSubmit={e=>{e.preventDefault();if(!editName.trim())return;updateProject(project.id,{name:editName.trim(),clientId:editSpace,info:{...project.info,notes:editNotes}});setEditing(false);}}>
+        <h2>Project settings</h2>
+        <label>Project name<input className="input" required value={editName} onChange={e=>setEditName(e.target.value)}/></label>
+        <label>Space<select className="input" value={editSpace} onChange={e=>setEditSpace(e.target.value)}>{spaces.filter(s=>!s.archived).map(sp=><option key={sp.id} value={sp.id}>{sp.name}</option>)}</select></label>
+        <label>Notes<textarea className="input" rows={4} value={editNotes} onChange={e=>setEditNotes(e.target.value)} placeholder="Context, links, decisions…"/></label>
+        <div className="baton-space-actions"><button type="button" className="btn" onClick={()=>setEditing(false)}>Cancel</button><button className="btn btn-primary">Save changes</button></div>
+      </form>}
       {project.certainty && (
         <section className="card" aria-label="How real is it" style={{ padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>

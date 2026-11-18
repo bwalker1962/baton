@@ -6,6 +6,7 @@ import { useStore, UNDO_SECONDS, type Mode } from "@/lib/store";
 import { Icon } from "./Icon";
 import { DropDocs } from "./DropDocs";
 import { CommandPalette } from "./CommandPalette";
+import { WorkTimer } from "./WorkTimer";
 import { OneOnOne } from "./OneOnOne";
 import { ClientTile } from "./ui";
 import { useEffect, useState } from "react";
@@ -88,6 +89,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <span>Search or jump to a client, task, chat…</span>
           <kbd>{mac ? "⌘K" : "Ctrl K"}</kbd>
         </button>
+        <WorkTimer />
         <span className="baton-top-date" aria-label="Current date">{dateLabel}</span>
         {active && (
           <span className="switcher hide-mobile">
